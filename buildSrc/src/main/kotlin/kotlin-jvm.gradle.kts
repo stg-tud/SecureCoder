@@ -7,3 +7,6 @@ plugins {
 kotlin {
     jvmToolchain(21)
 }
+repositories {
+    mavenCentral()
+}
