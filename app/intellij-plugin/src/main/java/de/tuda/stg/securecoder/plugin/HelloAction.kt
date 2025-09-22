@@ -1,4 +1,4 @@
-package de.tuda.securecoder.plugin
+package de.tuda.stg.securecoder.plugin
 
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent

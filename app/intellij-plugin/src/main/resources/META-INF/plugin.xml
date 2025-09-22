@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>de.tuda.securecoder</id>
     <name>SecureCoder</name>
-    <vendor email="dev@yourorg.com" url="https://yourorg.com">Your Org</vendor>
+    <vendor email="sekretariat@st.informatik.tu-darmstadt.de" url="https://www.stg.tu-darmstadt.de/">Software Technology Group at TU Darmstadt</vendor>
     <version>0.0.1</version>
     <description><![CDATA[
         SecureCoder brings security to your IDE by AI suggestions, and running quick critics before code lands.
@@ -9,8 +9,8 @@
     <depends>com.intellij.modules.platform</depends>
     <!--<depends optional="true">com.intellij.modules.java</depends>-->
     <actions>
-        <action id="de.tuda.securecoder.plugin.HelloAction"
-                class="de.tuda.securecoder.plugin.HelloAction"
+        <action id="de.tuda.stg.securecoder.plugin.HelloAction"
+                class="de.tuda.stg.securecoder.plugin.HelloAction"
                 text="SecureCoder: Say Hello"
                 description="Shows a hello message">
             <add-to-group group-id="ToolsMenu" anchor="last"/>
