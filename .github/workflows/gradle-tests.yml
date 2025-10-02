@@ -2,6 +2,8 @@ name: Gradle Tests
 on:
   push:
   pull_request:
+permissions:
+  contents: write # dependency submission
 jobs:
   test:
     runs-on: ubuntu-latest
