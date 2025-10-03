@@ -36,7 +36,7 @@ class DummyAgentStreamer {
             )
 
             repeat(8) { idx ->
-                val title = randomPick(titles) + " (${idx + 1}/5)"
+                val title = randomPick(titles) + " (${idx + 1}/8)"
                 val desc = randomPick(descriptions)
                 val icon = randomPick(icons)
                 onEvent(title, desc, icon)

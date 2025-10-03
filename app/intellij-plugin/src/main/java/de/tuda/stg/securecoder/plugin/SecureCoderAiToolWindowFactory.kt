@@ -78,7 +78,7 @@ class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
         horizontalScrollBarPolicy = ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER
     }
 
-    private fun createSubmitButton(height: Int): JButton = JButton("Submit").apply {
+    private fun createSubmitButton(height: Int): JButton = JButton(SecureCoderBundle.message("toolwindow.submit")).apply {
         maximumSize = Dimension(preferredSize.width, height)
     }
 
@@ -86,10 +86,14 @@ class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
         submit.addActionListener {
             val text = inputArea.text.trim()
             if (text.isEmpty()) {
-                Messages.showWarningDialog(project, "Please enter a prompt before submitting.", "SecureCoder AI")
+                Messages.showWarningDialog(
+                    project,
+                    SecureCoderBundle.message("warning.emptyPrompt"),
+                    SecureCoderBundle.message("product.name")
+                )
             } else {
                 submit.isEnabled = false
-                submit.text = "Streaming..."
+                submit.text = SecureCoderBundle.message("toolwindow.streaming")
 
                 eventsPanel.removeAll()
                 eventsPanel.revalidate()
@@ -102,7 +106,7 @@ class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
                     onComplete = {
                         SwingUtilities.invokeLater {
                             submit.isEnabled = true
-                            submit.text = "Submit"
+                            submit.text = SecureCoderBundle.message("toolwindow.submit")
                         }
                     }
                 )
