@@ -11,3 +11,6 @@ plugins {
 
 rootProject.name = "securecoder"
 include("app:intellij-plugin")
+include("enricher:api")
+include("enricher:client")
+include("app:placeholder-enricher")
