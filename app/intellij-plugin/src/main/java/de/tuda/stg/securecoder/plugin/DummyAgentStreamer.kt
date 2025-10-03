@@ -35,8 +35,8 @@ class DummyAgentStreamer {
                 AllIcons.General.Error
             )
 
-            repeat(8) { idx ->
-                val title = randomPick(titles) + " (${idx + 1}/8)"
+            repeat(16) { idx ->
+                val title = randomPick(titles) + " (${idx + 1}/16)"
                 val desc = randomPick(descriptions)
                 val icon = randomPick(icons)
                 onEvent(title, desc, icon)

@@ -74,6 +74,7 @@ class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
         wrapStyleWord = true
         rows = 5
         columns = 30
+        border = Borders.empty(8)
     }
 
     private fun wrapTextInScrollPane(inputArea: JBTextArea): JBScrollPane = JBScrollPane(inputArea).apply {
