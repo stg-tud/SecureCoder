@@ -10,7 +10,10 @@ import com.intellij.ui.components.JBTextArea
 import com.intellij.ui.content.ContentFactory
 import com.intellij.util.ui.JBFont
 import com.intellij.util.ui.JBUI
+import com.intellij.util.ui.JBUI.Borders
+import com.intellij.util.ui.JBUI.CurrentTheme.CustomFrameDecorations.separatorForeground
 import java.awt.BorderLayout
+import java.awt.Component
 import java.awt.Dimension
 import javax.swing.Box
 import javax.swing.BoxLayout
@@ -44,12 +47,12 @@ class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
 
         eventsPanel = JPanel().apply {
             layout = BoxLayout(this, BoxLayout.Y_AXIS)
-            border = JBUI.Borders.empty(8)
+            border = Borders.empty(8)
         }
         eventsScrollPane = JBScrollPane(eventsPanel).apply {
             verticalScrollBarPolicy = ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED
             horizontalScrollBarPolicy = ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER
-            border = JBUI.Borders.empty()
+            border = Borders.empty()
         }
         add(eventsScrollPane, BorderLayout.CENTER)
         setupSubmitAction(project, inputArea, submit)
@@ -58,7 +61,7 @@ class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
     private fun buildInputRow(scroll: JBScrollPane, submit: JButton): JPanel {
         val row = JPanel().apply {
             layout = BoxLayout(this, BoxLayout.X_AXIS)
-            border = JBUI.Borders.empty(8)
+            border = Borders.empty(8)
         }
         row.add(scroll)
         row.add(Box.createRigidArea(Dimension(JBUI.scale(8), 0)))
@@ -117,12 +120,13 @@ class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
     private fun addEventCard(title: String, description: String, icon: Icon) {
         val card = JPanel().apply {
             layout = BoxLayout(this, BoxLayout.Y_AXIS)
-            border = JBUI.Borders.empty(8)
+            border = Borders.empty(8)
         }
 
         val titlePanel = JPanel().apply {
             layout = BoxLayout(this, BoxLayout.X_AXIS)
-            border = JBUI.Borders.emptyBottom(4)
+            border = Borders.emptyBottom(4)
+            alignmentX = Component.LEFT_ALIGNMENT
         }
         val titleLabel = JLabel(title, icon, JLabel.LEADING).apply {
             font = JBFont.label().asBold()
@@ -133,13 +137,15 @@ class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
             isEditable = false
             lineWrap = true
             wrapStyleWord = true
-            border = JBUI.Borders.empty()
+            border = Borders.empty()
             background = card.background
+            alignmentX = Component.LEFT_ALIGNMENT
         }
 
         card.add(titlePanel)
         card.add(descArea)
-        card.border = JBUI.Borders.customLine(JBUI.CurrentTheme.CustomFrameDecorations.separatorForeground(), 1, 1, 1, 1)
+        card.border = Borders.customLine(separatorForeground(), 1)
+        card.maximumSize = Dimension(Int.MAX_VALUE, card.preferredSize.height)
 
         eventsPanel.add(card)
         eventsPanel.add(Box.createRigidArea(Dimension(0, JBUI.scale(8))))
