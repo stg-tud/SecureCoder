@@ -6,7 +6,11 @@ import javax.swing.Icon
 import java.util.concurrent.ThreadLocalRandom
 
 class DummyAgentStreamer {
-    fun startDummyStream(prompt: String, onEvent: (title: String, description: String, icon: Icon) -> Unit) {
+    fun startDummyStream(
+        prompt: String,
+        onEvent: (title: String, description: String, icon: Icon) -> Unit,
+        onComplete: () -> Unit
+    ) {
         ApplicationManager.getApplication().executeOnPooledThread {
             val titles = listOf(
                 "Analyzing your prompt",
@@ -42,6 +46,7 @@ class DummyAgentStreamer {
                     return@executeOnPooledThread
                 }
             }
+            onComplete()
         }
     }
 

@@ -27,14 +27,20 @@ class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
     private lateinit var eventsScrollPane: JBScrollPane
 
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
-        val root = JPanel(BorderLayout())
+        val root = createRoot(project)
+        val contentFactory = ContentFactory.getInstance()
+        val content = contentFactory.createContent(root, null, false)
+        toolWindow.contentManager.addContent(content)
+    }
+
+    private fun createRoot(project: Project): JPanel = JPanel(BorderLayout()).apply {
         val inputArea = createInputArea()
         val scroll = wrapTextInScrollPane(inputArea)
         val preferredHeight = scroll.preferredSize.height
         scroll.maximumSize = Dimension(Int.MAX_VALUE, preferredHeight)
         val submit = createSubmitButton(preferredHeight)
         val row = buildInputRow(scroll, submit)
-        root.add(row, BorderLayout.NORTH)
+        add(row, BorderLayout.NORTH)
 
         eventsPanel = JPanel().apply {
             layout = BoxLayout(this, BoxLayout.Y_AXIS)
@@ -45,10 +51,8 @@ class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
             horizontalScrollBarPolicy = ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER
             border = JBUI.Borders.empty()
         }
-        root.add(eventsScrollPane, BorderLayout.CENTER)
-
+        add(eventsScrollPane, BorderLayout.CENTER)
         setupSubmitAction(project, inputArea, submit)
-        addToToolWindow(toolWindow, root)
     }
 
     private fun buildInputRow(scroll: JBScrollPane, submit: JButton): JPanel {
@@ -84,20 +88,26 @@ class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
             if (text.isEmpty()) {
                 Messages.showWarningDialog(project, "Please enter a prompt before submitting.", "SecureCoder AI")
             } else {
+                submit.isEnabled = false
+                submit.text = "Streaming..."
+
                 eventsPanel.removeAll()
                 eventsPanel.revalidate()
                 eventsPanel.repaint()
-                DummyAgentStreamer().startDummyStream(text) { title, desc, icon ->
-                    SwingUtilities.invokeLater { addEventCard(title, desc, icon) }
-                }
+                DummyAgentStreamer().startDummyStream(
+                    text,
+                    onEvent = { title, desc, icon ->
+                        SwingUtilities.invokeLater { addEventCard(title, desc, icon) }
+                    },
+                    onComplete = {
+                        SwingUtilities.invokeLater {
+                            submit.isEnabled = true
+                            submit.text = "Submit"
+                        }
+                    }
+                )
             }
         }
-    }
-
-    private fun addToToolWindow(toolWindow: ToolWindow, root: JPanel) {
-        val contentFactory = ContentFactory.getInstance()
-        val content = contentFactory.createContent(root, null, false)
-        toolWindow.contentManager.addContent(content)
     }
 
     private fun addEventCard(title: String, description: String, icon: Icon) {
