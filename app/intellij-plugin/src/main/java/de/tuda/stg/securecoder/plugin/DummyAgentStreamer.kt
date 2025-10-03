@@ -1,53 +1,40 @@
 package de.tuda.stg.securecoder.plugin
 
-import com.intellij.icons.AllIcons
-import com.intellij.openapi.application.ApplicationManager
-import javax.swing.Icon
+import de.tuda.stg.securecoder.engine.Engine
+import de.tuda.stg.securecoder.engine.stream.EventIcon
 import java.util.concurrent.ThreadLocalRandom
+import kotlinx.coroutines.delay
 
-class DummyAgentStreamer {
-    fun startDummyStream(
+class DummyAgentStreamer : Engine {
+    override suspend fun start(
         prompt: String,
-        onEvent: (title: String, description: String, icon: Icon) -> Unit,
-        onComplete: () -> Unit
+        onEvent: suspend (title: String, description: String, icon: EventIcon) -> Unit,
+        onComplete: suspend () -> Unit
     ) {
-        ApplicationManager.getApplication().executeOnPooledThread {
-            val titles = listOf(
-                "Analyzing your prompt",
-                "Scanning project",
-                "Generating suggestions",
-                "Reviewing security checks",
-                "Summarizing findings",
-                "Optimizing fix",
-            )
-            val descriptions = listOf(
-                "Looking for potential vulnerabilities and patterns...",
-                "Collecting context from open files and project configuration...",
-                "Preparing actionable remediation steps...",
-                "Cross-checking against common CWE entries...",
-                "Packaging results for display...",
-            )
-            val icons = listOf(
-                AllIcons.General.Information,
-                AllIcons.General.Warning,
-                AllIcons.General.Balloon,
-                AllIcons.General.BalloonInformation,
-                AllIcons.General.Error
-            )
+        val titles = listOf(
+            "Analyzing your prompt",
+            "Scanning project",
+            "Generating suggestions",
+            "Reviewing security checks",
+            "Summarizing findings",
+            "Optimizing fix",
+        )
+        val descriptions = listOf(
+            "Looking for potential vulnerabilities and patterns...",
+            "Collecting context from open files and project configuration...",
+            "Preparing actionable remediation steps...",
+            "Cross-checking against common CWE entries...",
+            "Packaging results for display...",
+        )
 
-            repeat(16) { idx ->
-                val title = randomPick(titles) + " (${idx + 1}/16)"
-                val desc = randomPick(descriptions)
-                val icon = randomPick(icons)
-                onEvent(title, desc, icon)
-                try {
-                    Thread.sleep(1000)
-                } catch (_: InterruptedException) {
-                    return@executeOnPooledThread
-                }
-            }
-            onComplete()
+        repeat(24) { idx ->
+            val title = randomPick(titles) + " (${idx + 1}/24)"
+            val desc = randomPick(descriptions)
+            val icon = randomPick(EventIcon.entries)
+            onEvent(title, desc, icon)
+            delay(1000)
         }
+        onComplete()
     }
 
     private fun <T> randomPick(list: List<T>): T = list[ThreadLocalRandom.current().nextInt(list.size)]

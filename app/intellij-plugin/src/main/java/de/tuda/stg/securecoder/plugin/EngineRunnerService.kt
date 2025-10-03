@@ -1,0 +1,35 @@
+package de.tuda.stg.securecoder.plugin
+
+import com.intellij.openapi.components.Service
+import com.intellij.openapi.components.Service.Level
+import com.intellij.openapi.project.Project
+import com.intellij.platform.ide.progress.withBackgroundProgress
+import de.tuda.stg.securecoder.engine.stream.EventIcon
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+
+@Service(Level.PROJECT)
+class EngineRunnerService(
+    private val project: Project,
+    private val cs: CoroutineScope
+) {
+    private val engine by lazy {
+        DummyAgentStreamer()
+        /*WorkflowEngine(
+            EnricherClient("http://localhost:8080")
+        )*/
+    }
+
+    fun runEngine(
+        text: String,
+        onEvent: suspend (title: String, description: String, icon: EventIcon) -> Unit,
+        onComplete: suspend () -> Unit
+    ) {
+        cs.launch(Dispatchers.IO) {
+            withBackgroundProgress(project, "Running engine…", cancellable = false) {
+                engine.start(text, onEvent, onComplete)
+            }
+        }
+    }
+}

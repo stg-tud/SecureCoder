@@ -2,6 +2,7 @@ package de.tuda.stg.securecoder.enricher
 
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.engine.java.Java
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -13,7 +14,7 @@ import kotlinx.serialization.json.Json
 class EnricherClient(
     private val baseUrl: String,
 ) : PromptEnricher {
-    private val client: HttpClient = HttpClient {
+    private val client: HttpClient = HttpClient(Java) {
         install(ContentNegotiation) {
             json(Json {
                 ignoreUnknownKeys = false

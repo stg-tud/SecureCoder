@@ -1,5 +1,8 @@
 package de.tuda.stg.securecoder.plugin
 
+import com.intellij.icons.AllIcons
+import com.intellij.openapi.application.EDT
+import com.intellij.openapi.components.service
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
@@ -12,6 +15,9 @@ import com.intellij.util.ui.JBFont
 import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.JBUI.Borders
 import com.intellij.util.ui.JBUI.CurrentTheme.CustomFrameDecorations.separatorForeground
+import de.tuda.stg.securecoder.engine.stream.EventIcon
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.awt.BorderLayout
 import java.awt.Component
 import java.awt.Dimension
@@ -102,13 +108,17 @@ class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
                 eventsPanel.removeAll()
                 eventsPanel.revalidate()
                 eventsPanel.repaint()
-                DummyAgentStreamer().startDummyStream(
+                val runner = project.service<EngineRunnerService>()
+                runner.runEngine(
                     text,
                     onEvent = { title, desc, icon ->
-                        SwingUtilities.invokeLater { addEventCard(title, desc, icon) }
+                        withContext(Dispatchers.EDT) { addEventCard(title, desc, when (icon) {
+                            EventIcon.Info -> AllIcons.General.Information
+                            EventIcon.Warning -> AllIcons.General.Warning
+                        })}
                     },
                     onComplete = {
-                        SwingUtilities.invokeLater {
+                        withContext(Dispatchers.EDT) {
                             submit.isEnabled = true
                             submit.text = SecureCoderBundle.message("toolwindow.submit")
                         }
