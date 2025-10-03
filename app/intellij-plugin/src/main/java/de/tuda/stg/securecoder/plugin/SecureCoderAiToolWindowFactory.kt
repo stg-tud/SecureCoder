@@ -8,16 +8,24 @@ import com.intellij.openapi.wm.ToolWindowFactory
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.components.JBTextArea
 import com.intellij.ui.content.ContentFactory
+import com.intellij.util.ui.JBFont
 import com.intellij.util.ui.JBUI
 import java.awt.BorderLayout
 import java.awt.Dimension
 import javax.swing.Box
 import javax.swing.BoxLayout
+import javax.swing.Icon
 import javax.swing.JButton
+import javax.swing.JLabel
 import javax.swing.JPanel
+import javax.swing.JTextArea
 import javax.swing.ScrollPaneConstants
+import javax.swing.SwingUtilities
 
 class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
+    private lateinit var eventsPanel: JPanel
+    private lateinit var eventsScrollPane: JBScrollPane
+
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
         val root = JPanel(BorderLayout())
         val inputArea = createInputArea()
@@ -27,6 +35,18 @@ class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
         val submit = createSubmitButton(preferredHeight)
         val row = buildInputRow(scroll, submit)
         root.add(row, BorderLayout.NORTH)
+
+        eventsPanel = JPanel().apply {
+            layout = BoxLayout(this, BoxLayout.Y_AXIS)
+            border = JBUI.Borders.empty(8)
+        }
+        eventsScrollPane = JBScrollPane(eventsPanel).apply {
+            verticalScrollBarPolicy = ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED
+            horizontalScrollBarPolicy = ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER
+            border = JBUI.Borders.empty()
+        }
+        root.add(eventsScrollPane, BorderLayout.CENTER)
+
         setupSubmitAction(project, inputArea, submit)
         addToToolWindow(toolWindow, root)
     }
@@ -64,7 +84,12 @@ class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
             if (text.isEmpty()) {
                 Messages.showWarningDialog(project, "Please enter a prompt before submitting.", "SecureCoder AI")
             } else {
-                Messages.showInfoMessage(project, "Submitted: $text", "SecureCoder AI")
+                eventsPanel.removeAll()
+                eventsPanel.revalidate()
+                eventsPanel.repaint()
+                DummyAgentStreamer().startDummyStream(text) { title, desc, icon ->
+                    SwingUtilities.invokeLater { addEventCard(title, desc, icon) }
+                }
             }
         }
     }
@@ -73,5 +98,43 @@ class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
         val contentFactory = ContentFactory.getInstance()
         val content = contentFactory.createContent(root, null, false)
         toolWindow.contentManager.addContent(content)
+    }
+
+    private fun addEventCard(title: String, description: String, icon: Icon) {
+        val card = JPanel().apply {
+            layout = BoxLayout(this, BoxLayout.Y_AXIS)
+            border = JBUI.Borders.empty(8)
+        }
+
+        val titlePanel = JPanel().apply {
+            layout = BoxLayout(this, BoxLayout.X_AXIS)
+            border = JBUI.Borders.emptyBottom(4)
+        }
+        val titleLabel = JLabel(title, icon, JLabel.LEADING).apply {
+            font = JBFont.label().asBold()
+        }
+        titlePanel.add(titleLabel)
+
+        val descArea = JTextArea(description).apply {
+            isEditable = false
+            lineWrap = true
+            wrapStyleWord = true
+            border = JBUI.Borders.empty()
+            background = card.background
+        }
+
+        card.add(titlePanel)
+        card.add(descArea)
+        card.border = JBUI.Borders.customLine(JBUI.CurrentTheme.CustomFrameDecorations.separatorForeground(), 1, 1, 1, 1)
+
+        eventsPanel.add(card)
+        eventsPanel.add(Box.createRigidArea(Dimension(0, JBUI.scale(8))))
+        eventsPanel.revalidate()
+        eventsPanel.repaint()
+
+        SwingUtilities.invokeLater {
+            val vBar = eventsScrollPane.verticalScrollBar
+            vBar.value = vBar.maximum
+        }
     }
 }
