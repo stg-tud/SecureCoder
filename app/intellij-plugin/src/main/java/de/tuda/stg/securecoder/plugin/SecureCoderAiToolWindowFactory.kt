@@ -129,7 +129,9 @@ class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
     }
 
     private fun addEventCard(title: String, description: String, icon: Icon) {
-        val card = JPanel().apply {
+        val card = object : JPanel() {
+            override fun getMaximumSize() = Dimension(Int.MAX_VALUE, preferredSize.height)
+        }.apply {
             layout = BoxLayout(this, BoxLayout.Y_AXIS)
             border = Borders.empty(8)
         }
@@ -156,7 +158,6 @@ class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
         card.add(titlePanel)
         card.add(descArea)
         card.border = Borders.customLine(separatorForeground(), 1)
-        card.maximumSize = Dimension(Int.MAX_VALUE, card.preferredSize.height)
 
         eventsPanel.add(card)
         eventsPanel.add(Box.createRigidArea(Dimension(0, JBUI.scale(8))))

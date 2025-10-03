@@ -15,7 +15,7 @@ class WorkflowEngine (
     ) {
         onEvent("Enriching prompt...", "Sending prompt to enrichment service...", EventIcon.Info)
         val prompt = enricher.enrich(EnrichRequest(prompt))
-        onEvent("Prompt enriched", "Updated prompt: $prompt", EventIcon.Info)
+        onEvent("Prompt enriched", "Updated prompt: ${prompt.enriched}", EventIcon.Info)
         onComplete()
     }
 }
