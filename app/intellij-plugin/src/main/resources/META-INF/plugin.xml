@@ -8,6 +8,13 @@
     ]]></description>
     <depends>com.intellij.modules.platform</depends>
     <!--<depends optional="true">com.intellij.modules.java</depends>-->
+
+    <extensions defaultExtensionNs="com.intellij">
+        <toolWindow id="SecureCoder AI"
+                    anchor="right"
+                    factoryClass="de.tuda.stg.securecoder.plugin.SecureCoderAiToolWindowFactory"/>
+    </extensions>
+
     <actions>
         <action id="de.tuda.stg.securecoder.plugin.HelloAction"
                 class="de.tuda.stg.securecoder.plugin.HelloAction"
