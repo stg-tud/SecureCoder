@@ -3,7 +3,6 @@ package de.tuda.stg.securecoder.engine.llm
 import de.tuda.stg.securecoder.engine.llm.ChatMessage.Role
 import de.tuda.stg.securecoder.engine.llm.LlmClient.GenerationParams
 import io.ktor.client.*
-import io.ktor.client.call.*
 import io.ktor.client.engine.java.Java
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*

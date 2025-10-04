@@ -9,6 +9,7 @@ dependencies {
     implementation(libs.ktor.server.netty)
     implementation(libs.ktor.serialization.json)
     implementation(libs.ktor.server.content.negotiation)
+    runtimeOnly(libs.logback)
     testImplementation(kotlin("test"))
     testImplementation(libs.ktor.server.test.host)
 }
