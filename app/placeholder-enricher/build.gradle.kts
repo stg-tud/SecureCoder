@@ -10,5 +10,5 @@ dependencies {
     implementation(libs.ktor.serialization.json)
     implementation(libs.ktor.server.content.negotiation)
     testImplementation(kotlin("test"))
-    testImplementation("io.ktor:ktor-server-test-host-jvm:3.0.0")
+    testImplementation(libs.ktor.server.test.host)
 }
