@@ -20,6 +20,7 @@ import javax.swing.UIManager
 import com.intellij.diff.DiffContentFactory
 import com.intellij.diff.DiffManager
 import com.intellij.diff.requests.SimpleDiffRequest
+import com.intellij.icons.AllIcons
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.*
@@ -75,7 +76,8 @@ fun buildEditFilesPanel(project: Project, changes: Changes): JComponent {
             add(meta)
         }
 
-        val openBtn = JButton("Diff öffnen").apply {
+        val openBtn = JButton(AllIcons.Actions.Diff).apply {
+            toolTipText = SecureCoderBundle.message("edit.show.diff.tooltip")
             addActionListener {
                 openDiffForFile(project, summary.fileUrl, grouped[summary.fileUrl].orEmpty())
             }
