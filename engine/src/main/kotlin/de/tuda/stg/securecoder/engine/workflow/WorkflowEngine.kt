@@ -5,6 +5,7 @@ import de.tuda.stg.securecoder.engine.file.FileSystem
 import de.tuda.stg.securecoder.engine.llm.ChatMessage
 import de.tuda.stg.securecoder.engine.llm.ChatMessage.Role
 import de.tuda.stg.securecoder.engine.llm.EditFilesLlmClient
+import de.tuda.stg.securecoder.engine.llm.FilesInContextPromptBuilder
 import de.tuda.stg.securecoder.engine.llm.LlmClient
 import de.tuda.stg.securecoder.engine.stream.EventIcon
 import de.tuda.stg.securecoder.enricher.EnrichRequest
@@ -25,10 +26,14 @@ class WorkflowEngine (
         val prompt = enricher.enrich(EnrichRequest(prompt))
         onEvent("Prompt enriched", "Updated prompt: ${prompt.enriched}", EventIcon.Info)
         val out = llmClient.chat(
-            listOf(ChatMessage(ChatMessage.Role.User, prompt.enriched)),
-            LlmClient.GenerationParams("gpt-oss:20b")
+            listOf(
+                ChatMessage(Role.System, "You are a Security Engineering Agent mainly for writing secure code"),
+                ChatMessage(Role.User, prompt.enriched),
+                ChatMessage(Role.System, FilesInContextPromptBuilder.build(filesystem.iterateAllFiles())),
+            ),
+            LlmClient.GenerationParams("gpt-oss:20b"),
         )
-        onEvent("LLM output", out.toString(), EventIcon.Info)
+        onEvent("LLM output", out, EventIcon.Info)
         onComplete()
     }
 }
