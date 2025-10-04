@@ -1,5 +1,6 @@
 package de.tuda.stg.securecoder.plugin.engine
 
+import com.intellij.openapi.application.readAction
 import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.diagnostic.Logger
@@ -8,6 +9,8 @@ import com.intellij.openapi.roots.ProjectFileIndex
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.vfs.VirtualFileManager
 import de.tuda.stg.securecoder.engine.file.FileSystem
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import java.io.IOException
 
 class IntelliJProjectFileSystem(
@@ -16,25 +19,26 @@ class IntelliJProjectFileSystem(
 ) : FileSystem {
     private val log = Logger.getInstance(IntelliJProjectFileSystem::class.java)
 
-    override fun iterateAllFiles(): Iterable<FileSystem.File> = sequence {
+    override fun allFiles(): Flow<FileSystem.File> = flow {
         val contentRoots = ProjectRootManager.getInstance(project).contentRoots
         val index = ProjectFileIndex.getInstance(project)
         val stack = ArrayDeque<VirtualFile>()
         contentRoots.forEach { root -> stack.addLast(root) }
         while (stack.isNotEmpty()) {
-            val file = stack.removeLast()
-            if (index.isExcluded(file) || index.isUnderIgnored(file)) {
-                continue
-            }
-            if (file.isDirectory) {
-                for (child in file.children) {
-                    stack.addLast(child)
+            val step = readAction {
+                val virtualFile = stack.removeLast()
+                if (index.isExcluded(virtualFile) || index.isUnderIgnored(virtualFile)) return@readAction Unit
+                if (virtualFile.isDirectory) {
+                    virtualFile.children.forEach { child -> stack.addLast(child) }
+                } else {
+                    val ok = !virtualFile.fileType.isBinary && virtualFile.length <= maxFileSize
+                    if (ok) ProjectFile(virtualFile, virtualFile.url) else Unit
                 }
-            } else if (!file.fileType.isBinary && file.length <= maxFileSize) {
-                yield(ProjectFile(file, file.url))
             }
+            if (step !is ProjectFile) continue
+            emit(step)
         }
-    }.asIterable()
+    }
 
     override fun getFile(name: String): FileSystem.File? {
         val vf = VirtualFileManager.getInstance().findFileByUrl(name) ?: return null
@@ -47,8 +51,8 @@ class IntelliJProjectFileSystem(
     ) : FileSystem.File {
         override fun name(): String = uniqueName
 
-        override fun content(): String {
-            return try {
+        override suspend fun content(): String = readAction {
+            try {
                 VfsUtilCore.loadText(vf)
             } catch (e: IOException) {
                 log.warn("Could not load text for $uniqueName", e)

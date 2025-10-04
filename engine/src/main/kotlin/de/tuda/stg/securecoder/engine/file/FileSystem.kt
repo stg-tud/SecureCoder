@@ -1,16 +1,18 @@
 package de.tuda.stg.securecoder.engine.file
 
+import kotlinx.coroutines.flow.Flow
+
 interface FileSystem {
     /** Does not return directories */
-    fun iterateAllFiles() : Iterable<File>
+    fun allFiles() : Flow<File>
 
-    /** This must be a name you receive from [iterateAllFiles] */
+    /** This must be a name you receive from [allFiles] */
     fun getFile(name : String) : File?
 
     interface File {
         /** File name might be relative or absolute. But must be unique in a file system */
         fun name(): String
 
-        fun content(): String
+        suspend fun content(): String
     }
 }

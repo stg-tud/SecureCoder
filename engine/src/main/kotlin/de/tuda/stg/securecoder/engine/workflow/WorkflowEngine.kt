@@ -13,6 +13,7 @@ import de.tuda.stg.securecoder.engine.stream.StreamEvent
 import de.tuda.stg.securecoder.enricher.EnrichFileForContext
 import de.tuda.stg.securecoder.enricher.EnrichRequest
 import de.tuda.stg.securecoder.enricher.PromptEnricher
+import kotlinx.coroutines.flow.toList
 
 class WorkflowEngine (
     val enricher: PromptEnricher,
@@ -25,16 +26,17 @@ class WorkflowEngine (
         filesystem: FileSystem,
         onEvent: suspend (StreamEvent) -> Unit,
     ) {
-        onEvent(StreamEvent.Message("Got files", filesystem.iterateAllFiles().joinToString { it.name() }, EventIcon.Info))
+        val files = filesystem.allFiles().toList()
+        onEvent(StreamEvent.Message("Got files", files.joinToString { it.name() }, EventIcon.Info))
         onEvent(StreamEvent.Message("Enriching prompt...", "Sending prompt to enrichment service...", EventIcon.Info))
-        val filesForPrompt = filesystem.iterateAllFiles().map { EnrichFileForContext(it.name(), it.content()) }
+        val filesForPrompt = files.map { EnrichFileForContext(it.name(), it.content()) }
         val prompt = enricher.enrich(EnrichRequest(prompt, filesForPrompt))
         onEvent(StreamEvent.Message("Prompt enriched", "Updated prompt: ${prompt.enriched}", EventIcon.Info))
         val out = editFiles.chat(
             listOf(
                 ChatMessage(Role.System, "You are a Security Engineering Agent mainly for writing secure code"),
                 ChatMessage(Role.User, prompt.enriched),
-                ChatMessage(Role.System, FilesInContextPromptBuilder.build(filesystem.iterateAllFiles())),
+                ChatMessage(Role.System, FilesInContextPromptBuilder.build(files)),
             ),
             LlmClient.GenerationParams("gpt-oss:20b"),
         )
