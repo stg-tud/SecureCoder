@@ -1,8 +1,8 @@
 package de.tuda.stg.securecoder.engine.file.edit
 
 import de.tuda.stg.securecoder.engine.llm.ChatMessage
+import de.tuda.stg.securecoder.engine.llm.ChatMessage.Role
 import de.tuda.stg.securecoder.engine.llm.LlmClient
-import kotlin.collections.plus
 import kotlin.collections.plusAssign
 
 class EditFilesLlmWrapper(
@@ -36,9 +36,23 @@ class EditFilesLlmWrapper(
     suspend fun chat(
         messages: List<ChatMessage>,
         params: LlmClient.GenerationParams,
-    ): ParseResult {
-        val result = llmClient.chat(messages + ChatMessage(ChatMessage.Role.System, prompt), params)
-        return parse(result)
+        onParseError: suspend (List<String>) -> Unit = {},
+        attempts: Int = 3
+    ): Changes? {
+        val messages = messages.toMutableList()
+        messages += ChatMessage(Role.System, prompt)
+        repeat(attempts) {
+            val response = llmClient.chat(messages, params)
+            when (val result = parse(response)) {
+                is ParseResult.Ok -> return result.value
+                is ParseResult.Err -> {
+                    messages += ChatMessage(Role.Assistant, response)
+                    messages += ChatMessage(Role.Tool, result.buildMessage())
+                    onParseError(result.messages)
+                }
+            }
+        }
+        return null
     }
 
     sealed interface ParseResult {

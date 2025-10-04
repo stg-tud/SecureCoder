@@ -2,10 +2,10 @@ package de.tuda.stg.securecoder.engine.workflow
 
 import de.tuda.stg.securecoder.engine.Engine
 import de.tuda.stg.securecoder.engine.file.FileSystem
+import de.tuda.stg.securecoder.engine.file.edit.Changes
 import de.tuda.stg.securecoder.engine.llm.ChatMessage
 import de.tuda.stg.securecoder.engine.llm.ChatMessage.Role
 import de.tuda.stg.securecoder.engine.file.edit.EditFilesLlmWrapper
-import de.tuda.stg.securecoder.engine.file.edit.EditFilesLlmWrapper.ParseResult
 import de.tuda.stg.securecoder.engine.llm.FilesInContextPromptBuilder
 import de.tuda.stg.securecoder.engine.llm.LlmClient
 import de.tuda.stg.securecoder.engine.stream.EventIcon
@@ -39,14 +39,12 @@ class WorkflowEngine (
                 ChatMessage(Role.System, FilesInContextPromptBuilder.build(files, edit = true)),
             ),
             LlmClient.GenerationParams("gpt-oss:20b"),
+            { onEvent(StreamEvent.Message("Malicious LLM output", it.joinToString(), EventIcon.Warning)) }
         )
-        if (out is ParseResult.Ok) onEvent(StreamEvent.EditFiles(out.value))
-        else onEvent(
-            StreamEvent.Message(
-                "Could not parse LLM output",
-                (out as ParseResult.Err).messages.joinToString("\n"),
-                EventIcon.Warning
-            )
-        )
+        when (out) {
+            null -> onEvent(StreamEvent.Message("Failed generating changeset", "Failed to parse the output of the llm. Maximum amount on retries exceeded! Look for parsing errors above", EventIcon.Info))
+            is Changes -> onEvent(StreamEvent.EditFiles(out))
+        }
+        onEvent(StreamEvent.Message("Finished", "The workflow engine has finished execution", EventIcon.Info))
     }
 }
