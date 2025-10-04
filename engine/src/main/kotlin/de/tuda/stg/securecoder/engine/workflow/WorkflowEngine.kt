@@ -36,7 +36,7 @@ class WorkflowEngine (
             listOf(
                 ChatMessage(Role.System, "You are a Security Engineering Agent mainly for writing secure code"),
                 ChatMessage(Role.User, prompt.enriched),
-                ChatMessage(Role.System, FilesInContextPromptBuilder.build(files)),
+                ChatMessage(Role.System, FilesInContextPromptBuilder.build(files, edit = true)),
             ),
             LlmClient.GenerationParams("gpt-oss:20b"),
         )
