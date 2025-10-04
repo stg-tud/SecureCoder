@@ -38,7 +38,7 @@ fun buildEditFilesPanel(project: Project, changes: Changes): JComponent {
     }
 
     val grouped = changes.searchReplaces.groupBy { it.fileName }
-    val summaries = EditFileSummary.of(changes)
+    val summaries = EditFileSummary.of(project, changes)
 
     val header = JPanel().apply {
         layout = BoxLayout(this, BoxLayout.X_AXIS)
