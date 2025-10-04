@@ -18,13 +18,13 @@ class WorkflowEngine (
     override suspend fun start(
         prompt: String,
         filesystem: FileSystem,
-        onEvent: suspend (title: String, description: String, icon: EventIcon) -> Unit,
+        onEvent: suspend (StreamEvent) -> Unit,
     ) {
-        onEvent("Got files", filesystem.iterateAllFiles().joinToString { it.name() }, EventIcon.Info)
-        onEvent("Enriching prompt...", "Sending prompt to enrichment service...", EventIcon.Info)
+        onEvent(StreamEvent.Message("Got files", filesystem.iterateAllFiles().joinToString { it.name() }, EventIcon.Info))
+        onEvent(StreamEvent.Message("Enriching prompt...", "Sending prompt to enrichment service...", EventIcon.Info))
         val filesForPrompt = filesystem.iterateAllFiles().map { EnrichFileForContext(it.name(), it.content()) }
         val prompt = enricher.enrich(EnrichRequest(prompt, filesForPrompt))
-        onEvent("Prompt enriched", "Updated prompt: ${prompt.enriched}", EventIcon.Info)
+        onEvent(StreamEvent.Message("Prompt enriched", "Updated prompt: ${prompt.enriched}", EventIcon.Info))
         val out = llmClient.chat(
             listOf(
                 ChatMessage(Role.System, "You are a Security Engineering Agent mainly for writing secure code"),
@@ -33,6 +33,6 @@ class WorkflowEngine (
             ),
             LlmClient.GenerationParams("gpt-oss:20b"),
         )
-        onEvent("LLM output", out, EventIcon.Info)
+        onEvent(StreamEvent.Message("LLM output", out, EventIcon.Info))
     }
 }

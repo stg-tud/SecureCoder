@@ -5,6 +5,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.platform.ide.progress.withBackgroundProgress
 import de.tuda.stg.securecoder.engine.llm.OllamaClient
 import de.tuda.stg.securecoder.engine.stream.EventIcon
+import de.tuda.stg.securecoder.engine.stream.StreamEvent
 import de.tuda.stg.securecoder.engine.workflow.WorkflowEngine
 import de.tuda.stg.securecoder.enricher.EnricherClient
 import kotlinx.coroutines.CoroutineScope
@@ -26,7 +27,7 @@ class EngineRunnerService(
 
     fun runEngine(
         text: String,
-        onEvent: suspend (title: String, description: String, icon: EventIcon) -> Unit,
+        onEvent: suspend (StreamEvent) -> Unit,
         onComplete: suspend () -> Unit
     ) {
         cs.launch(Dispatchers.IO) {

@@ -16,6 +16,7 @@ import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.JBUI.Borders
 import com.intellij.util.ui.JBUI.CurrentTheme.CustomFrameDecorations.separatorForeground
 import de.tuda.stg.securecoder.engine.stream.EventIcon
+import de.tuda.stg.securecoder.engine.stream.StreamEvent
 import de.tuda.stg.securecoder.plugin.engine.EngineRunnerService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -24,7 +25,6 @@ import java.awt.Component
 import java.awt.Dimension
 import javax.swing.Box
 import javax.swing.BoxLayout
-import javax.swing.Icon
 import javax.swing.JButton
 import javax.swing.JLabel
 import javax.swing.JPanel
@@ -112,11 +112,8 @@ class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
                 val runner = project.service<EngineRunnerService>()
                 runner.runEngine(
                     text,
-                    onEvent = { title, desc, icon ->
-                        withContext(Dispatchers.EDT) { addEventCard(title, desc, when (icon) {
-                            EventIcon.Info -> AllIcons.General.Information
-                            EventIcon.Warning -> AllIcons.General.Warning
-                        })}
+                    onEvent = { event ->
+                        withContext(Dispatchers.EDT) { addEventCard(event) }
                     },
                     onComplete = {
                         withContext(Dispatchers.EDT) {
@@ -129,7 +126,7 @@ class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
         }
     }
 
-    private fun addEventCard(title: String, description: String, icon: Icon) {
+    private fun addEventCard(event: StreamEvent) {
         val card = object : JPanel() {
             override fun getMaximumSize() = Dimension(Int.MAX_VALUE, preferredSize.height)
         }.apply {
@@ -142,22 +139,33 @@ class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
             border = Borders.emptyBottom(4)
             alignmentX = Component.LEFT_ALIGNMENT
         }
+        val title = when (event) {
+            is StreamEvent.Message -> event.title
+        }
+        val icon = when (event) {
+            is StreamEvent.Message -> when (event.icon) {
+                EventIcon.Info -> AllIcons.General.Information
+                EventIcon.Warning -> AllIcons.General.Warning
+            }
+        }
         val titleLabel = JLabel(title, icon, JLabel.LEADING).apply {
             font = JBFont.label().asBold()
         }
         titlePanel.add(titleLabel)
 
-        val descArea = JTextArea(description).apply {
-            isEditable = false
-            lineWrap = true
-            wrapStyleWord = true
-            border = Borders.empty()
-            background = card.background
-            alignmentX = Component.LEFT_ALIGNMENT
+        val content = when (event) {
+            is StreamEvent.Message -> JTextArea(event.description).apply {
+                isEditable = false
+                lineWrap = true
+                wrapStyleWord = true
+                border = Borders.empty()
+                background = card.background
+                alignmentX = Component.LEFT_ALIGNMENT
+            }
         }
 
         card.add(titlePanel)
-        card.add(descArea)
+        card.add(content)
         card.border = Borders.customLine(separatorForeground(), 1)
 
         eventsPanel.add(card)

@@ -3,6 +3,7 @@ package de.tuda.stg.securecoder.plugin.engine
 import de.tuda.stg.securecoder.engine.Engine
 import de.tuda.stg.securecoder.engine.file.FileSystem
 import de.tuda.stg.securecoder.engine.stream.EventIcon
+import de.tuda.stg.securecoder.engine.stream.StreamEvent
 import kotlinx.coroutines.delay
 import java.util.concurrent.ThreadLocalRandom
 
@@ -10,7 +11,7 @@ class DummyAgentStreamer : Engine {
     override suspend fun start(
         prompt: String,
         filesystem: FileSystem,
-        onEvent: suspend (title: String, description: String, icon: EventIcon) -> Unit,
+        onEvent: suspend (StreamEvent) -> Unit,
     ) {
         val titles = listOf(
             "Analyzing your prompt",
@@ -32,7 +33,7 @@ class DummyAgentStreamer : Engine {
             val title = randomPick(titles) + " (${idx + 1}/24)"
             val desc = randomPick(descriptions)
             val icon = randomPick(EventIcon.entries)
-            onEvent(title, desc, icon)
+            onEvent(StreamEvent.Message(title, desc, icon))
             delay(1000)
         }
     }
