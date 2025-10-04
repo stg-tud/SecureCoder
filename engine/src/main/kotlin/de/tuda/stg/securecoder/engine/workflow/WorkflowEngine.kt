@@ -1,7 +1,10 @@
 package de.tuda.stg.securecoder.engine.workflow
 
 import de.tuda.stg.securecoder.engine.Engine
+import de.tuda.stg.securecoder.engine.file.FileSystem
 import de.tuda.stg.securecoder.engine.llm.ChatMessage
+import de.tuda.stg.securecoder.engine.llm.ChatMessage.Role
+import de.tuda.stg.securecoder.engine.llm.EditFilesLlmClient
 import de.tuda.stg.securecoder.engine.llm.LlmClient
 import de.tuda.stg.securecoder.engine.stream.EventIcon
 import de.tuda.stg.securecoder.enricher.EnrichRequest
@@ -13,9 +16,11 @@ class WorkflowEngine (
 ) : Engine {
     override suspend fun start(
         prompt: String,
+        filesystem: FileSystem,
         onEvent: suspend (title: String, description: String, icon: EventIcon) -> Unit,
         onComplete: suspend () -> Unit
     ) {
+        onEvent("Got files", filesystem.iterateAllFiles().joinToString { it.name() }, EventIcon.Info)
         onEvent("Enriching prompt...", "Sending prompt to enrichment service...", EventIcon.Info)
         val prompt = enricher.enrich(EnrichRequest(prompt))
         onEvent("Prompt enriched", "Updated prompt: ${prompt.enriched}", EventIcon.Info)
