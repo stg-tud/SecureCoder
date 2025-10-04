@@ -1,7 +1,6 @@
-package de.tuda.stg.securecoder.plugin
+package de.tuda.stg.securecoder.plugin.engine
 
 import com.intellij.openapi.components.Service
-import com.intellij.openapi.components.Service.Level
 import com.intellij.openapi.project.Project
 import com.intellij.platform.ide.progress.withBackgroundProgress
 import de.tuda.stg.securecoder.engine.llm.OllamaClient
@@ -12,7 +11,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-@Service(Level.PROJECT)
+@Service(Service.Level.PROJECT)
 class EngineRunnerService(
     private val project: Project,
     private val cs: CoroutineScope

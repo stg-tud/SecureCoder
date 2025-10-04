@@ -1,9 +1,9 @@
-package de.tuda.stg.securecoder.plugin
+package de.tuda.stg.securecoder.plugin.engine
 
 import de.tuda.stg.securecoder.engine.Engine
 import de.tuda.stg.securecoder.engine.stream.EventIcon
-import java.util.concurrent.ThreadLocalRandom
 import kotlinx.coroutines.delay
+import java.util.concurrent.ThreadLocalRandom
 
 class DummyAgentStreamer : Engine {
     override suspend fun start(

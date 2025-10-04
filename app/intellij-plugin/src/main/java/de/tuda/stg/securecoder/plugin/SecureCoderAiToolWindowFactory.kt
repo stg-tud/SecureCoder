@@ -16,6 +16,7 @@ import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.JBUI.Borders
 import com.intellij.util.ui.JBUI.CurrentTheme.CustomFrameDecorations.separatorForeground
 import de.tuda.stg.securecoder.engine.stream.EventIcon
+import de.tuda.stg.securecoder.plugin.engine.EngineRunnerService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.awt.BorderLayout
