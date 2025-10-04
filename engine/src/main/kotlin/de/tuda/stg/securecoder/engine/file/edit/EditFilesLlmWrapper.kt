@@ -1,0 +1,121 @@
+package de.tuda.stg.securecoder.engine.file.edit
+
+import de.tuda.stg.securecoder.engine.llm.ChatMessage
+import de.tuda.stg.securecoder.engine.llm.LlmClient
+import kotlin.collections.plus
+import kotlin.collections.plusAssign
+
+class EditFilesLlmWrapper(
+    private val llmClient: LlmClient
+) {
+    private val prompt = """
+        Your task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!
+        
+        The edits must be described with *SEARCH/REPLACE* blocks enclosed in XML tags <EDITN>, where N represents the sequence number of *SEARCH/REPLACE* block.
+        It's acceptable to add multiple *SEARCH/REPLACE* sections if you need to change multiple parts of the file.
+        *SEARCH/REPLACE* block Rules:
+        
+        Every *SEARCH/REPLACE* block must contain 3 sections, each enclosed in XML tags:
+        - <FILE_PATH>: The full path of the file that will be modified.
+        - <SEARCH>: A continuous, yet concise block of lines to search for in the existing source code (*SEARCH* pattern). If this section is empty, the lines from <REPLACE> will be added to the end of the file.
+        - <REPLACE>: The lines to replace the existing code found using <SEARCH>. If this section is empty, the lines specified in <SEARCH> will be removed.
+        All of these sections must be included in each *SEARCH/REPLACE* block.
+        
+        Each *SEARCH* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.
+        Do not use a part of the line as *SEARCH* pattern. You must use full lines.
+        Include enough lines to make code inside *SEARCH* pattern uniquely identifiable. A *SEARCH* pattern that produces multiple matches in the source code will be rejected as an error.
+        Do not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.
+        Do not use git diff style (+ and - at the beginning of the line) for *SEARCH/REPLACE* blocks.
+        Do not use line numbers in *SEARCH/REPLACE* blocks. Do not enclose the *SEARCH/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.
+        Do not use the same value for *SEARCH* and *REPLACE* parameters, as this will make no changes.
+        
+        If you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.
+    """.trimIndent()
+
+
+    suspend fun chat(
+        messages: List<ChatMessage>,
+        params: LlmClient.GenerationParams,
+    ): ParseResult {
+        val result = llmClient.chat(messages + ChatMessage(ChatMessage.Role.System, prompt), params)
+        return parse(result)
+    }
+
+    sealed interface ParseResult {
+        data class Ok(val value: Changes) : ParseResult
+        data class Err(val messages: List<String>) : ParseResult {
+            fun buildMessage() = buildString {
+                messages.forEach { appendLine("ERROR: $it. Fix errors and provide correct code modification.\n") }
+            }
+        }
+    }
+
+    fun parse(content: String): ParseResult {
+        val results = mutableListOf<Changes.SearchReplace>()
+        val allErrors = mutableListOf<String>()
+        val contentCopy = if (content.endsWith("\n")) content else content + "\n"
+        val editsRegex = Regex(
+            "<EDIT(\\d{0,2})>(.*?)</EDIT\\1>", setOf(
+                RegexOption.MULTILINE, RegexOption.DOT_MATCHES_ALL
+            )
+        )
+        val matches = editsRegex.findAll(contentCopy).toList()
+
+        if (matches.isEmpty()) {
+            allErrors += "Did not find any *SEARCH/REPLACE* block within the `<EDIT>` tag"
+            return ParseResult.Err(allErrors)
+        }
+
+        for (m in matches) {
+            val editContent = (m.groups[2]?.value ?: "").trim()
+            if (editContent.isEmpty()) continue
+
+            val currentFileName = getTextByXMLTag(editContent, "FILE_PATH")?.trim()
+            val searchPartRaw = getTextByXMLTag(editContent, "SEARCH")
+            val replacePartRaw = getTextByXMLTag(editContent, "REPLACE")
+
+            val searchPart = removeStartingEmptyLine(searchPartRaw)
+            val replacePart = removeStartingEmptyLine(replacePartRaw)
+
+            if (currentFileName == null) {
+                allErrors += "Missing or empty filename"
+                continue
+            }
+            if (searchPartRaw == null) {
+                allErrors += "Missing `<SEARCH>` section"
+                continue
+            }
+            if (replacePartRaw == null) {
+                allErrors += "Missing `<REPLACE>` section"
+                continue
+            }
+            if (searchPart == replacePart) {
+                allErrors += "`<SEARCH>` and `<REPLACE>` parameters are the same"
+                continue
+            }
+
+            results += Changes.SearchReplace(currentFileName, searchPart ?: "", replacePart ?: "")
+        }
+
+        if (results.isEmpty()) {
+            return ParseResult.Err(allErrors)
+        }
+
+        val seen = HashSet<Pair<String, String>>()
+        val deduped = results.filter { sr ->
+            seen.add(sr.fileName to sr.searchedText)
+        }
+
+        return ParseResult.Ok(Changes(deduped))
+    }
+
+    private fun getTextByXMLTag(container: String, tag: String): String? {
+        val regex = Regex("<$tag>(.*?)</$tag>", setOf(RegexOption.MULTILINE, RegexOption.DOT_MATCHES_ALL))
+        return regex.find(container)?.groups?.get(1)?.value
+    }
+
+    private fun removeStartingEmptyLine(content: String?): String? {
+        if (content == null) return null
+        return content.replaceFirst(Regex("^\\n"), "")
+    }
+}
