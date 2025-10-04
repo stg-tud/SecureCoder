@@ -53,12 +53,13 @@ class OllamaClient(
         params: GenerationParams
     ): String {
         val mapped = messages.map {
-            val r = when (it.role) {
+            val role = when (it.role) {
                 Role.System -> "system"
                 Role.User -> "user"
                 Role.Assistant -> "assistant"
+                Role.Tool -> "tool"
             }
-            OllamaMsg(role = r, content = it.content)
+            OllamaMsg(role, it.content)
         }
 
         val options = buildJsonObject {
