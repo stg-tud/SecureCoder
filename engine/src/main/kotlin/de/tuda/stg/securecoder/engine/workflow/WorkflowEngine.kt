@@ -19,11 +19,11 @@ class WorkflowEngine (
         prompt: String,
         filesystem: FileSystem,
         onEvent: suspend (title: String, description: String, icon: EventIcon) -> Unit,
-        onComplete: suspend () -> Unit
     ) {
         onEvent("Got files", filesystem.iterateAllFiles().joinToString { it.name() }, EventIcon.Info)
         onEvent("Enriching prompt...", "Sending prompt to enrichment service...", EventIcon.Info)
-        val prompt = enricher.enrich(EnrichRequest(prompt, filesystem.iterateAllFiles().map { EnrichFileForContext(it.name(), it.content()) }))
+        val filesForPrompt = filesystem.iterateAllFiles().map { EnrichFileForContext(it.name(), it.content()) }
+        val prompt = enricher.enrich(EnrichRequest(prompt, filesForPrompt))
         onEvent("Prompt enriched", "Updated prompt: ${prompt.enriched}", EventIcon.Info)
         val out = llmClient.chat(
             listOf(
@@ -34,6 +34,5 @@ class WorkflowEngine (
             LlmClient.GenerationParams("gpt-oss:20b"),
         )
         onEvent("LLM output", out, EventIcon.Info)
-        onComplete()
     }
 }

@@ -32,7 +32,8 @@ class EngineRunnerService(
         cs.launch(Dispatchers.IO) {
             withBackgroundProgress(project, "Running engine…", cancellable = false) {
                 val fileSystem = IntelliJProjectFileSystem(project)
-                engine.start(text, fileSystem, onEvent, onComplete)
+                engine.start(text, fileSystem, onEvent)
+                onComplete()
             }
         }
     }

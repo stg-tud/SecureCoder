@@ -11,7 +11,6 @@ class DummyAgentStreamer : Engine {
         prompt: String,
         filesystem: FileSystem,
         onEvent: suspend (title: String, description: String, icon: EventIcon) -> Unit,
-        onComplete: suspend () -> Unit
     ) {
         val titles = listOf(
             "Analyzing your prompt",
@@ -36,7 +35,6 @@ class DummyAgentStreamer : Engine {
             onEvent(title, desc, icon)
             delay(1000)
         }
-        onComplete()
     }
 
     private fun <T> randomPick(list: List<T>): T = list[ThreadLocalRandom.current().nextInt(list.size)]

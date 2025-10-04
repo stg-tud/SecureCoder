@@ -8,6 +8,5 @@ interface Engine {
         prompt: String,
         filesystem: FileSystem,
         onEvent: suspend (title: String, description: String, icon: EventIcon) -> Unit,
-        onComplete: suspend () -> Unit
     )
 }
