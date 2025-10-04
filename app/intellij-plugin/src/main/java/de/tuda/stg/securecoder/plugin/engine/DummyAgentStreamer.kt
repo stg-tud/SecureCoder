@@ -37,7 +37,9 @@ class DummyAgentStreamer : Engine {
             onEvent(StreamEvent.Message(title, desc, icon))
             if (idx % 3 == 0) {
                 onEvent(StreamEvent.EditFiles(Changes(listOf(
-                    Changes.SearchReplace("app.py", "", "print(\"Hello World!\"")
+                    Changes.SearchReplace("app.py", "", "print(\"Hello World!\")"),
+                    Changes.SearchReplace("app2.py", "", "print(\"Hello World!\")"),
+                    Changes.SearchReplace("app.py", "", "\nprint(\"Hello World!2\")"),
                 ))))
             }
             delay(1000)

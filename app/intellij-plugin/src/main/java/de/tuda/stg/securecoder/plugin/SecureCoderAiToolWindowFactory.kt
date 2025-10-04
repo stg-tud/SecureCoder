@@ -17,6 +17,7 @@ import com.intellij.util.ui.JBUI.Borders
 import com.intellij.util.ui.JBUI.CurrentTheme.CustomFrameDecorations.separatorForeground
 import de.tuda.stg.securecoder.engine.stream.EventIcon
 import de.tuda.stg.securecoder.engine.stream.StreamEvent
+import de.tuda.stg.securecoder.plugin.edit.buildEditFilesPanel
 import de.tuda.stg.securecoder.plugin.engine.EngineRunnerService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -113,7 +114,7 @@ class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
                 runner.runEngine(
                     text,
                     onEvent = { event ->
-                        withContext(Dispatchers.EDT) { addEventCard(event) }
+                        withContext(Dispatchers.EDT) { addEventCard(event, project) }
                     },
                     onComplete = {
                         withContext(Dispatchers.EDT) {
@@ -126,7 +127,7 @@ class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
         }
     }
 
-    private fun addEventCard(event: StreamEvent) {
+    private fun addEventCard(event: StreamEvent, project: Project) {
         val card = object : JPanel() {
             override fun getMaximumSize() = Dimension(Int.MAX_VALUE, preferredSize.height)
         }.apply {
@@ -164,12 +165,7 @@ class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
                 background = card.background
                 alignmentX = Component.LEFT_ALIGNMENT
             }
-            is StreamEvent.EditFiles -> JTextArea(event.change.toString()).apply {
-                isEditable = false
-                lineWrap = true
-                wrapStyleWord = true
-                alignmentX = Component.LEFT_ALIGNMENT
-            }
+            is StreamEvent.EditFiles -> buildEditFilesPanel(project, event.changes)
         }
 
         card.add(titlePanel)
