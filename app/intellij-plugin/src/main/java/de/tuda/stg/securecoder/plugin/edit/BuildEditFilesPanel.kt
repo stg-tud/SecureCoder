@@ -15,7 +15,6 @@ import javax.swing.JButton
 import javax.swing.JComponent
 import javax.swing.JLabel
 import javax.swing.JPanel
-import javax.swing.UIManager
 
 import com.intellij.diff.DiffContentFactory
 import com.intellij.diff.DiffManager
@@ -36,7 +35,6 @@ fun buildEditFilesPanel(project: Project, changes: Changes): JComponent {
         layout = BoxLayout(this, BoxLayout.Y_AXIS)
         alignmentX = Component.LEFT_ALIGNMENT
         border = Borders.empty()
-        background = UIManager.getColor("Panel.background")
     }
 
     val grouped = changes.searchReplaces.groupBy { it.fileName }
@@ -46,7 +44,6 @@ fun buildEditFilesPanel(project: Project, changes: Changes): JComponent {
         layout = BoxLayout(this, BoxLayout.X_AXIS)
         alignmentX = Component.LEFT_ALIGNMENT
         border = Borders.emptyBottom(6)
-        background = panel.background
         val files = summaries.size
         val changesCount = summaries.sumOf { it.changesCount() }
         val delta = summaries.sumOf { abs(it.deltaLines()) }
@@ -59,7 +56,6 @@ fun buildEditFilesPanel(project: Project, changes: Changes): JComponent {
     summaries.forEach { summary ->
         val row = JPanel(BorderLayout()).apply {
             border = Borders.merge(Borders.customLine(separatorForeground(), 1), Borders.empty(6), true)
-            background = panel.background
             alignmentX = Component.LEFT_ALIGNMENT
             cursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
             toolTipText = SecureCoderBundle.message("edit.show.diff.tooltip")
@@ -92,13 +88,7 @@ fun buildEditFilesPanel(project: Project, changes: Changes): JComponent {
         })
 
         panel.add(row)
-        panel.add(Box.createRigidArea(Dimension(0, JBUI.scale(6))))
-    }
-
-    if (summaries.isEmpty()) {
-        panel.add(JLabel(SecureCoderBundle.message("edit.no.changes")).apply {
-            foreground = UIManager.getColor("Label.disabledForeground")
-        })
+        panel.add(Box.createRigidArea(Dimension(0, JBUI.scale(2))))
     }
 
     return panel
