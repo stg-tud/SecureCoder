@@ -2,6 +2,7 @@ package de.tuda.stg.securecoder.plugin.engine
 
 import de.tuda.stg.securecoder.engine.Engine
 import de.tuda.stg.securecoder.engine.file.FileSystem
+import de.tuda.stg.securecoder.engine.file.edit.Changes
 import de.tuda.stg.securecoder.engine.stream.EventIcon
 import de.tuda.stg.securecoder.engine.stream.StreamEvent
 import kotlinx.coroutines.delay
@@ -34,6 +35,11 @@ class DummyAgentStreamer : Engine {
             val desc = randomPick(descriptions)
             val icon = randomPick(EventIcon.entries)
             onEvent(StreamEvent.Message(title, desc, icon))
+            if (idx % 3 == 0) {
+                onEvent(StreamEvent.EditFiles(Changes(listOf(
+                    Changes.SearchReplace("app.py", "", "print(\"Hello World!\"")
+                ))))
+            }
             delay(1000)
         }
     }

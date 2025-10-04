@@ -141,12 +141,14 @@ class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
         }
         val title = when (event) {
             is StreamEvent.Message -> event.title
+            is StreamEvent.EditFiles -> "Edit Files"
         }
         val icon = when (event) {
             is StreamEvent.Message -> when (event.icon) {
                 EventIcon.Info -> AllIcons.General.Information
                 EventIcon.Warning -> AllIcons.General.Warning
             }
+            is StreamEvent.EditFiles -> AllIcons.Actions.EditSource
         }
         val titleLabel = JLabel(title, icon, JLabel.LEADING).apply {
             font = JBFont.label().asBold()
@@ -160,6 +162,12 @@ class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
                 wrapStyleWord = true
                 border = Borders.empty()
                 background = card.background
+                alignmentX = Component.LEFT_ALIGNMENT
+            }
+            is StreamEvent.EditFiles -> JTextArea(event.change.toString()).apply {
+                isEditable = false
+                lineWrap = true
+                wrapStyleWord = true
                 alignmentX = Component.LEFT_ALIGNMENT
             }
         }

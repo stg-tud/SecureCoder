@@ -18,11 +18,11 @@ class EngineRunnerService(
     private val cs: CoroutineScope
 ) {
     private val engine by lazy {
-        //DummyAgentStreamer()
-        WorkflowEngine(
+        DummyAgentStreamer()
+        /*WorkflowEngine(
             EnricherClient("http://localhost:7070"),
             OllamaClient()
-        )
+        )*/
     }
 
     fun runEngine(
