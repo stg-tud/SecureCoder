@@ -4,29 +4,33 @@ import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.roots.ProjectFileIndex
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.vfs.VirtualFileManager
 import de.tuda.stg.securecoder.engine.file.FileSystem
 import java.io.IOException
 
 class IntelliJProjectFileSystem(
-    private val project: Project
+    private val project: Project,
+    private val maxFileSize: Long = 5L * 1024 * 1024
 ) : FileSystem {
     private val log = Logger.getInstance(IntelliJProjectFileSystem::class.java)
 
     override fun iterateAllFiles(): Iterable<FileSystem.File> = sequence {
         val contentRoots = ProjectRootManager.getInstance(project).contentRoots
+        val index = ProjectFileIndex.getInstance(project)
         val stack = ArrayDeque<VirtualFile>()
         contentRoots.forEach { root -> stack.addLast(root) }
         while (stack.isNotEmpty()) {
             val file = stack.removeLast()
-
+            if (index.isExcluded(file) || index.isUnderIgnored(file)) {
+                continue
+            }
             if (file.isDirectory) {
                 for (child in file.children) {
                     stack.addLast(child)
                 }
-                continue
-            } else if (!file.fileType.isBinary && file.length <= 5L * 1024 * 1024) {
+            } else if (!file.fileType.isBinary && file.length <= maxFileSize) {
                 yield(ProjectFile(file, file.url))
             }
         }
