@@ -23,7 +23,7 @@ class WorkflowEngine (
     ) {
         onEvent("Got files", filesystem.iterateAllFiles().joinToString { it.name() }, EventIcon.Info)
         onEvent("Enriching prompt...", "Sending prompt to enrichment service...", EventIcon.Info)
-        val prompt = enricher.enrich(EnrichRequest(prompt))
+        val prompt = enricher.enrich(EnrichRequest(prompt, filesystem.iterateAllFiles().map { EnrichFileForContext(it.name(), it.content()) }))
         onEvent("Prompt enriched", "Updated prompt: ${prompt.enriched}", EventIcon.Info)
         val out = llmClient.chat(
             listOf(
