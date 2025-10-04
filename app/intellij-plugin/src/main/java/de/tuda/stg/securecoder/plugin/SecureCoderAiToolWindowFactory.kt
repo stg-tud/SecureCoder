@@ -24,6 +24,7 @@ import kotlinx.coroutines.withContext
 import java.awt.BorderLayout
 import java.awt.Component
 import java.awt.Dimension
+import javax.swing.BorderFactory
 import javax.swing.Box
 import javax.swing.BoxLayout
 import javax.swing.JButton
@@ -132,7 +133,10 @@ class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
             override fun getMaximumSize() = Dimension(Int.MAX_VALUE, preferredSize.height)
         }.apply {
             layout = BoxLayout(this, BoxLayout.Y_AXIS)
-            border = Borders.empty(8)
+            border = BorderFactory.createCompoundBorder(
+                Borders.customLine(separatorForeground(), 1),
+                Borders.empty(6)
+            )
         }
 
         val titlePanel = JPanel().apply {
@@ -170,7 +174,6 @@ class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
 
         card.add(titlePanel)
         card.add(content)
-        card.border = Borders.customLine(separatorForeground(), 1)
 
         eventsPanel.add(card)
         eventsPanel.add(Box.createRigidArea(Dimension(0, JBUI.scale(8))))

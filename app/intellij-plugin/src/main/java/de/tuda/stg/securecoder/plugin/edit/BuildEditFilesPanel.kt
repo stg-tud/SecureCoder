@@ -28,6 +28,7 @@ import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.JBUI.Borders
 import de.tuda.stg.securecoder.engine.file.edit.ApplyChanges
 import de.tuda.stg.securecoder.plugin.SecureCoderBundle
+import javax.swing.BorderFactory
 import kotlin.math.abs
 
 fun buildEditFilesPanel(project: Project, changes: Changes): JComponent {
@@ -55,7 +56,13 @@ fun buildEditFilesPanel(project: Project, changes: Changes): JComponent {
 
     summaries.forEach { summary ->
         val row = JPanel(BorderLayout()).apply {
-            border = Borders.merge(Borders.customLine(separatorForeground(), 1), Borders.empty(6), true)
+            border = BorderFactory.createCompoundBorder(
+                Borders.empty(4),
+                BorderFactory.createCompoundBorder(
+                    Borders.customLine(separatorForeground(), 1),
+                    Borders.empty(3)
+                )
+            )
             alignmentX = Component.LEFT_ALIGNMENT
             cursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
             toolTipText = SecureCoderBundle.message("edit.show.diff.tooltip")
