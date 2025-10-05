@@ -13,7 +13,10 @@ class DummyEnricherServiceTest {
         val resp = service.enrich(req)
 
         val expected = """
-            You are a security expert. Please answer the following question:
+            You are a security expert.
+            Your top priority is to design, modify, or review features security overrides speed and scope
+            Disallowed: content that facilitates exploitation, bypassing controls or unauthorized access. Provide safe alternatives and mitigations instead.
+
             How to sanitize inputs?
         """.trimIndent().trim()
 
