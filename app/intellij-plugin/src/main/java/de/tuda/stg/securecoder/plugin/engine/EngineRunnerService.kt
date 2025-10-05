@@ -9,6 +9,7 @@ import de.tuda.stg.securecoder.engine.stream.EventIcon
 import de.tuda.stg.securecoder.engine.stream.StreamEvent
 import de.tuda.stg.securecoder.engine.workflow.WorkflowEngine
 import de.tuda.stg.securecoder.enricher.EnricherClient
+import de.tuda.stg.securecoder.plugin.SecureCoderBundle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -39,9 +40,12 @@ class EngineRunnerService(
                 } catch (exception: Exception) {
                     thisLogger().error("Uncaught exception within the engine", exception)
                     onEvent(StreamEvent.Message(
-                        "Internal engine error",
-                        "Uncaught exception within the engine."
-                                + " This should not happen and is always a bug: ${exception.message} (${exception.javaClass.simpleName})",
+                        SecureCoderBundle.message("error.uncaught.title"),
+                        SecureCoderBundle.message(
+                            "error.uncaught.description",
+                            exception.message ?: "N/A",
+                            exception.javaClass.simpleName
+                        ),
                         EventIcon.Error
                     ))
                 } finally {
