@@ -152,6 +152,7 @@ class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
             is StreamEvent.Message -> when (event.icon) {
                 EventIcon.Info -> AllIcons.General.Information
                 EventIcon.Warning -> AllIcons.General.Warning
+                EventIcon.Error -> AllIcons.General.Error
             }
             is StreamEvent.EditFiles -> AllIcons.Actions.EditSource
         }
