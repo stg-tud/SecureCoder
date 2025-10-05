@@ -1,5 +1,7 @@
 package de.tuda.stg.securecoder.engine.file.edit
 
+import de.tuda.stg.securecoder.engine.file.FileSystem
+import de.tuda.stg.securecoder.engine.file.edit.Changes.SearchedText
 import de.tuda.stg.securecoder.engine.llm.ChatMessage
 import de.tuda.stg.securecoder.engine.llm.ChatMessage.Role
 import de.tuda.stg.securecoder.engine.llm.LlmClient
@@ -36,6 +38,7 @@ class EditFilesLlmWrapper(
     suspend fun chat(
         messages: List<ChatMessage>,
         params: LlmClient.GenerationParams,
+        fileSystem: FileSystem,
         onParseError: suspend (List<String>) -> Unit = {},
         attempts: Int = 3
     ): Changes? {
@@ -43,9 +46,10 @@ class EditFilesLlmWrapper(
         messages += ChatMessage(Role.System, prompt)
         repeat(attempts) {
             val response = llmClient.chat(messages, params)
-            when (val result = parse(response)) {
+            when (val result = parse(response, fileSystem)) {
                 is ParseResult.Ok -> return result.value
                 is ParseResult.Err -> {
+                    println("LLM parse failed: ${result.buildMessage()}")
                     messages += ChatMessage(Role.Assistant, response)
                     messages += ChatMessage(Role.Tool, result.buildMessage())
                     onParseError(result.messages)
@@ -59,12 +63,17 @@ class EditFilesLlmWrapper(
         data class Ok(val value: Changes) : ParseResult
         data class Err(val messages: List<String>) : ParseResult {
             fun buildMessage() = buildString {
-                messages.forEach { appendLine("ERROR: $it. Fix errors and provide correct code modification.\n") }
+                appendLine("Your previous output could not be applied.")
+                appendLine("It violated the required format.")
+                appendLine("Errors:")
+                messages.forEach { appendLine(it) }
+                appendLine("Respond again with ONLY <EDITN> blocks that strictly follow the rules. Do NOT include prose, markdown, or explanations.")
+                appendLine("IMPORTANT: Resend the COMPLETE set of edits you intend to apply from your previous message")
             }
         }
     }
 
-    fun parse(content: String): ParseResult {
+    suspend fun parse(content: String, fileSystem: FileSystem): ParseResult {
         val results = mutableListOf<Changes.SearchReplace>()
         val allErrors = mutableListOf<String>()
         val contentCopy = if (content.endsWith("\n")) content else content + "\n"
@@ -80,8 +89,8 @@ class EditFilesLlmWrapper(
             return ParseResult.Err(allErrors)
         }
 
-        for (m in matches) {
-            val editContent = (m.groups[2]?.value ?: "").trim()
+        for (match in matches) {
+            val editContent = (match.groups[2]?.value ?: "").trim()
             if (editContent.isEmpty()) continue
 
             val currentFileName = getTextByXMLTag(editContent, "FILE_PATH")?.trim()
@@ -107,8 +116,14 @@ class EditFilesLlmWrapper(
                 allErrors += "`<SEARCH>` and `<REPLACE>` parameters are the same"
                 continue
             }
-
-            results += Changes.SearchReplace(currentFileName, searchPart ?: "", replacePart ?: "")
+            val replace = Changes.SearchReplace(currentFileName, SearchedText(searchPart ?: ""), replacePart ?: "")
+            val content = fileSystem.getFile(currentFileName)?.content() ?: ""
+            val match = ApplyChanges.match(content, replace.searchedText)
+            if (match is ApplyChanges.MatchResult.Error) {
+                allErrors += ApplyChanges.buildErrorMessage(currentFileName, searchPart ?: "", match)
+                continue
+            }
+            results += replace
         }
 
         if (results.isEmpty()) {
@@ -117,7 +132,7 @@ class EditFilesLlmWrapper(
 
         val seen = HashSet<Pair<String, String>>()
         val deduped = results.filter { sr ->
-            seen.add(sr.fileName to sr.searchedText)
+            seen.add(sr.fileName to sr.searchedText.text)
         }
 
         return ParseResult.Ok(Changes(deduped))
