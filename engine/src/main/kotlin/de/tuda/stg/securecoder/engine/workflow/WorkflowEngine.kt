@@ -43,7 +43,11 @@ class WorkflowEngine (
             { onEvent(StreamEvent.Message("Malicious LLM output", it.joinToString(), EventIcon.Warning)) }
         )
         when (out) {
-            null -> onEvent(StreamEvent.Message("Failed generating changeset", "Failed to parse the output of the llm. Maximum amount on retries exceeded! Look for parsing errors above", EventIcon.Info))
+            null -> onEvent(StreamEvent.Message(
+                "Failed generating changeset",
+                "Failed to parse the output of the llm. Maximum amount on retries exceeded! Look for parsing errors above",
+                EventIcon.Error
+            ))
             is Changes -> onEvent(StreamEvent.EditFiles(out))
         }
         onEvent(StreamEvent.Message("Finished", "The workflow engine has finished execution", EventIcon.Info))
