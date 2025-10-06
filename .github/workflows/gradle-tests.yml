@@ -19,5 +19,6 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
       - name: Build and run tests
         run: ./gradlew test
-      - name: Generate and submit dependency graph
-        uses: gradle/actions/dependency-submission@v4
+      # The Dependency graph is disabled for the mono repo
+      #- name: Generate and submit dependency graph
+      #  uses: gradle/actions/dependency-submission@v4
