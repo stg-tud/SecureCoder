@@ -10,6 +10,7 @@ import kotlin.collections.plusAssign
 class EditFilesLlmWrapper(
     private val llmClient: LlmClient
 ) {
+    //TODO path => **uri** ; EditFilesLlmWrapper should be separate from the filesystem implementation
     private val prompt = """
         Your task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!
         
@@ -18,7 +19,7 @@ class EditFilesLlmWrapper(
         *SEARCH/REPLACE* block Rules:
         
         Every *SEARCH/REPLACE* block must contain 3 sections, each enclosed in XML tags:
-        - <FILE_PATH>: The full path of the file that will be modified.
+        - <FILE_PATH>: The full **uri** of the file that will be modified.
         - <SEARCH>: A continuous, yet concise block of lines to search for in the existing source code (*SEARCH* pattern). If this section is empty, the lines from <REPLACE> will be added to the end of the file.
         - <REPLACE>: The lines to replace the existing code found using <SEARCH>. If this section is empty, the lines specified in <SEARCH> will be removed.
         All of these sections must be included in each *SEARCH/REPLACE* block.
@@ -119,7 +120,7 @@ class EditFilesLlmWrapper(
             val replace = Changes.SearchReplace(currentFileName, SearchedText(searchPart ?: ""), replacePart ?: "")
             val content = fileSystem.getFile(currentFileName)?.content() ?: ""
             val match = ApplyChanges.match(content, replace.searchedText)
-            if (match is ApplyChanges.MatchResult.Error) {
+            if (match is Matcher.MatchResult.Error) {
                 allErrors += ApplyChanges.buildErrorMessage(currentFileName, searchPart ?: "", match)
                 continue
             }
