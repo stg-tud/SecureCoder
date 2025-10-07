@@ -13,7 +13,11 @@ import de.tuda.stg.securecoder.engine.stream.StreamEvent
 import de.tuda.stg.securecoder.enricher.EnrichFileForContext
 import de.tuda.stg.securecoder.enricher.EnrichRequest
 import de.tuda.stg.securecoder.enricher.PromptEnricher
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.supervisorScope
+import kotlinx.coroutines.withTimeoutOrNull
+import kotlin.time.TimeSource.Monotonic
 
 class WorkflowEngine (
     val enricher: PromptEnricher,
@@ -27,15 +31,11 @@ class WorkflowEngine (
         onEvent: suspend (StreamEvent) -> Unit,
     ) {
         val files = filesystem.allFiles().toList()
-        onEvent(StreamEvent.Message("Got files", files.joinToString { it.name() }, EventIcon.Info))
-        onEvent(StreamEvent.Message("Enriching prompt...", "Sending prompt to enrichment service...", EventIcon.Info))
-        val filesForPrompt = files.map { EnrichFileForContext(it.name(), it.content()) }
-        val prompt = enricher.enrich(EnrichRequest(prompt, filesForPrompt))
-        onEvent(StreamEvent.Message("Prompt enriched", "Updated prompt: ${prompt.enriched}", EventIcon.Info))
+        val enrichedPrompt = enrichPrompt(onEvent, files, prompt)
         val out = editFiles.chat(
             listOf(
                 ChatMessage(Role.System, "You are a Security Engineering Agent mainly for writing secure code"),
-                ChatMessage(Role.User, prompt.enriched),
+                ChatMessage(Role.User, enrichedPrompt),
                 ChatMessage(Role.System, FilesInContextPromptBuilder.build(files, edit = true)),
             ),
             LlmClient.GenerationParams("gpt-oss:20b"),
@@ -51,5 +51,50 @@ class WorkflowEngine (
             is Changes -> onEvent(StreamEvent.EditFiles(out))
         }
         onEvent(StreamEvent.Message("Finished", "The workflow engine has finished execution", EventIcon.Info))
+    }
+
+    private suspend fun enrichPrompt(
+        onEvent: suspend (StreamEvent) -> Unit,
+        files: List<FileSystem.File>,
+        prompt: String,
+        warnAfterMillis: Long = 300,
+    ): String = supervisorScope {
+        val filesForPrompt = files.map { EnrichFileForContext(it.name(), it.content()) }
+        val mark = Monotonic.markNow()
+        val deferred = async { enricher.enrich(EnrichRequest(prompt, filesForPrompt)) }
+        val result = runCatching {
+            val early = withTimeoutOrNull(warnAfterMillis) { deferred.await() }
+            if (early == null) {
+                onEvent(
+                    StreamEvent.Message(
+                        "Enriching prompt…",
+                        "Enrichment is taking longer than $warnAfterMillis ms.",
+                        EventIcon.Info
+                    )
+                )
+                deferred.await()
+            } else {
+                early
+            }
+        }
+        val elapsed = mark.elapsedNow()
+        result.fold(
+            onSuccess = { resp ->
+                onEvent(StreamEvent.Message(
+                    "Prompt enriched",
+                    "Updated prompt (took ${elapsed.inWholeMilliseconds} ms): ${resp.enriched}",
+                    EventIcon.Info
+                ))
+                resp.enriched
+            },
+            onFailure = { t ->
+                onEvent(StreamEvent.Message(
+                    "Enrichment failed",
+                    "Using original prompt. Reason: ${t.message ?: t::class.simpleName}",
+                    EventIcon.Warning
+                ))
+                prompt
+            }
+        )
     }
 }
