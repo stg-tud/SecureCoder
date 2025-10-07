@@ -52,7 +52,7 @@ class EditFilesLlmWrapper(
                 is ParseResult.Err -> {
                     println("LLM parse failed: ${result.buildMessage()}")
                     messages += ChatMessage(Role.Assistant, response)
-                    messages += ChatMessage(Role.Tool, result.buildMessage())
+                    messages += ChatMessage(Role.User, result.buildMessage())
                     onParseError(result.messages)
                 }
             }
