@@ -19,12 +19,12 @@ import kotlinx.serialization.json.buildJsonObject
 class OllamaClient(
     baseUrl: String = "http://127.0.0.1:11434",
     private val keepAlive: String = "5m",
+) : LlmClient {
     private val json: Json = Json {
         ignoreUnknownKeys = true
         explicitNulls = false
         encodeDefaults = true
     }
-) : LlmClient {
     private val http = HttpClient(Java) {
         install(ContentNegotiation) { json(json) }
     }
@@ -86,5 +86,5 @@ class OllamaClient(
         return respObj.message.content
     }
 
-    override fun close() { http.close() }
+    override fun close() = http.close()
 }
