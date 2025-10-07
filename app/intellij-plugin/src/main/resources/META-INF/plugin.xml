@@ -7,6 +7,7 @@
         SecureCoder brings security to your IDE by AI suggestions, and running quick critics before code lands.
     ]]></description>
     <depends>com.intellij.modules.platform</depends>
+    <resource-bundle>messages.SecureCoderBundle</resource-bundle>
     <!--<depends optional="true">com.intellij.modules.java</depends>-->
 
     <extensions defaultExtensionNs="com.intellij">
