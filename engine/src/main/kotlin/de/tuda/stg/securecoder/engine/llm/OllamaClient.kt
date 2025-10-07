@@ -73,14 +73,14 @@ class OllamaClient(
             options = options,
             keepAlive = keepAlive
         )
-
+        println("Sending llm request: $req")
         val resp = http.post(endpoint) {
             contentType(ContentType.Application.Json)
             accept(ContentType.Application.Json)
             setBody(req)
         }
         val body = resp.bodyAsText()
-        println("got $body")
+        println("Got llm response: $body")
         val respObj = json.decodeFromString<OllamaChatResponse>(body)
 
         return respObj.message.content
@@ -88,4 +88,3 @@ class OllamaClient(
 
     override fun close() { http.close() }
 }
-

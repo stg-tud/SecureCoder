@@ -14,7 +14,7 @@ object FilesInContextPromptBuilder {
         }
         appendLine("The following files are in the context:")
         for (file in files) {
-            appendLine("<<<FILE path=\"${file.name()}\">>>")
+            append("<<<FILE path=\"${file.name()}\">>>")
             append(file.content())
             appendLine("<<<END FILE>>>")
         }
