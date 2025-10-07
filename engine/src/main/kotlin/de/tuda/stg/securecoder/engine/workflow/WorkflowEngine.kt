@@ -38,9 +38,14 @@ class WorkflowEngine (
                 ChatMessage(Role.User, enrichedPrompt),
                 ChatMessage(Role.System, FilesInContextPromptBuilder.build(files, edit = true)),
             ),
-            LlmClient.GenerationParams("gpt-oss:20b"),
             filesystem,
-            { onEvent(StreamEvent.Message("Malicious LLM output", it.joinToString(), EventIcon.Warning)) }
+            onParseError = {
+                onEvent(StreamEvent.Message(
+                    "Malicious LLM output",
+                    it.joinToString(),
+                    EventIcon.Warning
+                ))
+            },
         )
         when (out) {
             null -> onEvent(StreamEvent.Message(

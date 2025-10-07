@@ -17,6 +17,7 @@ import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 
 class OllamaClient(
+    private val model: String,
     baseUrl: String = "http://127.0.0.1:11434",
     private val keepAlive: String = "5m",
 ) : LlmClient {
@@ -67,7 +68,7 @@ class OllamaClient(
         }
 
         val req = OllamaChatRequest(
-            model = params.model,
+            model = model,
             messages = mapped,
             options = options,
             keepAlive = keepAlive

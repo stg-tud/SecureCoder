@@ -23,6 +23,7 @@ import kotlinx.serialization.json.buildJsonObject
 
 class OpenRouterClient (
     private val apiKey: String,
+    private val model: String,
     private val siteName: String? = null,
 ) : LlmClient {
     private val json: Json = Json {
@@ -69,7 +70,7 @@ class OpenRouterClient (
         }
 
         val req = OpenRouterChatRequest(
-            model = params.model,
+            model = model,
             messages = mapped,
             temperature = params.temperature,
             maxTokens = params.maxTokens

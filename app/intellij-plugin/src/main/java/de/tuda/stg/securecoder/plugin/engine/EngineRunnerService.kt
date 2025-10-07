@@ -5,6 +5,7 @@ import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import com.intellij.platform.ide.progress.withBackgroundProgress
 import de.tuda.stg.securecoder.engine.llm.OllamaClient
+import de.tuda.stg.securecoder.engine.llm.OpenRouterClient
 import de.tuda.stg.securecoder.engine.stream.EventIcon
 import de.tuda.stg.securecoder.engine.stream.StreamEvent
 import de.tuda.stg.securecoder.engine.workflow.WorkflowEngine
@@ -23,7 +24,12 @@ class EngineRunnerService(
         //DummyAgentStreamer()
         WorkflowEngine(
             EnricherClient("http://localhost:7070"),
-            OllamaClient()
+            /*OpenRouterClient(
+                "",
+                "openai/gpt-oss-20b",
+                "securecoder"
+            )*/
+            OllamaClient("gpt-oss:20b")
         )
     }
 

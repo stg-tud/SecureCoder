@@ -38,8 +38,8 @@ class EditFilesLlmWrapper(
 
     suspend fun chat(
         messages: List<ChatMessage>,
-        params: LlmClient.GenerationParams,
         fileSystem: FileSystem,
+        params: LlmClient.GenerationParams = LlmClient.GenerationParams(),
         onParseError: suspend (List<String>) -> Unit = {},
         attempts: Int = 3
     ): Changes? {
