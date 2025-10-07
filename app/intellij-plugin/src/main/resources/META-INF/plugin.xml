@@ -11,7 +11,7 @@
     <!--<depends optional="true">com.intellij.modules.java</depends>-->
 
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow id="SecureCoder AI"
+        <toolWindow id="securecoder"
                     anchor="right"
                     factoryClass="de.tuda.stg.securecoder.plugin.SecureCoderAiToolWindowFactory"/>
     </extensions>
