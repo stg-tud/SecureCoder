@@ -1,8 +1,11 @@
 package de.tuda.stg.securecoder.plugin
 
 import com.intellij.icons.AllIcons
+import com.intellij.openapi.actionSystem.AnAction
+import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.components.service
+import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
@@ -19,6 +22,7 @@ import de.tuda.stg.securecoder.engine.stream.EventIcon
 import de.tuda.stg.securecoder.engine.stream.StreamEvent
 import de.tuda.stg.securecoder.plugin.edit.buildEditFilesPanel
 import de.tuda.stg.securecoder.plugin.engine.EngineRunnerService
+import de.tuda.stg.securecoder.plugin.settings.SecureCoderSettingsConfigurable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.awt.BorderLayout
@@ -43,6 +47,19 @@ class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
         val contentFactory = ContentFactory.getInstance()
         val content = contentFactory.createContent(root, null, false)
         toolWindow.contentManager.addContent(content)
+        toolWindow.setTitleActions(
+            listOf(
+            object : AnAction(
+                SecureCoderBundle.message("toolwindow.settings"),
+                null,
+                AllIcons.General.Settings
+            ), DumbAware {
+                override fun actionPerformed(e: AnActionEvent) {
+                    ShowSettingsUtil.getInstance()
+                        .showSettingsDialog(project, SecureCoderSettingsConfigurable::class.java)
+                }
+            }
+        ))
     }
 
     private fun createRoot(project: Project): JPanel = JPanel(BorderLayout()).apply {
