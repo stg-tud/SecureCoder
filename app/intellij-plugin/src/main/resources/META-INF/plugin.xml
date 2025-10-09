@@ -19,13 +19,4 @@
                                  parentId="tools"
                                  instance="de.tuda.stg.securecoder.plugin.settings.SecureCoderSettingsConfigurable"/>
     </extensions>
-
-    <actions>
-        <action id="de.tuda.stg.securecoder.plugin.HelloAction"
-                class="de.tuda.stg.securecoder.plugin.HelloAction"
-                text="SecureCoder: Say Hello"
-                description="Shows a hello message">
-            <add-to-group group-id="ToolsMenu" anchor="last"/>
-        </action>
-    </actions>
 </idea-plugin>
