@@ -24,12 +24,12 @@ class EngineRunnerService(
         //DummyAgentStreamer()
         WorkflowEngine(
             EnricherClient("http://localhost:7070"),
-            /*OpenRouterClient(
-                "",
+            OpenRouterClient(
+                "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",
                 "openai/gpt-oss-20b",
                 "securecoder"
-            )*/
-            OllamaClient("gpt-oss:20b")
+            )
+            //OllamaClient("gpt-oss:20b")
         )
     }
 
