@@ -7,22 +7,23 @@ import com.intellij.ui.EnumComboBoxModel
 import com.intellij.ui.dsl.builder.*
 import com.intellij.ui.layout.selectedValueMatches
 import de.tuda.stg.securecoder.plugin.settings.SecureCoderSettingsState.LlmProvider
+import de.tuda.stg.securecoder.plugin.SecureCoderBundle
 
-class SecureCoderSettingsConfigurable : BoundConfigurable("SecureCoder") {
+class SecureCoderSettingsConfigurable : BoundConfigurable(SecureCoderBundle.message("settings.configurable.display.name")) {
     private val settings = service<SecureCoderSettingsState>()
 
     override fun createPanel() = panel {
-        group("Connection") {
-            row("Enricher URL:") {
+        group(SecureCoderBundle.message("settings.group.connection")) {
+            row(SecureCoderBundle.message("settings.enricher.url")) {
                 textField()
                     .bindText(settings.state::enricherUrl)
                     .columns(COLUMNS_MEDIUM)
             }
         }
 
-        group("LLM Provider") {
+        group(SecureCoderBundle.message("settings.group.llmProvider")) {
             val providerBox = ComboBox(EnumComboBoxModel(LlmProvider::class.java))
-            row("Provider:") {
+            row(SecureCoderBundle.message("settings.provider")) {
                 val providerBinding: MutableProperty<LlmProvider?> = MutableProperty(
                     { settings.state.llmProvider },
                     { settings.state.llmProvider = it ?: LlmProvider.OLLAMA }
@@ -30,19 +31,19 @@ class SecureCoderSettingsConfigurable : BoundConfigurable("SecureCoder") {
                 cell(providerBox).bindItem(providerBinding)
             }
             rowsRange {
-                row("Ollama Model:") {
+                row(SecureCoderBundle.message("settings.ollama.model")) {
                     textField()
                         .bindText(settings.state::ollamaModel)
                         .columns(COLUMNS_MEDIUM)
                 }
             }.visibleIf(providerBox.selectedValueMatches { it == LlmProvider.OLLAMA })
             rowsRange {
-                row("OpenRouter API Key:") {
+                row(SecureCoderBundle.message("settings.openrouter.api.key")) {
                     passwordField()
                         .bindText(settings.state::openrouterApiKey)
                         .columns(COLUMNS_MEDIUM)
                 }
-                row("OpenRouter Model:") {
+                row(SecureCoderBundle.message("settings.openrouter.model")) {
                     textField()
                         .bindText(settings.state::openrouterModel)
                         .columns(COLUMNS_MEDIUM)
