@@ -14,6 +14,9 @@
         <toolWindow id="securecoder"
                     anchor="right"
                     factoryClass="de.tuda.stg.securecoder.plugin.SecureCoderAiToolWindowFactory"/>
+        <applicationConfigurable id="de.tuda.securecoder.settings"
+                                 displayName="SecureCoder"
+                                 instance="de.tuda.stg.securecoder.plugin.settings.SecureCoderSettingsConfigurable"/>
     </extensions>
 
     <actions>

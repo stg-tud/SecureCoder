@@ -1,6 +1,7 @@
 package de.tuda.stg.securecoder.plugin.engine
 
 import com.intellij.openapi.components.Service
+import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import com.intellij.platform.ide.progress.withBackgroundProgress
@@ -11,6 +12,8 @@ import de.tuda.stg.securecoder.engine.stream.StreamEvent
 import de.tuda.stg.securecoder.engine.workflow.WorkflowEngine
 import de.tuda.stg.securecoder.enricher.EnricherClient
 import de.tuda.stg.securecoder.plugin.SecureCoderBundle
+import de.tuda.stg.securecoder.plugin.settings.SecureCoderSettingsState
+import de.tuda.stg.securecoder.plugin.settings.SecureCoderSettingsState.LlmProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -18,18 +21,22 @@ import kotlinx.coroutines.launch
 @Service(Service.Level.PROJECT)
 class EngineRunnerService(
     private val project: Project,
-    private val cs: CoroutineScope
+    private val cs: CoroutineScope,
 ) {
+    private val settings = service<SecureCoderSettingsState>()
     private val engine by lazy {
-        //DummyAgentStreamer()
-        WorkflowEngine(
-            EnricherClient("http://localhost:7070"),
-            OpenRouterClient(
-                "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",
-                "openai/gpt-oss-20b",
+        val settings = settings.state
+        val llm = when (settings.llmProvider) {
+            LlmProvider.OPENROUTER -> OpenRouterClient(
+                settings.openrouterApiKey,
+                settings.openrouterModel,
                 "securecoder"
             )
-            //OllamaClient("gpt-oss:20b")
+            LlmProvider.OLLAMA -> OllamaClient(settings.ollamaModel)
+        }
+        WorkflowEngine(
+            EnricherClient(settings.enricherUrl),
+            llm
         )
     }
 
