@@ -24,7 +24,8 @@ class EngineRunnerService(
     private val cs: CoroutineScope,
 ) {
     private val settings = service<SecureCoderSettingsState>()
-    private val engine by lazy {
+
+    private fun buildEngine(): WorkflowEngine {
         val settings = settings.state
         val llm = when (settings.llmProvider) {
             LlmProvider.OPENROUTER -> OpenRouterClient(
@@ -34,7 +35,7 @@ class EngineRunnerService(
             )
             LlmProvider.OLLAMA -> OllamaClient(settings.ollamaModel)
         }
-        WorkflowEngine(
+        return WorkflowEngine(
             EnricherClient(settings.enricherUrl),
             llm
         )
@@ -49,6 +50,7 @@ class EngineRunnerService(
             withBackgroundProgress(project, "Running engine…", cancellable = false) {
                 val fileSystem = IntelliJProjectFileSystem(project)
                 try {
+                    val engine = buildEngine()
                     engine.start(text, fileSystem, onEvent)
                 } catch (exception: Exception) {
                     thisLogger().error("Uncaught exception within the engine", exception)
