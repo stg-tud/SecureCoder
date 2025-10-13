@@ -25,7 +25,12 @@ class EngineRunnerService(
 ) {
     private val settings = service<SecureCoderSettingsState>()
 
-    private fun buildEngine(): WorkflowEngine {
+    private data class EngineHandle(
+        val engine: WorkflowEngine,
+        val close: () -> Unit,
+    )
+
+    private fun buildEngine(): EngineHandle {
         val settings = settings.state
         val llm = when (settings.llmProvider) {
             LlmProvider.OPENROUTER -> OpenRouterClient(
@@ -35,9 +40,13 @@ class EngineRunnerService(
             )
             LlmProvider.OLLAMA -> OllamaClient(settings.ollamaModel)
         }
-        return WorkflowEngine(
-            EnricherClient(settings.enricherUrl),
-            llm
+        val enricher = EnricherClient(settings.enricherUrl)
+        return EngineHandle(
+            WorkflowEngine(enricher, llm),
+            {
+                llm.close()
+                enricher.close()
+            }
         )
     }
 
@@ -49,9 +58,10 @@ class EngineRunnerService(
         cs.launch(Dispatchers.IO) {
             withBackgroundProgress(project, "Running engine…", cancellable = false) {
                 val fileSystem = IntelliJProjectFileSystem(project)
+                var handle: EngineHandle? = null
                 try {
-                    val engine = buildEngine()
-                    engine.start(text, fileSystem, onEvent)
+                    handle = buildEngine()
+                    handle.engine.start(text, fileSystem, onEvent)
                 } catch (exception: Exception) {
                     thisLogger().error("Uncaught exception within the engine", exception)
                     onEvent(StreamEvent.Message(
@@ -64,6 +74,9 @@ class EngineRunnerService(
                         EventIcon.Error
                     ))
                 } finally {
+                    runCatching { handle?.close?.invoke() }.onFailure {
+                        thisLogger().warn("Failed closing engine handle", it)
+                    }
                     onComplete()
                 }
             }
