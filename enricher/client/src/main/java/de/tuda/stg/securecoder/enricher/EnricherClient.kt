@@ -15,7 +15,7 @@ import kotlinx.serialization.json.Json
 class EnricherClient(
     private val baseUrl: String,
     private val timeoutMillis: Long = 5_000,
-) : PromptEnricher {
+) : PromptEnricher, AutoCloseable {
     private val client: HttpClient = HttpClient(Java) {
         install(ContentNegotiation) {
             json(Json {
@@ -36,4 +36,6 @@ class EnricherClient(
         }
         return resp.body()
     }
+
+    override fun close() = client.close()
 }
