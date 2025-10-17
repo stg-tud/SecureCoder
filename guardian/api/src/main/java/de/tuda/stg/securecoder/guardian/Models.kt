@@ -13,7 +13,6 @@ data class AnalyzeRequest(val files: List<File>) /* TODO do we need ALL files? *
 
 @Serializable
 data class AnalyzeResponse(
-    val hardReject: Boolean,
     val violations: List<Violation>,
 )
 
@@ -22,6 +21,7 @@ data class Violation(
     val rule: RuleRef,
     val message: String,
     val location: Location,
+    val hardReject: Boolean,
     val confidence: String? = null,
 )
 
