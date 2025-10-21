@@ -26,7 +26,20 @@ object ApplyChanges {
             }
         }
     }
-    
+
+    fun apply(
+        changes: Changes,
+        loadFile: (file: String) -> String?,
+        saveFile: (file: String, content: String) -> Unit
+    ) {
+        val byFile = changes.searchReplaces.groupBy(Changes.SearchReplace::fileName)
+        for ((file, edits) in byFile) {
+            val original = loadFile(file) ?: ""
+            val result = applyInText(original, edits)
+            saveFile(file, result)
+        }
+    }
+
     fun match(text: String, search: Changes.SearchedText): MatchResult {
         return Matcher.RootMatcher.match(text, search)
     }
