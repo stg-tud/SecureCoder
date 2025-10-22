@@ -27,10 +27,10 @@ object ApplyChanges {
         }
     }
 
-    fun apply(
+    suspend fun applyAll(
         changes: Changes,
-        loadFile: (file: String) -> String?,
-        saveFile: (file: String, content: String) -> Unit
+        loadFile: suspend (file: String) -> String?,
+        saveFile: suspend (file: String, content: String) -> Unit
     ) {
         val byFile = changes.searchReplaces.groupBy(Changes.SearchReplace::fileName)
         for ((file, edits) in byFile) {
