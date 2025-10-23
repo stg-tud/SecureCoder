@@ -13,6 +13,7 @@ import de.tuda.stg.securecoder.engine.stream.StreamEvent
 import de.tuda.stg.securecoder.enricher.EnrichFileForContext
 import de.tuda.stg.securecoder.enricher.EnrichRequest
 import de.tuda.stg.securecoder.enricher.PromptEnricher
+import de.tuda.stg.securecoder.guardian.Guardian
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.supervisorScope
@@ -22,8 +23,10 @@ import kotlin.time.TimeSource.Monotonic
 class WorkflowEngine (
     val enricher: PromptEnricher,
     llmClient: LlmClient,
+    guardians: List<Guardian> = emptyList(),
 ) : Engine {
     private val editFiles = EditFilesLlmWrapper(llmClient)
+    private val guardianExecutor = GuardianExecutor(guardians)
 
     override suspend fun start(
         prompt: String,
@@ -53,7 +56,14 @@ class WorkflowEngine (
                 "Failed to parse the output of the llm. Maximum amount on retries exceeded! Look for parsing errors above",
                 EventIcon.Error
             ))
-            is Changes -> onEvent(StreamEvent.EditFiles(out))
+            is Changes -> {
+                onEvent(StreamEvent.EditFiles(out))
+                onEvent(StreamEvent.Message(
+                    "Guardian result",
+                    guardianExecutor.analyze(filesystem, out).violations.toString(),
+                    EventIcon.Info
+                ))
+            }
         }
         onEvent(StreamEvent.Message("Finished", "The workflow engine has finished execution", EventIcon.Info))
     }
