@@ -11,6 +11,7 @@ import de.tuda.stg.securecoder.engine.stream.EventIcon
 import de.tuda.stg.securecoder.engine.stream.StreamEvent
 import de.tuda.stg.securecoder.engine.workflow.WorkflowEngine
 import de.tuda.stg.securecoder.enricher.EnricherClient
+import de.tuda.stg.securecoder.guardian.DummyGuardian
 import de.tuda.stg.securecoder.plugin.SecureCoderBundle
 import de.tuda.stg.securecoder.plugin.settings.SecureCoderSettingsState
 import de.tuda.stg.securecoder.plugin.settings.SecureCoderSettingsState.LlmProvider
@@ -42,7 +43,7 @@ class EngineRunnerService(
         }
         val enricher = EnricherClient(settings.enricherUrl)
         return EngineHandle(
-            WorkflowEngine(enricher, llm),
+            WorkflowEngine(enricher, llm, listOf(DummyGuardian())),
             {
                 llm.close()
                 enricher.close()

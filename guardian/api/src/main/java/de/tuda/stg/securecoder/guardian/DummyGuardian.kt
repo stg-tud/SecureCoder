@@ -3,7 +3,7 @@ package de.tuda.stg.securecoder.guardian
 import kotlin.random.Random
 
 class DummyGuardian(
-    private val flagProbabilityPerFile: Double = 0.4,
+    private val flagProbabilityPerFile: Double = 0.8,
     private val hardRejet: Boolean = false,
     private val rng: Random = Random,
 ) : Guardian {
