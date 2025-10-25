@@ -50,17 +50,17 @@ class WorkflowEngine (
                 ))
             },
         )
-        when (out) {
+        when (val changes = out.changes) {
             null -> onEvent(StreamEvent.Message(
                 "Failed generating changeset",
                 "Failed to parse the output of the llm. Maximum amount on retries exceeded! Look for parsing errors above",
                 EventIcon.Error
             ))
             is Changes -> {
-                onEvent(StreamEvent.EditFiles(out))
+                onEvent(StreamEvent.EditFiles(changes))
                 onEvent(StreamEvent.Message(
                     "Guardian result",
-                    guardianExecutor.analyze(filesystem, out).violations.toString(),
+                    guardianExecutor.analyze(filesystem, changes).violations.toString(),
                     EventIcon.Info
                 ))
             }

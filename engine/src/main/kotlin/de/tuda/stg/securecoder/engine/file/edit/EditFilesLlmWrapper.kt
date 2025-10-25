@@ -42,22 +42,26 @@ class EditFilesLlmWrapper(
         params: LlmClient.GenerationParams = LlmClient.GenerationParams(),
         onParseError: suspend (List<String>) -> Unit = {},
         attempts: Int = 3
-    ): Changes? {
+    ): ChatResult {
         val messages = messages.toMutableList()
         messages += ChatMessage(Role.System, prompt)
         repeat(attempts) {
             val response = llmClient.chat(messages, params)
+            messages += ChatMessage(Role.Assistant, response)
             when (val result = parse(response, fileSystem)) {
-                is ParseResult.Ok -> return result.value
+                is ParseResult.Ok -> return ChatResult(messages, result.value)
                 is ParseResult.Err -> {
                     println("LLM parse failed: ${result.buildMessage()}")
-                    messages += ChatMessage(Role.Assistant, response)
                     messages += ChatMessage(Role.User, result.buildMessage())
                     onParseError(result.messages)
                 }
             }
         }
-        return null
+        return ChatResult(messages, null)
+    }
+
+    data class ChatResult(val messages: List<ChatMessage>, val changes: Changes?) {
+        fun changesMessage() = messages.last { it.role == Role.Assistant }
     }
 
     sealed interface ParseResult {
