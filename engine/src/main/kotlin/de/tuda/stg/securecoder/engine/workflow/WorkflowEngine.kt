@@ -24,6 +24,7 @@ class WorkflowEngine (
     val enricher: PromptEnricher,
     llmClient: LlmClient,
     guardians: List<Guardian> = emptyList(),
+    private val maxGuardianRetries: Int = 6,
 ) : Engine {
     private val editFiles = EditFilesLlmWrapper(llmClient)
     private val guardianExecutor = GuardianExecutor(guardians)
@@ -40,7 +41,7 @@ class WorkflowEngine (
             ChatMessage(Role.User, enrichedPrompt),
             ChatMessage(Role.System, FilesInContextPromptBuilder.build(files, edit = true)),
         )
-        repeat(6) { attempt ->
+        repeat(maxGuardianRetries) { attempt ->
             val out = editFiles.chat(
                 messages = messages,
                 fileSystem = filesystem,
