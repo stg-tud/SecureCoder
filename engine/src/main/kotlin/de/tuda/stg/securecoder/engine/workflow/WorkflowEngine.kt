@@ -72,6 +72,16 @@ class WorkflowEngine (
                 onEvent(StreamEvent.EditFiles(changes))
                 return@repeat
             }
+            if (attempt == maxGuardianRetries - 1) {
+                onEvent(
+                    StreamEvent.Message(
+                        "Guardian max retries reached",
+                        "Maximum amount of retries exceeded after $maxGuardianRetries tries.",
+                        EventIcon.Error
+                    )
+                )
+                return@repeat
+            }
             val feedback = guardianResult.buildFeedbackForLlm()
             onEvent(StreamEvent.Message(
                 "Guardian result",
