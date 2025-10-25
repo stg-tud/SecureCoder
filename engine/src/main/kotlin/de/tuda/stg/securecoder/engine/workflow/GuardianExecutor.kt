@@ -21,7 +21,9 @@ class GuardianExecutor (
     data class GuardianResult(
         val violations: List<Violation>,
         val files: List<File>,
-    )
+    ) {
+        fun hasNoViolations() = violations.isEmpty()
+    }
 
     suspend fun analyze(fileSystem: FileSystem, changes: Changes): GuardianResult {
         val files = mutableListOf<File>()
