@@ -53,6 +53,7 @@ class WorkflowEngine (
                     ))
                 },
             )
+            messages += out.changesMessage()
             val changes = out.changes
             if (changes == null) {
                 onEvent(StreamEvent.Message(
@@ -88,9 +89,7 @@ class WorkflowEngine (
                 guardianResult.violations.toString(),
                 EventIcon.Warning
             ))
-            messages = out.messages.toMutableList().apply {
-                add(ChatMessage(Role.User, feedback))
-            }
+            messages += ChatMessage(Role.User, feedback)
         }
         onEvent(StreamEvent.Message("Finished", "The workflow engine has finished execution", EventIcon.Info))
     }
