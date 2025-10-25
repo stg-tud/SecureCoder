@@ -92,7 +92,6 @@ interface Matcher {
 
         private fun splitToLinesAndTrimLast(text: String): List<String> {
             val lines = text.split("\n")
-            if (lines.isEmpty()) return emptyList()
             val lastNonBlankIndex = lines.indexOfLast { it.trim().isNotEmpty() }
             return if (lastNonBlankIndex >= 0) lines.take(lastNonBlankIndex + 1) else emptyList()
         }
