@@ -2,7 +2,6 @@ package de.tuda.stg.securecoder.engine.workflow
 
 import de.tuda.stg.securecoder.engine.Engine
 import de.tuda.stg.securecoder.engine.file.FileSystem
-import de.tuda.stg.securecoder.engine.file.edit.Changes
 import de.tuda.stg.securecoder.engine.llm.ChatMessage
 import de.tuda.stg.securecoder.engine.llm.ChatMessage.Role
 import de.tuda.stg.securecoder.engine.file.edit.EditFilesLlmWrapper
@@ -10,6 +9,7 @@ import de.tuda.stg.securecoder.engine.llm.FilesInContextPromptBuilder
 import de.tuda.stg.securecoder.engine.llm.LlmClient
 import de.tuda.stg.securecoder.engine.stream.EventIcon
 import de.tuda.stg.securecoder.engine.stream.StreamEvent
+import de.tuda.stg.securecoder.engine.workflow.FeedbackBuilder.buildFeedbackForLlm
 import de.tuda.stg.securecoder.enricher.EnrichFileForContext
 import de.tuda.stg.securecoder.enricher.EnrichRequest
 import de.tuda.stg.securecoder.enricher.PromptEnricher
@@ -35,34 +35,50 @@ class WorkflowEngine (
     ) {
         val files = filesystem.allFiles().toList()
         val enrichedPrompt = enrichPrompt(onEvent, files, prompt)
-        val out = editFiles.chat(
-            listOf(
-                ChatMessage(Role.System, "You are a Security Engineering Agent mainly for writing secure code"),
-                ChatMessage(Role.User, enrichedPrompt),
-                ChatMessage(Role.System, FilesInContextPromptBuilder.build(files, edit = true)),
-            ),
-            filesystem,
-            onParseError = {
-                onEvent(StreamEvent.Message(
-                    "Malicious LLM output",
-                    it.joinToString(),
-                    EventIcon.Warning
-                ))
-            },
+        var messages = mutableListOf(
+            ChatMessage(Role.System, "You are a Security Engineering Agent mainly for writing secure code"),
+            ChatMessage(Role.User, enrichedPrompt),
+            ChatMessage(Role.System, FilesInContextPromptBuilder.build(files, edit = true)),
         )
-        when (val changes = out.changes) {
-            null -> onEvent(StreamEvent.Message(
-                "Failed generating changeset",
-                "Failed to parse the output of the llm. Maximum amount on retries exceeded! Look for parsing errors above",
-                EventIcon.Error
-            ))
-            is Changes -> {
-                onEvent(StreamEvent.EditFiles(changes))
+        repeat(6) { attempt ->
+            val out = editFiles.chat(
+                messages = messages,
+                fileSystem = filesystem,
+                onParseError = {
+                    onEvent(StreamEvent.Message(
+                        "Malicious or invalid LLM output",
+                        it.joinToString("\n"),
+                        EventIcon.Warning
+                    ))
+                },
+            )
+            val changes = out.changes
+            if (changes == null) {
+                onEvent(StreamEvent.Message(
+                    "Failed generating changeset",
+                    "Failed to parse the output of the llm. Maximum amount on retries exceeded! Look for parsing errors above",
+                    EventIcon.Error
+                ))
+                return@repeat
+            }
+            val guardianResult = guardianExecutor.analyze(filesystem, changes)
+            if (guardianResult.hasNoViolations()) {
                 onEvent(StreamEvent.Message(
                     "Guardian result",
-                    guardianExecutor.analyze(filesystem, changes).violations.toString(),
+                    "No violations found. Applying edits.",
                     EventIcon.Info
                 ))
+                onEvent(StreamEvent.EditFiles(changes))
+                return@repeat
+            }
+            val feedback = guardianResult.buildFeedbackForLlm()
+            onEvent(StreamEvent.Message(
+                "Guardian result",
+                guardianResult.violations.toString(),
+                EventIcon.Warning
+            ))
+            messages = out.messages.toMutableList().apply {
+                add(ChatMessage(Role.User, feedback))
             }
         }
         onEvent(StreamEvent.Message("Finished", "The workflow engine has finished execution", EventIcon.Info))
