@@ -63,7 +63,7 @@ class EngineRunnerService(
                 var handle: EngineHandle? = null
                 try {
                     handle = buildEngine()
-                    when (val result = handle.engine.start(text, fileSystem, onEvent)) {
+                    when (val result = handle.engine.run(text, fileSystem, onEvent)) {
                         EngineResult.Failure.GenerationFailure -> {
                             onEvent(StreamEvent.Message(
                                 SecureCoderBundle.message("error.generation.title"),

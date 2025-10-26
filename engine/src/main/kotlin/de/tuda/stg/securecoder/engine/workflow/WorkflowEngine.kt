@@ -25,7 +25,7 @@ class WorkflowEngine (
     private val editFiles = EditFilesLlmWrapper(llmClient)
     private val guardianExecutor = GuardianExecutor(guardians)
 
-    override suspend fun start(
+    override suspend fun run(
         prompt: String,
         filesystem: FileSystem,
         onEvent: suspend (StreamEvent) -> Unit,

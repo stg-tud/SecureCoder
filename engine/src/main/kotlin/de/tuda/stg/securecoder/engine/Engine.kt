@@ -5,7 +5,7 @@ import de.tuda.stg.securecoder.engine.file.edit.Changes
 import de.tuda.stg.securecoder.engine.stream.StreamEvent
 
 interface Engine {
-    suspend fun start(
+    suspend fun run(
         prompt: String,
         filesystem: FileSystem,
         onEvent: suspend (StreamEvent) -> Unit,

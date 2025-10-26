@@ -10,7 +10,7 @@ import kotlinx.coroutines.delay
 import java.util.concurrent.ThreadLocalRandom
 
 class DummyAgentStreamer : Engine {
-    override suspend fun start(
+    override suspend fun run(
         prompt: String,
         filesystem: FileSystem,
         onEvent: suspend (StreamEvent) -> Unit,
