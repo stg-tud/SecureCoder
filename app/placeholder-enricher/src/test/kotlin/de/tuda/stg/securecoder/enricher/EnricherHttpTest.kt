@@ -11,7 +11,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class EnricherHttpTest {
-
     @Test
     fun testGetHealth() = testApplication {
         application {

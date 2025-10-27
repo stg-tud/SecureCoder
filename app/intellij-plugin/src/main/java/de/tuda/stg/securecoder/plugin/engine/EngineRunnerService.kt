@@ -6,6 +6,7 @@ import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import com.intellij.platform.ide.progress.withBackgroundProgress
 import de.tuda.stg.securecoder.engine.Engine.EngineResult
+import de.tuda.stg.securecoder.engine.Engine
 import de.tuda.stg.securecoder.engine.llm.OllamaClient
 import de.tuda.stg.securecoder.engine.llm.OpenRouterClient
 import de.tuda.stg.securecoder.engine.stream.EventIcon
@@ -28,7 +29,7 @@ class EngineRunnerService(
     private val settings = service<SecureCoderSettingsState>()
 
     private data class EngineHandle(
-        val engine: WorkflowEngine,
+        val engine: Engine,
         val close: () -> Unit,
     )
 
@@ -43,6 +44,7 @@ class EngineRunnerService(
             LlmProvider.OLLAMA -> OllamaClient(settings.ollamaModel)
         }
         val enricher = EnricherClient(settings.enricherUrl)
+        //return EngineHandle(DummyAgentStreamer(), {})
         return EngineHandle(
             WorkflowEngine(enricher, llm, listOf(DummyGuardian())),
             {

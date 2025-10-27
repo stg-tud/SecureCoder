@@ -43,7 +43,7 @@ class DummyAgentStreamer : Engine {
                     SearchReplace("app.py", SearchedText.append(), "\nprint(\"Hello World!2\")"),
                 ))))
             }
-            delay(1000)
+            delay(800)
         }
         return Engine.EngineResult.Failure.GenerationFailure
     }
