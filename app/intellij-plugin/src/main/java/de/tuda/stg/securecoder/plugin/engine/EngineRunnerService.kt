@@ -5,6 +5,8 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
 import com.intellij.openapi.project.Project
 import com.intellij.platform.ide.progress.withBackgroundProgress
+import de.tuda.stg.securecoder.engine.Engine.EngineResult
+import de.tuda.stg.securecoder.engine.Engine
 import de.tuda.stg.securecoder.engine.llm.OllamaClient
 import de.tuda.stg.securecoder.engine.llm.OpenRouterClient
 import de.tuda.stg.securecoder.engine.stream.EventIcon
@@ -27,7 +29,7 @@ class EngineRunnerService(
     private val settings = service<SecureCoderSettingsState>()
 
     private data class EngineHandle(
-        val engine: WorkflowEngine,
+        val engine: Engine,
         val close: () -> Unit,
     )
 
@@ -42,6 +44,7 @@ class EngineRunnerService(
             LlmProvider.OLLAMA -> OllamaClient(settings.ollamaModel)
         }
         val enricher = EnricherClient(settings.enricherUrl)
+        //return EngineHandle(DummyAgentStreamer(), {})
         return EngineHandle(
             WorkflowEngine(enricher, llm, listOf(DummyGuardian())),
             {
@@ -62,7 +65,25 @@ class EngineRunnerService(
                 var handle: EngineHandle? = null
                 try {
                     handle = buildEngine()
-                    handle.engine.start(text, fileSystem, onEvent)
+                    when (val result = handle.engine.run(text, fileSystem, onEvent)) {
+                        EngineResult.Failure.GenerationFailure -> {
+                            onEvent(StreamEvent.Message(
+                                SecureCoderBundle.message("error.generation.title"),
+                                SecureCoderBundle.message("error.generation.description"),
+                                EventIcon.Error
+                            ))
+                        }
+                        is EngineResult.Failure.ValidationFailure -> {
+                            onEvent(StreamEvent.Message(
+                                SecureCoderBundle.message("error.validation.title"),
+                                SecureCoderBundle.message("error.validation.description", result.maxGuardianRetries),
+                                EventIcon.Error
+                            ))
+                        }
+                        is EngineResult.Success -> {
+                            onEvent(StreamEvent.EditFiles(result.changes))
+                        }
+                    }
                 } catch (exception: Exception) {
                     thisLogger().error("Uncaught exception within the engine", exception)
                     onEvent(StreamEvent.Message(

@@ -57,7 +57,7 @@ suspend fun runSecurityEval(
                 }
             }
         }
-        engine.start(item.prompt, fs, onEvent)
+        engine.run(item.prompt, fs, onEvent)
         val files = fs.allFiles().toList()
         if (files.size != 1) {
             println("Expected 1 file, but got ${files.size}")

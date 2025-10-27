@@ -1,6 +1,7 @@
 package de.tuda.stg.securecoder.engine.workflow
 
 import de.tuda.stg.securecoder.engine.Engine
+import de.tuda.stg.securecoder.engine.Engine.EngineResult
 import de.tuda.stg.securecoder.engine.file.FileSystem
 import de.tuda.stg.securecoder.engine.llm.ChatMessage
 import de.tuda.stg.securecoder.engine.llm.ChatMessage.Role
@@ -24,11 +25,11 @@ class WorkflowEngine (
     private val editFiles = EditFilesLlmWrapper(llmClient)
     private val guardianExecutor = GuardianExecutor(guardians)
 
-    override suspend fun start(
+    override suspend fun run(
         prompt: String,
         filesystem: FileSystem,
         onEvent: suspend (StreamEvent) -> Unit,
-    ) {
+    ): EngineResult {
         val files = filesystem.allFiles().toList()
         val enrichedPrompt = promptEnrichRunner.enrichPrompt(onEvent, files, prompt)
         val messages = mutableListOf(
@@ -36,7 +37,7 @@ class WorkflowEngine (
             ChatMessage(Role.User, enrichedPrompt),
             ChatMessage(Role.System, FilesInContextPromptBuilder.build(files, edit = true)),
         )
-        repeat(maxGuardianRetries) { attempt ->
+        repeat(maxGuardianRetries) {
             val out = editFiles.chat(
                 messages = messages,
                 fileSystem = filesystem,
@@ -49,44 +50,18 @@ class WorkflowEngine (
                 },
             )
             messages += out.changesMessage()
-            val changes = out.changes
-            if (changes == null) {
-                onEvent(StreamEvent.Message(
-                    "Failed generating changeset",
-                    "Failed to parse the output of the llm. Maximum amount on retries exceeded! Look for parsing errors above",
-                    EventIcon.Error
-                ))
-                return@repeat
-            }
+            val changes = out.changes ?: return EngineResult.Failure.GenerationFailure
             val guardianResult = guardianExecutor.analyze(filesystem, changes)
             if (guardianResult.hasNoViolations()) {
-                onEvent(StreamEvent.Message(
-                    "Guardian result",
-                    "No violations found. Applying edits.",
-                    EventIcon.Info
-                ))
-                onEvent(StreamEvent.EditFiles(changes))
-                return@repeat
+                return EngineResult.Success(changes)
             }
-            if (attempt == maxGuardianRetries - 1) {
-                onEvent(
-                    StreamEvent.Message(
-                        "Guardian max retries reached",
-                        "Maximum amount of retries exceeded after $maxGuardianRetries tries.",
-                        EventIcon.Error
-                    )
-                )
-                return@repeat
-            }
-            val feedback = guardianResult.buildFeedbackForLlm()
             onEvent(StreamEvent.Message(
                 "Guardian result",
                 guardianResult.violations.toString(),
                 EventIcon.Warning
             ))
-            messages += ChatMessage(Role.User, feedback)
+            messages += ChatMessage(Role.User, guardianResult.buildFeedbackForLlm())
         }
-        onEvent(StreamEvent.Message("Finished", "The workflow engine has finished execution", EventIcon.Info))
+        return EngineResult.Failure.ValidationFailure(maxGuardianRetries)
     }
-
 }

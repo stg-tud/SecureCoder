@@ -10,11 +10,11 @@ import kotlinx.coroutines.delay
 import java.util.concurrent.ThreadLocalRandom
 
 class DummyAgentStreamer : Engine {
-    override suspend fun start(
+    override suspend fun run(
         prompt: String,
         filesystem: FileSystem,
         onEvent: suspend (StreamEvent) -> Unit,
-    ) {
+    ): Engine.EngineResult {
         val titles = listOf(
             "Analyzing your prompt",
             "Scanning project",
@@ -43,8 +43,9 @@ class DummyAgentStreamer : Engine {
                     SearchReplace("app.py", SearchedText.append(), "\nprint(\"Hello World!2\")"),
                 ))))
             }
-            delay(1000)
+            delay(800)
         }
+        return Engine.EngineResult.Failure.GenerationFailure
     }
 
     private fun <T> randomPick(list: List<T>): T = list[ThreadLocalRandom.current().nextInt(list.size)]
