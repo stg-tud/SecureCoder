@@ -1,6 +1,7 @@
 package de.tuda.stg.securecoder.engine.workflow
 
 import de.tuda.stg.securecoder.engine.Engine
+import de.tuda.stg.securecoder.engine.Engine.Context
 import de.tuda.stg.securecoder.engine.Engine.EngineResult
 import de.tuda.stg.securecoder.engine.file.FileSystem
 import de.tuda.stg.securecoder.engine.llm.ChatMessage
@@ -13,7 +14,6 @@ import de.tuda.stg.securecoder.engine.stream.StreamEvent
 import de.tuda.stg.securecoder.engine.workflow.FeedbackBuilder.buildFeedbackForLlm
 import de.tuda.stg.securecoder.enricher.PromptEnricher
 import de.tuda.stg.securecoder.guardian.Guardian
-import kotlinx.coroutines.flow.toList
 
 class WorkflowEngine (
     enricher: PromptEnricher,
@@ -29,13 +29,14 @@ class WorkflowEngine (
         prompt: String,
         filesystem: FileSystem,
         onEvent: suspend (StreamEvent) -> Unit,
+        context: Context?,
     ): EngineResult {
-        val files = filesystem.allFiles().toList()
-        val enrichedPrompt = promptEnrichRunner.enrichPrompt(onEvent, files, prompt)
+        val filesInContext = resolveContext(context, filesystem)
+        val enrichedPrompt = promptEnrichRunner.enrichPrompt(onEvent, filesInContext, prompt)
         val messages = mutableListOf(
             ChatMessage(Role.System, "You are a Security Engineering Agent mainly for writing secure code"),
             ChatMessage(Role.User, enrichedPrompt),
-            ChatMessage(Role.System, FilesInContextPromptBuilder.build(files, edit = true)),
+            ChatMessage(Role.System, FilesInContextPromptBuilder.build(filesInContext, edit = true)),
         )
         repeat(maxGuardianRetries) {
             val out = editFiles.chat(
