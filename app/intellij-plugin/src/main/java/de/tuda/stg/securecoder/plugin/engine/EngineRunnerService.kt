@@ -3,6 +3,7 @@ package de.tuda.stg.securecoder.plugin.engine
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.thisLogger
+import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import com.intellij.platform.ide.progress.withBackgroundProgress
 import de.tuda.stg.securecoder.engine.Engine.EngineResult
@@ -57,7 +58,8 @@ class EngineRunnerService(
     fun runEngine(
         text: String,
         onEvent: suspend (StreamEvent) -> Unit,
-        onComplete: suspend () -> Unit
+        onComplete: suspend () -> Unit,
+        reduceContextToOpenFiles: Boolean = false,
     ) {
         cs.launch(Dispatchers.IO) {
             withBackgroundProgress(project, "Running engine…", cancellable = false) {
@@ -65,7 +67,7 @@ class EngineRunnerService(
                 var handle: EngineHandle? = null
                 try {
                     handle = buildEngine()
-                    when (val result = handle.engine.run(text, fileSystem, onEvent)) {
+                    when (val result = handle.engine.run(text, fileSystem, onEvent, buildContext(reduceContextToOpenFiles))) {
                         EngineResult.Failure.GenerationFailure -> {
                             onEvent(StreamEvent.Message(
                                 SecureCoderBundle.message("error.generation.title"),
@@ -103,5 +105,17 @@ class EngineRunnerService(
                 }
             }
         }
+    }
+
+    private fun buildContext(reduceContextToOpenFiles: Boolean): Engine.Context? {
+        if (!reduceContextToOpenFiles) {
+            return null
+        }
+        return Engine.Context(
+            FileEditorManager.getInstance(project)
+                .openFiles
+                .map { it.url }
+                .toSet()
+        )
     }
 }
