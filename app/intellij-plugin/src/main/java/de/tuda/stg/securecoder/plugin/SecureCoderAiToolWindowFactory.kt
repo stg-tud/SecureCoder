@@ -32,6 +32,7 @@ import javax.swing.BorderFactory
 import javax.swing.Box
 import javax.swing.BoxLayout
 import javax.swing.JButton
+import javax.swing.JCheckBox
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.JTextArea
@@ -67,8 +68,23 @@ class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
         val preferredHeight = scroll.preferredSize.height
         scroll.maximumSize = Dimension(Int.MAX_VALUE, preferredHeight)
         val submit = createSubmitButton(preferredHeight)
-        val row = buildInputRow(scroll, submit)
-        add(row, BorderLayout.NORTH)
+        val checkBox = JCheckBox(SecureCoderBundle.message("toolwindow.useWholeProject"), true).apply {
+            alignmentX = Component.LEFT_ALIGNMENT
+            border = Borders.emptyLeft(4)
+            toolTipText = SecureCoderBundle.message("toolwindow.useWholeProject.tooltip")
+        }
+        val header = JPanel().apply {
+            layout = BoxLayout(this, BoxLayout.Y_AXIS)
+            border = Borders.empty(8)
+            alignmentX = Component.LEFT_ALIGNMENT
+        }
+        val textRow = buildTextRow(scroll)
+        val controlsRow = buildControlsRow(checkBox, submit)
+
+        header.add(textRow)
+        header.add(Box.createRigidArea(Dimension(0, JBUI.scale(8))))
+        header.add(controlsRow)
+        add(header, BorderLayout.NORTH)
 
         eventsPanel = JPanel().apply {
             layout = BoxLayout(this, BoxLayout.Y_AXIS)
@@ -83,15 +99,16 @@ class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
         setupSubmitAction(project, inputArea, submit)
     }
 
-    private fun buildInputRow(scroll: JBScrollPane, submit: JButton): JPanel {
-        val row = JPanel().apply {
-            layout = BoxLayout(this, BoxLayout.X_AXIS)
-            border = Borders.empty(8)
-        }
-        row.add(scroll)
-        row.add(Box.createRigidArea(Dimension(JBUI.scale(8), 0)))
-        row.add(submit)
-        return row
+    private fun buildControlsRow(checkBox: JCheckBox, submit: JButton): JPanel = JPanel().apply {
+        layout = BoxLayout(this, BoxLayout.X_AXIS)
+        border = Borders.empty()
+        checkBox.alignmentY = Component.CENTER_ALIGNMENT
+        checkBox.maximumSize = checkBox.preferredSize
+        submit.alignmentY = Component.CENTER_ALIGNMENT
+        submit.maximumSize = Dimension(submit.preferredSize.width, submit.preferredSize.height)
+        add(checkBox)
+        add(Box.createHorizontalGlue())
+        add(submit)
     }
 
     private fun createInputArea(): JBTextArea = JBTextArea().apply {
@@ -109,6 +126,15 @@ class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
 
     private fun createSubmitButton(height: Int): JButton = JButton(SecureCoderBundle.message("toolwindow.submit")).apply {
         maximumSize = Dimension(preferredSize.width, height)
+    }
+
+    private fun buildTextRow(scroll: JBScrollPane): JPanel = JPanel().apply {
+        layout = BoxLayout(this, BoxLayout.X_AXIS)
+        border = Borders.empty()
+        add(scroll.apply {
+            alignmentX = Component.LEFT_ALIGNMENT
+            maximumSize = Dimension(Int.MAX_VALUE, preferredSize.height)
+        })
     }
 
     private fun setupSubmitAction(project: Project, inputArea: JBTextArea, submit: JButton) {
