@@ -9,7 +9,10 @@ interface Engine {
         prompt: String,
         filesystem: FileSystem,
         onEvent: suspend (StreamEvent) -> Unit,
+        context: Context? = null,
     ): EngineResult
+
+    data class Context (val files: Set<String>)
 
     sealed interface EngineResult {
         data class Success(val changes: Changes) : EngineResult

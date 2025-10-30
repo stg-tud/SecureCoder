@@ -1,6 +1,7 @@
 package de.tuda.stg.securecoder.plugin.engine
 
 import de.tuda.stg.securecoder.engine.Engine
+import de.tuda.stg.securecoder.engine.Engine.Context
 import de.tuda.stg.securecoder.engine.file.FileSystem
 import de.tuda.stg.securecoder.engine.file.edit.Changes
 import de.tuda.stg.securecoder.engine.file.edit.Changes.*
@@ -14,6 +15,7 @@ class DummyAgentStreamer : Engine {
         prompt: String,
         filesystem: FileSystem,
         onEvent: suspend (StreamEvent) -> Unit,
+        context: Context?,
     ): Engine.EngineResult {
         val titles = listOf(
             "Analyzing your prompt",
