@@ -8,7 +8,17 @@ import com.intellij.openapi.components.Storage
 @State(name = "SecureCoderSettings", storages = [Storage("SecureCoderSettings.xml")])
 @Service(Service.Level.APP)
 class SecureCoderSettingsState : PersistentStateComponent<SecureCoderSettingsState.StateData> {
-    enum class LlmProvider { OLLAMA, OPENROUTER }
+    enum class LlmProvider {
+        OLLAMA,
+        OPENROUTER;
+
+        override fun toString(): String {
+            return when (this) {
+                OLLAMA -> "Ollama"
+                OPENROUTER -> "OpenRouter"
+            }
+        }
+    }
 
     data class StateData(
         var enricherUrl: String = "http://localhost:7070",
@@ -16,6 +26,8 @@ class SecureCoderSettingsState : PersistentStateComponent<SecureCoderSettingsSta
         var ollamaModel: String = "gpt-oss:20b",
         var openrouterApiKey: String = "",
         var openrouterModel: String = "openai/gpt-oss-20b",
+        var enablePromptEnriching: Boolean = true,
+        var enableDummyGuardian: Boolean = true,
     )
 
     private var state: StateData = StateData()

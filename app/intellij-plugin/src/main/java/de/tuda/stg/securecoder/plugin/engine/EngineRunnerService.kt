@@ -14,6 +14,7 @@ import de.tuda.stg.securecoder.engine.stream.EventIcon
 import de.tuda.stg.securecoder.engine.stream.StreamEvent
 import de.tuda.stg.securecoder.engine.workflow.WorkflowEngine
 import de.tuda.stg.securecoder.enricher.EnricherClient
+import de.tuda.stg.securecoder.enricher.PromptEnricher
 import de.tuda.stg.securecoder.guardian.DummyGuardian
 import de.tuda.stg.securecoder.plugin.SecureCoderBundle
 import de.tuda.stg.securecoder.plugin.settings.SecureCoderSettingsState
@@ -44,13 +45,24 @@ class EngineRunnerService(
             )
             LlmProvider.OLLAMA -> OllamaClient(settings.ollamaModel)
         }
-        val enricher = EnricherClient(settings.enricherUrl)
+        
+        val enricher = if (settings.enablePromptEnriching) {
+            EnricherClient(settings.enricherUrl)
+        } else {
+            PromptEnricher.PASSTHROUGH
+        }
+        val guardians = listOfNotNull(
+            if (settings.enableDummyGuardian) DummyGuardian() else null
+        )
+        
         //return EngineHandle(DummyAgentStreamer(), {})
         return EngineHandle(
-            WorkflowEngine(enricher, llm, listOf(DummyGuardian())),
+            WorkflowEngine(enricher, llm, guardians),
             {
                 llm.close()
-                enricher.close()
+                if (enricher is AutoCloseable) {
+                    enricher.close()
+                }
             }
         )
     }
