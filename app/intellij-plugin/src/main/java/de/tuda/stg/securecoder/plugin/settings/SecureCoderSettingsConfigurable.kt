@@ -54,6 +54,9 @@ class SecureCoderSettingsConfigurable : BoundConfigurable(SecureCoderBundle.mess
                     .bindText(settings.state::enricherUrl)
                     .columns(COLUMNS_MEDIUM)
             }.enabledIf(enricher.selected)
+            row {
+                checkBox("Dummy guardian").bindSelected(settings.state::enableDummyGuardian)
+            }
         }
     }
 }

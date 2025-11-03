@@ -51,10 +51,13 @@ class EngineRunnerService(
         } else {
             PromptEnricher.PASSTHROUGH
         }
+        val guardians = listOfNotNull(
+            if (settings.enableDummyGuardian) DummyGuardian() else null
+        )
         
         //return EngineHandle(DummyAgentStreamer(), {})
         return EngineHandle(
-            WorkflowEngine(enricher, llm, listOf(DummyGuardian())),
+            WorkflowEngine(enricher, llm, guardians),
             {
                 llm.close()
                 if (enricher is AutoCloseable) {
