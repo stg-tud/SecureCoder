@@ -27,7 +27,7 @@ class PromptEnrichRunner (
             val early = withTimeoutOrNull(warnAfterMillis) { deferred.await() }
             if (early == null) {
                 onEvent(
-                    StreamEvent.Message(
+                    StreamEvent.SendDebugMessage(
                         "Enriching prompt…",
                         "Enrichment is taking longer than $warnAfterMillis ms.",
                         EventIcon.Info
@@ -41,7 +41,7 @@ class PromptEnrichRunner (
         val elapsed = mark.elapsedNow()
         result.fold(
             onSuccess = { resp ->
-                onEvent(StreamEvent.Message(
+                onEvent(StreamEvent.SendDebugMessage(
                     "Prompt enriched",
                     "Updated prompt (took ${elapsed.inWholeMilliseconds} ms): ${resp.enriched}",
                     EventIcon.Info
@@ -49,7 +49,7 @@ class PromptEnrichRunner (
                 resp.enriched
             },
             onFailure = { t ->
-                onEvent(StreamEvent.Message(
+                onEvent(StreamEvent.SendDebugMessage(
                     "Enrichment failed",
                     "Using original prompt. Reason: ${t.message ?: t::class.simpleName}",
                     EventIcon.Warning

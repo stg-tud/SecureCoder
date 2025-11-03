@@ -81,14 +81,14 @@ class EngineRunnerService(
                     handle = buildEngine()
                     when (val result = handle.engine.run(text, fileSystem, onEvent, buildContext(reduceContextToOpenFiles))) {
                         EngineResult.Failure.GenerationFailure -> {
-                            onEvent(StreamEvent.Message(
+                            onEvent(StreamEvent.SendDebugMessage(
                                 SecureCoderBundle.message("error.generation.title"),
                                 SecureCoderBundle.message("error.generation.description"),
                                 EventIcon.Error
                             ))
                         }
                         is EngineResult.Failure.ValidationFailure -> {
-                            onEvent(StreamEvent.Message(
+                            onEvent(StreamEvent.SendDebugMessage(
                                 SecureCoderBundle.message("error.validation.title"),
                                 SecureCoderBundle.message("error.validation.description", result.maxGuardianRetries),
                                 EventIcon.Error
@@ -100,7 +100,7 @@ class EngineRunnerService(
                     }
                 } catch (exception: Exception) {
                     thisLogger().error("Uncaught exception within the engine", exception)
-                    onEvent(StreamEvent.Message(
+                    onEvent(StreamEvent.SendDebugMessage(
                         SecureCoderBundle.message("error.uncaught.title"),
                         SecureCoderBundle.message(
                             "error.uncaught.description",

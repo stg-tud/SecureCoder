@@ -188,11 +188,11 @@ class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
             alignmentX = Component.LEFT_ALIGNMENT
         }
         val title = when (event) {
-            is StreamEvent.Message -> event.title
+            is StreamEvent.SendDebugMessage -> event.title
             is StreamEvent.EditFiles -> "Edit Files"
         }
         val icon = when (event) {
-            is StreamEvent.Message -> when (event.icon) {
+            is StreamEvent.SendDebugMessage -> when (event.icon) {
                 EventIcon.Info -> AllIcons.General.Information
                 EventIcon.Warning -> AllIcons.General.Warning
                 EventIcon.Error -> AllIcons.General.Error
@@ -205,7 +205,7 @@ class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
         titlePanel.add(titleLabel)
 
         val content = when (event) {
-            is StreamEvent.Message -> JTextArea(event.description).apply {
+            is StreamEvent.SendDebugMessage -> JTextArea(event.description).apply {
                 isEditable = false
                 lineWrap = true
                 wrapStyleWord = true

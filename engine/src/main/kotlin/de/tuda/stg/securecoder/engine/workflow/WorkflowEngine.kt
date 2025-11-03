@@ -43,7 +43,7 @@ class WorkflowEngine (
                 messages = messages,
                 fileSystem = filesystem,
                 onParseError = {
-                    onEvent(StreamEvent.Message(
+                    onEvent(StreamEvent.SendDebugMessage(
                         "Malicious or invalid LLM output",
                         it.joinToString("\n"),
                         EventIcon.Warning
@@ -56,7 +56,7 @@ class WorkflowEngine (
             if (guardianResult.hasNoViolations()) {
                 return EngineResult.Success(changes)
             }
-            onEvent(StreamEvent.Message(
+            onEvent(StreamEvent.SendDebugMessage(
                 "Guardian result",
                 guardianResult.violations.toString(),
                 EventIcon.Warning
