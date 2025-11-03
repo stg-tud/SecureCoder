@@ -13,14 +13,6 @@ class SecureCoderSettingsConfigurable : BoundConfigurable(SecureCoderBundle.mess
     private val settings = service<SecureCoderSettingsState>()
 
     override fun createPanel() = panel {
-        group(SecureCoderBundle.message("settings.group.connection")) {
-            row(SecureCoderBundle.message("settings.enricher.url")) {
-                textField()
-                    .bindText(settings.state::enricherUrl)
-                    .columns(COLUMNS_MEDIUM)
-            }
-        }
-
         group(SecureCoderBundle.message("settings.group.llmProvider")) {
             val providerBox = ComboBox(EnumComboBoxModel(LlmProvider::class.java))
             row(SecureCoderBundle.message("settings.provider")) {
@@ -49,6 +41,17 @@ class SecureCoderSettingsConfigurable : BoundConfigurable(SecureCoderBundle.mess
                         .columns(COLUMNS_MEDIUM)
                 }
             }.visibleIf(providerBox.selectedValueMatches { it == LlmProvider.OPENROUTER })
+        }
+        group(SecureCoderBundle.message("settings.group.security")) {
+            row {
+                checkBox(SecureCoderBundle.message("settings.enricher.enabled"))
+                    .bindSelected(settings.state::enablePromptEnriching)
+            }
+            row(SecureCoderBundle.message("settings.enricher.url")) {
+                textField()
+                    .bindText(settings.state::enricherUrl)
+                    .columns(COLUMNS_MEDIUM)
+            }
         }
     }
 }
