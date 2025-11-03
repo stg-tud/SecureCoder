@@ -53,7 +53,7 @@ class SecureCoderSettingsConfigurable : BoundConfigurable(SecureCoderBundle.mess
                 textField()
                     .bindText(settings.state::enricherUrl)
                     .columns(COLUMNS_MEDIUM)
-            }.enabledIf(enricher.selected)
+            }.enabledIf(enricher.selected).bottomGap(BottomGap.SMALL)
             row {
                 checkBox("Dummy guardian").bindSelected(settings.state::enableDummyGuardian)
             }
