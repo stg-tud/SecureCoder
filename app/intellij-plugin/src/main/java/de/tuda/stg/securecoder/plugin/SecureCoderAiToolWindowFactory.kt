@@ -48,6 +48,7 @@ class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
         val contentFactory = ContentFactory.getInstance()
         val content = contentFactory.createContent(root, null, false)
         toolWindow.contentManager.addContent(content)
+        toolWindow.setIcon(AllIcons.Ultimate.Lock) // AllIcons.Ide.Readonly
         toolWindow.setTitleActions(listOf(
             object : AnAction(
                 SecureCoderBundle.message("toolwindow.settings"),
