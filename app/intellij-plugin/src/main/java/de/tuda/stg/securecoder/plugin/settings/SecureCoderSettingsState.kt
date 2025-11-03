@@ -16,6 +16,7 @@ class SecureCoderSettingsState : PersistentStateComponent<SecureCoderSettingsSta
         var ollamaModel: String = "gpt-oss:20b",
         var openrouterApiKey: String = "",
         var openrouterModel: String = "openai/gpt-oss-20b",
+        var enablePromptEnriching: Boolean = true,
     )
 
     private var state: StateData = StateData()
