@@ -50,10 +50,19 @@ suspend fun runSecurityEval(
                     println(ev)
                     fs.applyEdits(ev.changes.searchReplaces)
                 }
-                is StreamEvent.Message -> {
+                is StreamEvent.SendDebugMessage -> {
                     if (ev.icon != EventIcon.Info) {
                         println("ENGINE: $ev")
                     }
+                }
+                is StreamEvent.EnrichmentWarning -> {
+                    println("ENGINE WARNING: $ev")
+                }
+                is StreamEvent.GuardianWarning -> {
+                    println("ENGINE WARNING: $ev")
+                }
+                is StreamEvent.InvalidLlmOutputWarning -> {
+                    println("ENGINE WARNING: $ev")
                 }
             }
         }

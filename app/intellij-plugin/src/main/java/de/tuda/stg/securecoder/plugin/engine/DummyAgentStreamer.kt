@@ -37,7 +37,7 @@ class DummyAgentStreamer : Engine {
             val title = randomPick(titles) + " (${idx + 1}/24)"
             val desc = randomPick(descriptions)
             val icon = randomPick(EventIcon.entries)
-            onEvent(StreamEvent.Message(title, desc, icon))
+            onEvent(StreamEvent.SendDebugMessage(title, desc, icon))
             if (idx % 3 == 0) {
                 onEvent(StreamEvent.EditFiles(Changes(listOf(
                     SearchReplace("app.py", SearchedText.append(), "print(\"Hello World!\")"),
