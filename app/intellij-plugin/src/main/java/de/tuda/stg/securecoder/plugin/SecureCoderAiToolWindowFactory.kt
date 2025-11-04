@@ -18,10 +18,9 @@ import com.intellij.util.ui.JBFont
 import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.JBUI.Borders
 import com.intellij.util.ui.JBUI.CurrentTheme.CustomFrameDecorations.separatorForeground
-import de.tuda.stg.securecoder.engine.stream.EventIcon
-import de.tuda.stg.securecoder.engine.stream.StreamEvent
 import de.tuda.stg.securecoder.plugin.edit.buildEditFilesPanel
 import de.tuda.stg.securecoder.plugin.engine.EngineRunnerService
+import de.tuda.stg.securecoder.plugin.engine.event.UiStreamEvent
 import de.tuda.stg.securecoder.plugin.settings.SecureCoderSettingsConfigurable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -157,7 +156,7 @@ class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
                 val runner = project.service<EngineRunnerService>()
                 runner.runEngine(
                     text,
-                    onEvent = { event ->
+                    onUiEvent = { event ->
                         withContext(Dispatchers.EDT) { addEventCard(event, project) }
                     },
                     onComplete = {
@@ -171,7 +170,7 @@ class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
         }
     }
 
-    private fun addEventCard(event: StreamEvent, project: Project) {
+    private fun addEventCard(event: UiStreamEvent, project: Project) {
         val card = object : JPanel() {
             override fun getMaximumSize() = Dimension(Int.MAX_VALUE, preferredSize.height)
         }.apply {
@@ -188,16 +187,12 @@ class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
             alignmentX = Component.LEFT_ALIGNMENT
         }
         val title = when (event) {
-            is StreamEvent.SendDebugMessage -> event.title
-            is StreamEvent.EditFiles -> "Edit Files"
+            is UiStreamEvent.Message -> event.title
+            is UiStreamEvent.EditFiles -> "Edit Files"
         }
         val icon = when (event) {
-            is StreamEvent.SendDebugMessage -> when (event.icon) {
-                EventIcon.Info -> AllIcons.General.Information
-                EventIcon.Warning -> AllIcons.General.Warning
-                EventIcon.Error -> AllIcons.General.Error
-            }
-            is StreamEvent.EditFiles -> AllIcons.Actions.EditSource
+            is UiStreamEvent.Message -> event.icon
+            is UiStreamEvent.EditFiles -> AllIcons.Actions.EditSource
         }
         val titleLabel = JLabel(title, icon, JLabel.LEADING).apply {
             font = JBFont.label().asBold()
@@ -205,7 +200,7 @@ class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
         titlePanel.add(titleLabel)
 
         val content = when (event) {
-            is StreamEvent.SendDebugMessage -> JTextArea(event.description).apply {
+            is UiStreamEvent.Message -> JTextArea(event.description).apply {
                 isEditable = false
                 lineWrap = true
                 wrapStyleWord = true
@@ -213,7 +208,7 @@ class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
                 background = card.background
                 alignmentX = Component.LEFT_ALIGNMENT
             }
-            is StreamEvent.EditFiles -> buildEditFilesPanel(project, event.changes)
+            is UiStreamEvent.EditFiles -> buildEditFilesPanel(project, event.changes)
         }
 
         card.add(titlePanel)
