@@ -15,6 +15,30 @@ object StreamEventMapper {
                 icon = event.icon.toIntellijIcon()
             )
         }
+
+        is StreamEvent.EnrichmentWarning -> {
+            UiStreamEvent.Message(
+                title = SecureCoderBundle.message("warning.enrichment.title"),
+                description = SecureCoderBundle.message("warning.enrichment.description", event.errorMessage),
+                icon = AllIcons.General.Warning
+            )
+        }
+
+        is StreamEvent.GuardianWarning -> {
+            UiStreamEvent.Message(
+                title = SecureCoderBundle.message("warning.guardian.title"),
+                description = SecureCoderBundle.message("warning.guardian.description", event.violations),
+                icon = AllIcons.General.Warning
+            )
+        }
+
+        is StreamEvent.InvalidLlmOutputWarning -> {
+            UiStreamEvent.Message(
+                title = SecureCoderBundle.message("warning.llm.title"),
+                description = SecureCoderBundle.message("warning.llm.description", event.parseErrors.joinToString("\n")),
+                icon = AllIcons.General.Warning
+            )
+        }
     }
 
     fun mapException(exception: Exception): UiStreamEvent.Message {

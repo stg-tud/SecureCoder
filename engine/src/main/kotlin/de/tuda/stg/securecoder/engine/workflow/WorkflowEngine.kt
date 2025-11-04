@@ -43,11 +43,7 @@ class WorkflowEngine (
                 messages = messages,
                 fileSystem = filesystem,
                 onParseError = {
-                    onEvent(StreamEvent.SendDebugMessage(
-                        "Malicious or invalid LLM output",
-                        it.joinToString("\n"),
-                        EventIcon.Warning
-                    ))
+                    onEvent(StreamEvent.InvalidLlmOutputWarning(it))
                 },
             )
             messages += out.changesMessage()
@@ -56,11 +52,7 @@ class WorkflowEngine (
             if (guardianResult.hasNoViolations()) {
                 return EngineResult.Success(changes)
             }
-            onEvent(StreamEvent.SendDebugMessage(
-                "Guardian result",
-                guardianResult.violations.toString(),
-                EventIcon.Warning
-            ))
+            onEvent(StreamEvent.GuardianWarning(guardianResult.violations.toString()))
             messages += ChatMessage(Role.User, guardianResult.buildFeedbackForLlm())
         }
         return EngineResult.Failure.ValidationFailure(maxGuardianRetries)

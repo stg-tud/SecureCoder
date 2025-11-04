@@ -55,6 +55,15 @@ suspend fun runSecurityEval(
                         println("ENGINE: $ev")
                     }
                 }
+                is StreamEvent.EnrichmentWarning -> {
+                    println("ENGINE WARNING: $ev")
+                }
+                is StreamEvent.GuardianWarning -> {
+                    println("ENGINE WARNING: $ev")
+                }
+                is StreamEvent.InvalidLlmOutputWarning -> {
+                    println("ENGINE WARNING: $ev")
+                }
             }
         }
         engine.run(item.prompt, fs, onEvent)

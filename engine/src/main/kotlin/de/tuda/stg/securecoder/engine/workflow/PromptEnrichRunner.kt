@@ -49,10 +49,8 @@ class PromptEnrichRunner (
                 resp.enriched
             },
             onFailure = { t ->
-                onEvent(StreamEvent.SendDebugMessage(
-                    "Enrichment failed",
-                    "Using original prompt. Reason: ${t.message ?: t::class.simpleName}",
-                    EventIcon.Warning
+                onEvent(StreamEvent.EnrichmentWarning(
+                    t.message ?: t::class.simpleName.toString()
                 ))
                 prompt
             }
