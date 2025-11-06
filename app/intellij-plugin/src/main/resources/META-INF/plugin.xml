@@ -18,5 +18,8 @@
                                  parentId="tools"
                                  key="settings.configurable.display.name"
                                  instance="de.tuda.stg.securecoder.plugin.settings.SecureCoderSettingsConfigurable"/>
+        <notificationGroup id="securecoder"
+                           displayType="BALLOON"
+                           key="notification.group.name"/>
     </extensions>
 </idea-plugin>
