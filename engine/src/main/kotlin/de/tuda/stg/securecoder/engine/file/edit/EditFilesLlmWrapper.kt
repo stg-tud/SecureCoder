@@ -1,10 +1,10 @@
 package de.tuda.stg.securecoder.engine.file.edit
 
-import de.tuda.stg.securecoder.engine.file.FileSystem
 import de.tuda.stg.securecoder.engine.file.edit.Changes.SearchedText
 import de.tuda.stg.securecoder.engine.llm.ChatMessage
 import de.tuda.stg.securecoder.engine.llm.ChatMessage.Role
 import de.tuda.stg.securecoder.engine.llm.LlmClient
+import de.tuda.stg.securecoder.filesystem.FileSystem
 import kotlin.collections.plusAssign
 
 class EditFilesLlmWrapper(

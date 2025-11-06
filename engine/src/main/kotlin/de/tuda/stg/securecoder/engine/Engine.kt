@@ -1,8 +1,8 @@
 package de.tuda.stg.securecoder.engine
 
-import de.tuda.stg.securecoder.engine.file.FileSystem
 import de.tuda.stg.securecoder.engine.file.edit.Changes
 import de.tuda.stg.securecoder.engine.stream.StreamEvent
+import de.tuda.stg.securecoder.filesystem.FileSystem
 
 interface Engine {
     suspend fun run(

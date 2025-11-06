@@ -1,11 +1,11 @@
 package de.tuda.stg.securecoder.engine.workflow
 
-import de.tuda.stg.securecoder.engine.file.FileSystem
 import de.tuda.stg.securecoder.engine.stream.EventIcon
 import de.tuda.stg.securecoder.engine.stream.StreamEvent
 import de.tuda.stg.securecoder.enricher.EnrichFileForContext
 import de.tuda.stg.securecoder.enricher.EnrichRequest
 import de.tuda.stg.securecoder.enricher.PromptEnricher
+import de.tuda.stg.securecoder.filesystem.FileSystem
 import kotlinx.coroutines.async
 import kotlinx.coroutines.supervisorScope
 import kotlinx.coroutines.withTimeoutOrNull
