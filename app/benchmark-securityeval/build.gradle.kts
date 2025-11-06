@@ -7,7 +7,7 @@ plugins {
 dependencies {
     implementation(project(":engine"))
     implementation(project(":enricher:client"))
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
+    implementation(libs.kotlinx.coroutines.core)
 }
 application {
     mainClass.set("de.tuda.stg.securecoder.benchmark.MainKt")

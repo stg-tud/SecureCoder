@@ -8,11 +8,13 @@ ktor = "3.0.0"
 serialization = "1.7.3"
 intellijPlugin = "1.17.3"
 logback = "1.5.8"
+coroutines = "1.10.2"
 
 [libraries]
 # We use this as lib in buildSrc
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 ktor-server-core = { module = "io.ktor:ktor-server-core-jvm", version.ref = "ktor" }
 ktor-server-netty = { module = "io.ktor:ktor-server-netty-jvm", version.ref = "ktor" }
 ktor-client-java = { module = "io.ktor:ktor-client-java-jvm", version.ref = "ktor" }
