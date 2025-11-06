@@ -17,3 +17,6 @@ include("app:placeholder-enricher")
 include("engine")
 include("app:benchmark-securityeval")
 include("guardian:api")
+include("guardian:codeql")
+
+include("filesystem")
