@@ -9,6 +9,8 @@ interface FileSystem {
     /** This must be a name you receive from [allFiles] */
     fun getFile(name : String): File?
 
+    suspend fun upsert(name: String, content: String)
+
     interface File {
         /** File name might be relative or absolute. But must be unique in a file system */
         fun name(): String

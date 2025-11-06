@@ -10,7 +10,7 @@ class InMemoryFileSystem : FileSystem {
 
     override fun getFile(name: String): FileSystem.File? = files[name]
 
-    fun upsert(name: String, content: String) {
+    override suspend fun upsert(name: String, content: String) {
         files[name] = MemFile(name, content)
     }
 
