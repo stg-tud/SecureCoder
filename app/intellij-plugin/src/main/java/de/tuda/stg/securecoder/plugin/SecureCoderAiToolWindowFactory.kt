@@ -20,6 +20,7 @@ import com.intellij.util.ui.JBUI.Borders
 import com.intellij.util.ui.JBUI.CurrentTheme.CustomFrameDecorations.separatorForeground
 import de.tuda.stg.securecoder.plugin.edit.buildEditFilesPanel
 import de.tuda.stg.securecoder.plugin.engine.EngineRunnerService
+import de.tuda.stg.securecoder.plugin.engine.IntelliJProjectFileSystem
 import de.tuda.stg.securecoder.plugin.engine.event.UiStreamEvent
 import de.tuda.stg.securecoder.plugin.settings.SecureCoderSettingsConfigurable
 import kotlinx.coroutines.Dispatchers
@@ -208,7 +209,7 @@ class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
                 background = card.background
                 alignmentX = Component.LEFT_ALIGNMENT
             }
-            is UiStreamEvent.EditFiles -> buildEditFilesPanel(project, event.changes)
+            is UiStreamEvent.EditFiles -> buildEditFilesPanel(project, event.changes, IntelliJProjectFileSystem(project))
         }
 
         card.add(titlePanel)
@@ -225,3 +226,4 @@ class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
         }
     }
 }
+
