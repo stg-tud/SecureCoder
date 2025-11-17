@@ -3,6 +3,7 @@ package de.tuda.stg.securecoder.engine.file.edit
 import de.tuda.stg.securecoder.engine.file.edit.Matcher.MatchResult
 import de.tuda.stg.securecoder.engine.file.edit.Matcher.MatchResult.Error
 import de.tuda.stg.securecoder.engine.file.edit.Matcher.MatchResult.Success
+import de.tuda.stg.securecoder.filesystem.FileSystem
 
 object ApplyChanges {
     fun applyInText(original: String, edits: List<Changes.SearchReplace>): String {
@@ -77,6 +78,14 @@ object ApplyChanges {
             }
             appendLine("Include enough lines to make the *SEARCH* pattern uniquely match the lines to change.")
             appendLine()
+        }
+    }
+
+    suspend fun FileSystem.applyEdits(edits: List<Changes.SearchReplace>) {
+        edits.groupBy { it.fileName }.forEach { (fileName, list) ->
+            val original = getFile(fileName)?.content() ?: ""
+            val updated = applyInText(original, list)
+            upsert(fileName, updated)
         }
     }
 }

@@ -1,6 +1,7 @@
 package de.tuda.stg.securecoder.engine.llm
 
-import de.tuda.stg.securecoder.engine.file.FileSystem
+import de.tuda.stg.securecoder.filesystem.FileSystem
+
 
 object FilesInContextPromptBuilder {
     suspend fun build(files: Iterable<FileSystem.File>, edit: Boolean = false) = buildString {

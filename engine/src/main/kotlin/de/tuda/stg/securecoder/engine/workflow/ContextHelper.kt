@@ -1,7 +1,7 @@
 package de.tuda.stg.securecoder.engine.workflow
 
 import de.tuda.stg.securecoder.engine.Engine
-import de.tuda.stg.securecoder.engine.file.FileSystem
+import de.tuda.stg.securecoder.filesystem.FileSystem
 import kotlinx.coroutines.flow.toList
 import org.slf4j.LoggerFactory
 

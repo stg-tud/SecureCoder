@@ -1,16 +1,19 @@
 package de.tuda.stg.securecoder.plugin.engine
 
 import com.intellij.openapi.application.readAction
+import com.intellij.openapi.application.writeAction
 import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ProjectFileIndex
 import com.intellij.openapi.roots.ProjectRootManager
+import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFileManager
-import de.tuda.stg.securecoder.engine.file.FileSystem
+import de.tuda.stg.securecoder.filesystem.FileSystem
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import java.io.File
 import java.io.IOException
 
 class IntelliJProjectFileSystem(
@@ -43,6 +46,30 @@ class IntelliJProjectFileSystem(
     override fun getFile(name: String): FileSystem.File? {
         val vf = VirtualFileManager.getInstance().findFileByUrl(name) ?: return null
         return ProjectFile(vf, name)
+    }
+
+    override suspend fun upsert(name: String, content: String) {
+        writeAction {
+            val vfm = VirtualFileManager.getInstance()
+            var vf = vfm.findFileByUrl(name)
+            if (vf == null) {
+                val path = VfsUtilCore.urlToPath(name)
+                val ioFile = File(path)
+                val parentDirPath = ioFile.parent
+                if (parentDirPath == null) {
+                    log.warn("No parent for $name (Path: $path)")
+                    return@writeAction
+                }
+                val parentVf = VfsUtil.createDirectories(parentDirPath)
+                parentVf.refresh(false, true)
+                vf = parentVf.findChild(ioFile.name) ?: parentVf.createChildData(this, ioFile.name)
+            } else if (vf.isDirectory) {
+                log.warn("Path $name is a directory")
+                return@writeAction
+            }
+            VfsUtil.saveText(vf, content)
+            vf.refresh(false, false)
+        }
     }
 
     private inner class ProjectFile(

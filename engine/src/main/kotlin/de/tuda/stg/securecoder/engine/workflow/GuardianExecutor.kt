@@ -1,8 +1,8 @@
 package de.tuda.stg.securecoder.engine.workflow
 
-import de.tuda.stg.securecoder.engine.file.FileSystem
 import de.tuda.stg.securecoder.engine.file.edit.ApplyChanges
 import de.tuda.stg.securecoder.engine.file.edit.Changes
+import de.tuda.stg.securecoder.filesystem.FileSystem
 import de.tuda.stg.securecoder.guardian.AnalyzeRequest
 import de.tuda.stg.securecoder.guardian.File
 import de.tuda.stg.securecoder.guardian.Guardian
