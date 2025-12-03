@@ -1,7 +1,5 @@
 package de.tuda.stg.securecoder.guardian
 
-import java.io.File
-
 fun detectLanguages(files: List<File>): Set<String> {
     val extensions = files.map { it.name.substringAfterLast('.', missingDelimiterValue = "").lowercase() }
     return extensions.mapNotNull { languageFromExtension(it) }.toSet()
