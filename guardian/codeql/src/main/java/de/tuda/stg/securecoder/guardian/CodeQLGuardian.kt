@@ -111,6 +111,7 @@ class CodeQLGuardian(
             "--format=sarifv2.1.0",
             "--output", outSarif.absolutePathString(),
             "--threads=0",
+            "--download"
         )
         runProcess(args, dbDir)
     }
