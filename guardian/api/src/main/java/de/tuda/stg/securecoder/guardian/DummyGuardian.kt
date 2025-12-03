@@ -7,7 +7,7 @@ class DummyGuardian(
     private val hardRejet: Boolean = false,
     private val rng: Random = Random,
 ) : Guardian {
-    override fun run(req: AnalyzeRequest): AnalyzeResponse {
+    override suspend fun run(req: AnalyzeRequest): AnalyzeResponse {
         val violations = req.files
             .filter { rng.nextDouble() < flagProbabilityPerFile }
             .map { randomViolationFor(it) }
