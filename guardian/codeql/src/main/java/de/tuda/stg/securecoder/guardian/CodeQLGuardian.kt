@@ -49,23 +49,6 @@ class CodeQLGuardian(
         }
     }
 
-    private fun detectLanguages(files: List<File>): Set<String> {
-        val exts = files.map { it.name.substringAfterLast('.', missingDelimiterValue = "").lowercase() }
-        val langs = mutableSetOf<String>()
-        for (ext in exts) {
-            when (ext) {
-                "kt", "kts", "java" -> langs.add("java")
-                "js", "jsx", "ts", "tsx" -> langs.add("javascript")
-                "py" -> langs.add("python")
-                "rb" -> langs.add("ruby")
-                "go" -> langs.add("go")
-                "swift" -> langs.add("swift")
-                "c", "cc", "cpp", "cxx", "h", "hh", "hpp", "hxx" -> langs.add("cpp")
-                "cs" -> langs.add("csharp")
-            }
-        }
-        return langs
-    }
 
     private fun createDatabase(language: String, sourceRoot: Path, dbDir: Path) {
         val args = mutableListOf(
@@ -124,9 +107,4 @@ class CodeQLGuardian(
             throw IllegalStateException("Command failed (${args.joinToString(" ")}) with exit code $code. Output:\n$output")
         }
     }
-
 }
-
-
-
-
