@@ -16,10 +16,10 @@ import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.ui.MessageType
 import com.intellij.openapi.ui.popup.Balloon
 import com.intellij.openapi.ui.popup.JBPopupFactory
+import com.intellij.ui.AnimatedIcon
 import com.intellij.ui.awt.RelativePoint
 import de.tuda.stg.securecoder.guardian.CodeQLRunner
 import javax.swing.JComponent
-import javax.swing.JLabel
 
 class SecureCoderSettingsConfigurable : BoundConfigurable(SecureCoderBundle.message("settings.configurable.display.name")) {
     private val settings = service<SecureCoderSettingsState>()
@@ -78,9 +78,15 @@ class SecureCoderSettingsConfigurable : BoundConfigurable(SecureCoderBundle.mess
                 )
                     .bindText(settings.state::codeqlBinary)
                     .columns(COLUMNS_MEDIUM)
-                val statusLabel = JLabel("")
                 button("Test") { event ->
-                    statusLabel.text = "Checking…"
+                    val loadingBalloon = JBPopupFactory.getInstance()
+                        .createHtmlTextBalloonBuilder("Checking...", AnimatedIcon.Default.INSTANCE, null, null, null)
+                        .createBalloon()
+
+                    loadingBalloon.show(
+                        RelativePoint.getSouthOf(event.source as JComponent),
+                        Balloon.Position.below
+                    )
                     ApplicationManager.getApplication().executeOnPooledThread {
                         val bin = settings.state.codeqlBinary.ifBlank { "codeql" }
                         val (message, type) = try {
@@ -90,6 +96,7 @@ class SecureCoderSettingsConfigurable : BoundConfigurable(SecureCoderBundle.mess
                         }
                         ApplicationManager.getApplication().invokeLater(
                             {
+                                loadingBalloon.hide()
                                 val balloon = JBPopupFactory.getInstance()
                                     .createHtmlTextBalloonBuilder(message, type, null)
                                     .createBalloon()
@@ -102,7 +109,6 @@ class SecureCoderSettingsConfigurable : BoundConfigurable(SecureCoderBundle.mess
                         )
                     }
                 }
-                cell(statusLabel)
             }.enabledIf(codeql.selected)
         }
     }
