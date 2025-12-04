@@ -1,5 +1,6 @@
 package de.tuda.stg.securecoder.guardian
 
+import de.tuda.stg.securecoder.filesystem.FileSystem
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -9,7 +10,7 @@ data class File(
 )
 
 @Serializable
-data class AnalyzeRequest(val files: List<File>) /* TODO do we need ALL files? */
+data class AnalyzeRequest(val fileSystem: FileSystem, val files: List<File>) /* TODO do we need ALL files? */
 
 @Serializable
 data class AnalyzeResponse(

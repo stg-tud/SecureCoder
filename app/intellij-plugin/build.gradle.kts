@@ -11,6 +11,7 @@ intellij {
 
 dependencies {
     implementation(project(":engine"))
+    implementation(project(":guardian:codeql"))
     implementation(project(":enricher:client"))
 }
 configurations.all {
