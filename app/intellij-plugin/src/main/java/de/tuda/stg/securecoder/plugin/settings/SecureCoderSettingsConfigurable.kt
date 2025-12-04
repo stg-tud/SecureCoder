@@ -72,23 +72,23 @@ class SecureCoderSettingsConfigurable : BoundConfigurable(SecureCoderBundle.mess
                     .columns(COLUMNS_MEDIUM)
             }.enabledIf(enricher.selected).bottomGap(BottomGap.SMALL)
             row {
-                checkBox("Dummy guardian").bindSelected(settings.state::enableDummyGuardian)
+                checkBox(SecureCoderBundle.message("settings.guardian.dummy")).bindSelected(settings.state::enableDummyGuardian)
             }
-            val codeql = JBCheckBox("Enable CodeQL guardian")
+            val codeql = JBCheckBox(SecureCoderBundle.message("settings.guardian.codeql.enable"))
             row {
                 cell(codeql).bindSelected(settings.state::enableCodeQLGuardian)
             }
-            row("CodeQL binary") {
+            row(SecureCoderBundle.message("settings.codeql.binary")) {
                 val codeqlPathCell = textFieldWithBrowseButton(
-                    browseDialogTitle = "Select CodeQL binary",
+                    browseDialogTitle = SecureCoderBundle.message("settings.codeql.selectBinary"),
                     fileChooserDescriptor = FileChooserDescriptorFactory.createSingleFileDescriptor()
                 )
                     .bindText(settings.state::codeqlBinary)
                     .columns(COLUMNS_MEDIUM)
                 val codeqlPathField = codeqlPathCell.component
-                button("Test") { event ->
+                button(SecureCoderBundle.message("settings.codeql.test")) { event ->
                     val loadingBalloon = JBPopupFactory.getInstance()
-                        .createHtmlTextBalloonBuilder("Checking...", AnimatedIcon.Default.INSTANCE, null, null, null)
+                        .createHtmlTextBalloonBuilder(SecureCoderBundle.message("settings.codeql.checking"), AnimatedIcon.Default.INSTANCE, null, null, null)
                         .createBalloon()
 
                     loadingBalloon.show(
@@ -98,9 +98,9 @@ class SecureCoderSettingsConfigurable : BoundConfigurable(SecureCoderBundle.mess
                     ApplicationManager.getApplication().executeOnPooledThread {
                         val bin = settings.state.codeqlBinary.ifBlank { "codeql" }
                         val (message, type) = try {
-                            "Found CodeQL ${CodeQLRunner(bin).getToolVersion()}" to MessageType.INFO
+                            SecureCoderBundle.message("settings.codeql.found", CodeQLRunner(bin).getToolVersion()) to MessageType.INFO
                         } catch (e: Exception) {
-                            "Error: " + (e.message ?: e.toString()) to MessageType.ERROR
+                            SecureCoderBundle.message("settings.codeql.error", (e.message ?: e.toString())) to MessageType.ERROR
                         }
                         ApplicationManager.getApplication().invokeLater(
                             {
@@ -117,10 +117,10 @@ class SecureCoderSettingsConfigurable : BoundConfigurable(SecureCoderBundle.mess
                         )
                     }
                 }
-                button("Download") { event ->
+                button(SecureCoderBundle.message("settings.codeql.download")) { event ->
                     val button = event.source as JButton
                     button.setEnabled(false)
-                    ProgressManager.getInstance().run(object : Task.Backgroundable(null, "Installing CodeQL", true) {
+                    ProgressManager.getInstance().run(object : Task.Backgroundable(null, SecureCoderBundle.message("settings.codeql.installing"), true) {
                         private var resultPath: Path? = null
                         private var exception: Exception? = null
 
@@ -137,16 +137,19 @@ class SecureCoderSettingsConfigurable : BoundConfigurable(SecureCoderBundle.mess
                             button.setEnabled(true)
                             if (exception != null) {
                                 JBPopupFactory.getInstance()
-                                    .createHtmlTextBalloonBuilder("Failed to install CodeQL: ${exception!!.message}", MessageType.ERROR, null)
+                                    .createHtmlTextBalloonBuilder(
+                                        SecureCoderBundle.message("settings.codeql.install.failed", exception!!.message ?: exception!!.toString()),
+                                        MessageType.ERROR,
+                                        null
+                                    )
                                     .createBalloon()
                                     .show(RelativePoint.getSouthOf(button), Balloon.Position.below)
                             } else if (resultPath != null) {
                                 val path = resultPath.toString()
-                                // Update settings and the visible input field so the user sees it immediately
                                 settings.state.codeqlBinary = path
                                 codeqlPathField.text = path
                                 JBPopupFactory.getInstance()
-                                    .createHtmlTextBalloonBuilder("Downloaded!", MessageType.INFO, null)
+                                    .createHtmlTextBalloonBuilder(SecureCoderBundle.message("settings.codeql.downloaded"), MessageType.INFO, null)
                                     .createBalloon()
                                     .show(RelativePoint.getSouthOf(button), Balloon.Position.below)
                             }
