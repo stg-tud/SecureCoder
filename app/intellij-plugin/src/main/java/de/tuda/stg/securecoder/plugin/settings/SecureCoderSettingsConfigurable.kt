@@ -11,6 +11,10 @@ import com.intellij.ui.layout.selected
 import com.intellij.ui.layout.selectedValueMatches
 import de.tuda.stg.securecoder.plugin.settings.SecureCoderSettingsState.LlmProvider
 import de.tuda.stg.securecoder.plugin.SecureCoderBundle
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.ModalityState
+import de.tuda.stg.securecoder.guardian.CodeQLRunner
+import javax.swing.JLabel
 
 class SecureCoderSettingsConfigurable : BoundConfigurable(SecureCoderBundle.message("settings.configurable.display.name")) {
     private val settings = service<SecureCoderSettingsState>()
@@ -63,13 +67,30 @@ class SecureCoderSettingsConfigurable : BoundConfigurable(SecureCoderBundle.mess
                 cell(codeql).bindSelected(settings.state::enableCodeQLGuardian)
             }
             row("CodeQL binary") {
-                textFieldWithBrowseButton(
+                val codeqlField = textFieldWithBrowseButton(
                     browseDialogTitle = "Select CodeQL binary",
-                    project = null,
                     fileChooserDescriptor = FileChooserDescriptorFactory.createSingleFileDescriptor()
                 )
                     .bindText(settings.state::codeqlBinary)
                     .columns(COLUMNS_MEDIUM)
+                val statusLabel = JLabel("")
+                button("Check") {
+                    statusLabel.text = "Checking…"
+                    ApplicationManager.getApplication().executeOnPooledThread {
+                        val bin = settings.state.codeqlBinary.ifBlank { "codeql" }
+                        val result = try {
+                            CodeQLRunner(bin).getToolVersion()
+                        } catch (e: Exception) {
+                            "Error: " + (e.message ?: e.toString())
+                        }
+                        println(result)
+                        ApplicationManager.getApplication().invokeLater(
+                            { statusLabel.text = result },
+                            ModalityState.any()
+                        )
+                    }
+                }
+                cell(statusLabel)
             }.enabledIf(codeql.selected)
         }
     }
