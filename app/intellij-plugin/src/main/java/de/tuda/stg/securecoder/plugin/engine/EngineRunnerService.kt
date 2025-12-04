@@ -53,7 +53,7 @@ class EngineRunnerService(
         }
         val guardians = listOfNotNull(
             if (settings.enableDummyGuardian) DummyGuardian() else null,
-            CodeQLGuardian()
+            if (settings.enableCodeQLGuardian) CodeQLGuardian(settings.codeqlBinary) else null
         )
         
         //return EngineHandle(DummyAgentStreamer(), {})

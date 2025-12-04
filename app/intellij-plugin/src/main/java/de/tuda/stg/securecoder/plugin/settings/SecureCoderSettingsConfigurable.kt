@@ -1,6 +1,7 @@
 package de.tuda.stg.securecoder.plugin.settings
 
 import com.intellij.openapi.components.*
+import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.options.BoundConfigurable
 import com.intellij.openapi.ui.ComboBox
 import com.intellij.ui.EnumComboBoxModel
@@ -57,6 +58,19 @@ class SecureCoderSettingsConfigurable : BoundConfigurable(SecureCoderBundle.mess
             row {
                 checkBox("Dummy guardian").bindSelected(settings.state::enableDummyGuardian)
             }
+            val codeql = JBCheckBox("Enable CodeQL guardian")
+            row {
+                cell(codeql).bindSelected(settings.state::enableCodeQLGuardian)
+            }
+            row("CodeQL binary") {
+                textFieldWithBrowseButton(
+                    browseDialogTitle = "Select CodeQL binary",
+                    project = null,
+                    fileChooserDescriptor = FileChooserDescriptorFactory.createSingleFileDescriptor()
+                )
+                    .bindText(settings.state::codeqlBinary)
+                    .columns(COLUMNS_MEDIUM)
+            }.enabledIf(codeql.selected)
         }
     }
 }
