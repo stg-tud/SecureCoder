@@ -80,8 +80,7 @@ class SecureCoderSettingsConfigurable : BoundConfigurable(SecureCoderBundle.mess
             }
             row(SecureCoderBundle.message("settings.codeql.binary")) {
                 val codeqlPathCell = textFieldWithBrowseButton(
-                    browseDialogTitle = SecureCoderBundle.message("settings.codeql.selectBinary"),
-                    fileChooserDescriptor = FileChooserDescriptorFactory.createSingleFileDescriptor()
+                    FileChooserDescriptorFactory.singleFile()
                 )
                     .bindText(settings.state::codeqlBinary)
                     .columns(COLUMNS_MEDIUM)

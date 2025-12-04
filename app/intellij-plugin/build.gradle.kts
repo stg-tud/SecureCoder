@@ -15,7 +15,7 @@ dependencies {
     implementation(project(":guardian:codeql"))
     implementation(project(":enricher:client"))
     intellijPlatform {
-        create("IC", "2024.2")
+        create("IC", "2025.1.7")
     }
 }
 configurations.all {
@@ -28,10 +28,6 @@ tasks {
         changeNotes.set("""
             Initial preview.
         """.trimIndent())
-    }
-
-    runIde {
-        // ideDir.set(file(System.getProperty("user.home") + "/.cache/JetBrains/Toolbox/apps/IDEA-C/ch-0/242.xxxxx"))
     }
 
     buildPlugin {}
