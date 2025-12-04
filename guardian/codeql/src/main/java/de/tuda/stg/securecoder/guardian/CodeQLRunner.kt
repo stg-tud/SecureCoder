@@ -49,8 +49,12 @@ class CodeQLRunner(
 
     fun getToolVersion(): String {
         val output = runProcess(listOf(codeqlBinary, "--version"), null)
-        val versionString = output.lineSequence().firstOrNull()?.trim().takeIf { !it.isNullOrEmpty() }
-        if (versionString != null) return versionString
-        throw IllegalStateException("CodeQL version command")
+        val firstLine = output.lineSequence().firstOrNull()?.trim()
+            ?: throw IllegalStateException("CodeQL --version produced no output")
+        // "CodeQL command-line toolchain release 2.18.0"
+        val versionRegex = Regex("\\b\\d+(?:\\.\\d+)+\\b")
+        val match = versionRegex.find(firstLine)
+        if (match != null) return match.value
+        throw IllegalStateException("Unable to parse CodeQL version from: '$firstLine'")
     }
 }
