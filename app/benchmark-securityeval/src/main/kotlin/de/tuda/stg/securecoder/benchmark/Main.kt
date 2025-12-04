@@ -1,12 +1,13 @@
 package de.tuda.stg.securecoder.benchmark
 
 import de.tuda.stg.securecoder.engine.Engine
-import de.tuda.stg.securecoder.engine.file.InMemoryFileSystem
+import de.tuda.stg.securecoder.engine.file.edit.ApplyChanges.applyEdits
 import de.tuda.stg.securecoder.engine.llm.OllamaClient
 import de.tuda.stg.securecoder.engine.stream.EventIcon
 import de.tuda.stg.securecoder.engine.stream.StreamEvent
 import de.tuda.stg.securecoder.engine.workflow.WorkflowEngine
 import de.tuda.stg.securecoder.enricher.EnricherClient
+import de.tuda.stg.securecoder.filesystem.InMemoryFileSystem
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.SerialName
