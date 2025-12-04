@@ -13,7 +13,12 @@ import de.tuda.stg.securecoder.plugin.settings.SecureCoderSettingsState.LlmProvi
 import de.tuda.stg.securecoder.plugin.SecureCoderBundle
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
+import com.intellij.openapi.ui.MessageType
+import com.intellij.openapi.ui.popup.Balloon
+import com.intellij.openapi.ui.popup.JBPopupFactory
+import com.intellij.ui.awt.RelativePoint
 import de.tuda.stg.securecoder.guardian.CodeQLRunner
+import javax.swing.JComponent
 import javax.swing.JLabel
 
 class SecureCoderSettingsConfigurable : BoundConfigurable(SecureCoderBundle.message("settings.configurable.display.name")) {
@@ -67,25 +72,32 @@ class SecureCoderSettingsConfigurable : BoundConfigurable(SecureCoderBundle.mess
                 cell(codeql).bindSelected(settings.state::enableCodeQLGuardian)
             }
             row("CodeQL binary") {
-                val codeqlField = textFieldWithBrowseButton(
+                textFieldWithBrowseButton(
                     browseDialogTitle = "Select CodeQL binary",
                     fileChooserDescriptor = FileChooserDescriptorFactory.createSingleFileDescriptor()
                 )
                     .bindText(settings.state::codeqlBinary)
                     .columns(COLUMNS_MEDIUM)
                 val statusLabel = JLabel("")
-                button("Check") {
+                button("Test") { event ->
                     statusLabel.text = "Checking…"
                     ApplicationManager.getApplication().executeOnPooledThread {
                         val bin = settings.state.codeqlBinary.ifBlank { "codeql" }
-                        val result = try {
-                            CodeQLRunner(bin).getToolVersion()
+                        val (message, type) = try {
+                            "Found CodeQL ${CodeQLRunner(bin).getToolVersion()}" to MessageType.INFO
                         } catch (e: Exception) {
-                            "Error: " + (e.message ?: e.toString())
+                            "Error: " + (e.message ?: e.toString()) to MessageType.ERROR
                         }
-                        println(result)
                         ApplicationManager.getApplication().invokeLater(
-                            { statusLabel.text = result },
+                            {
+                                val balloon = JBPopupFactory.getInstance()
+                                    .createHtmlTextBalloonBuilder(message, type, null)
+                                    .createBalloon()
+                                balloon.show(
+                                    RelativePoint.getSouthOf(event.source as JComponent),
+                                    Balloon.Position.below
+                                )
+                            },
                             ModalityState.any()
                         )
                     }
