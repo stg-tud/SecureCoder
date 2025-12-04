@@ -32,7 +32,7 @@ class GuardianExecutor (
             { fileSystem.getFile(it)?.content() },
             { file, content -> files.add(File(file, content)) }
         )
-        val request = AnalyzeRequest(files)
+        val request = AnalyzeRequest(fileSystem, files)
         val result = execute(request)
         return result
     }
