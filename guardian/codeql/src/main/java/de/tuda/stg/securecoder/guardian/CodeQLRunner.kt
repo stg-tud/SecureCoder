@@ -32,16 +32,25 @@ class CodeQLRunner(
         runProcess(args, dbDir)
     }
 
-    private fun runProcess(args: List<String>, cwd: Path) {
+    private fun runProcess(args: List<String>, cwd: Path?): String {
         val pb = ProcessBuilder(args)
-            .directory(cwd.toFile())
             .redirectErrorStream(true)
+        if (cwd != null) {
+            pb.directory(cwd.toFile())
+        }
         val proc = pb.start()
         val output = proc.inputStream.bufferedReader().use { it.readText() }
         val code = proc.waitFor()
-        println(output)
         if (code != 0) {
             throw IllegalStateException("Command failed (${args.joinToString(" ")}) with exit code $code. Output:\n$output")
         }
+        return output
+    }
+
+    fun getToolVersion(): String {
+        val output = runProcess(listOf(codeqlBinary, "--version"), null)
+        val versionString = output.lineSequence().firstOrNull()?.trim().takeIf { !it.isNullOrEmpty() }
+        if (versionString != null) return versionString
+        throw IllegalStateException("CodeQL version command")
     }
 }
