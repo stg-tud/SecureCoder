@@ -15,6 +15,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 public class CodeQLInstaller {
     private static final Logger LOG = Logger.getInstance(CodeQLInstaller.class);
@@ -89,6 +90,20 @@ public class CodeQLInstaller {
             if (indicator != null) indicator.setText("Extracting CodeQL...");
             new Decompressor.Zip(tempZip).extract(installDir);
             Path executable = getExecutablePath(installDir);
+            Path codeqlHome = installDir.resolve("codeql");
+            Path mainBin = codeqlHome.resolve("codeql");
+            setExecutablePermissions(mainBin);
+            Path toolsDir = codeqlHome.resolve("tools");
+            if (Files.exists(toolsDir)) {
+                try (Stream<Path> stream = Files.walk(toolsDir)) {
+                    stream.filter(p -> {
+                        Path parent = p.getParent();
+                        return parent != null && "bin".equals(parent.getFileName().toString()) && Files.isRegularFile(p);
+                    }).forEach(this::setExecutablePermissions);
+                } catch (IOException e) {
+                    LOG.warn("Failed to walk tools directory for permissions: " + toolsDir, e);
+                }
+            }
             setExecutablePermissions(executable);
         } finally {
             FileUtil.delete(tempZip);
@@ -98,7 +113,8 @@ public class CodeQLInstaller {
     private Path getExecutablePath(Path installDir) {
         Path binDir = installDir.resolve("codeql");
         return SystemInfo.isWindows
-                ? binDir.resolve("codeql.exe") : binDir.resolve("codeql");
+                ? binDir.resolve("codeql.exe")
+                : binDir.resolve("codeql");
     }
 
     private String getDownloadUrl(String version) {
