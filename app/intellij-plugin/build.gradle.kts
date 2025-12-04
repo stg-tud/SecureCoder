@@ -3,16 +3,20 @@ plugins {
     alias(libs.plugins.intellij)
 }
 
-intellij {
-    version.set("2024.2")
-    type.set("IC")
-    plugins.set(listOf()) // java
+repositories {
+    mavenCentral()
+    intellijPlatform {
+        defaultRepositories()
+    }
 }
 
 dependencies {
     implementation(project(":engine"))
     implementation(project(":guardian:codeql"))
     implementation(project(":enricher:client"))
+    intellijPlatform {
+        create("IC", "2024.2")
+    }
 }
 configurations.all {
     exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-core")
