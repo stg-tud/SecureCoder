@@ -3,10 +3,10 @@
 # https://docs.gradle.org/current/userguide/platforms.html#sub::toml-dependencies-format
 
 [versions]
-kotlin = "2.2.0"
+kotlin = "2.2.21"
 ktor = "3.0.0"
 serialization = "1.7.3"
-intellijPlugin = "2.2.1"
+intellijPlugin = "2.10.5"
 logback = "1.5.8"
 coroutines = "1.10.2"
 

@@ -15,12 +15,11 @@ dependencies {
     implementation(project(":guardian:codeql"))
     implementation(project(":enricher:client"))
     intellijPlatform {
-        create("IC", "2025.1.7")
+        create("IC", "2025.2.5")
     }
 }
-configurations.all {
-    exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-core")
-    exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-jdk8")
+kotlin {
+    jvmToolchain(21)
 }
 
 tasks {
