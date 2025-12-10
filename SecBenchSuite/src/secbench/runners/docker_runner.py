@@ -1,178 +1,137 @@
+import docker
+import os
+import sys
 import asyncio
-import logging
-import shlex
-from pathlib import Path
-from typing import Dict, List, Optional, Union, Callable
-
-logger = logging.getLogger(__name__)
+import platform
+from typing import AsyncIterator, Optional
+from secbench.runners.base import BaseRunner
 
 
-class DockerRunner:
-    """
-    A wrapper around the Docker CLI to run containers and execute commands.
-    """
+class DockerRunner(BaseRunner):
+    def __init__(self, image_name: str = "co1lin/cweval"):
+        super().__init__("docker", "")
+        self.image_name = image_name
+        self.client = self._init_client()
 
-    def __init__(self, image: str):
-        self.image = image
+    def _init_client(self) -> Optional[docker.DockerClient]:
+        try:
+            client = docker.from_env()
+            client.ping()
+            return client
+        except docker.errors.DockerException as e:
+            # Fallback: Check for macOS user-level socket if default fails
+            user_socket = os.path.expanduser("~/.docker/run/docker.sock")
+            if os.path.exists(user_socket):
+                try:
+                    client = docker.DockerClient(base_url=f"unix://{user_socket}")
+                    client.ping()
+                    return client
+                except docker.errors.DockerException:
+                    pass
 
-    async def run_ephemeral(
-        self,
-        command: str,
-        volumes: Dict[str, str] = {},
-        env: Dict[str, str] = {},
-        workdir: Optional[str] = None,
-        network: str = "host",
-        remove: bool = True,
-        output_callback: Optional[Callable[[str], None]] = None,
-    ) -> int:
-        """
-        Run a command in a new container and exit.
-        Equivalent to `docker run --rm ...`
-        """
-        cmd_parts = ["docker", "run"]
-        if remove:
-            cmd_parts.append("--rm")
+            # If we are here, we failed to connect
+            # We will raise this later when run is called if client is None
+            return None
 
-        cmd_parts.extend(["--net", network])
+    async def pull_image(self) -> AsyncIterator[str]:
+        if not self.client:
+            yield "Error: Docker client not initialized. Is Docker running?"
+            return
 
-        for host_path, container_path in volumes.items():
-            cmd_parts.extend(["-v", f"{host_path}:{container_path}"])
+        try:
+            yield f"Pulling image {self.image_name}..."
+            # Run blocking pull in executor
+            loop = asyncio.get_running_loop()
+            await loop.run_in_executor(None, self.client.images.pull, self.image_name)
+            yield f"Successfully pulled {self.image_name}"
+        except Exception as e:
+            yield f"Error pulling image: {e}"
 
-        for key, value in env.items():
-            if value:
-                cmd_parts.extend(["-e", f"{key}={value}"])
+    async def run(self, target: str, **kwargs) -> AsyncIterator[str]:
+        if not self.client:
+            yield "Error: Docker client not initialized. Is Docker running?"
+            return
 
-        if workdir:
-            cmd_parts.extend(["-w", workdir])
+        # Determine if we are on an ARM-based host (e.g. Apple Silicon)
+        # This might be needed for environment variables inside the container
+        is_arm = platform.machine().lower() in ("arm64", "aarch64")
 
-        cmd_parts.append(self.image)
-        cmd_parts.extend(shlex.split(command))
+        # Prepare environment variables if passed
+        environment = kwargs.get("environment", {})
 
-        logger.info(f"Running docker command: {' '.join(cmd_parts)}")
+        # Prepare volumes if passed
+        volumes = kwargs.get("volumes", {})
 
-        process = await asyncio.create_subprocess_exec(
-            *cmd_parts, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.STDOUT
-        )
+        container = None
+        try:
+            # Run container
+            # We use detach=True to get the container object and stream logs
+            container = self.client.containers.run(
+                self.image_name,
+                command=target,
+                detach=True,
+                auto_remove=False,  # We remove it manually to ensure we get all logs
+                environment=environment,
+                volumes=volumes,
+                network_mode="host",  # Recommended in README
+            )
 
-        if process.stdout:
-            async for line in process.stdout:
-                decoded = line.decode().strip()
-                if output_callback:
-                    output_callback(f"[docker] {decoded}")
-                else:
-                    print(f"[docker] {decoded}")
+            yield f"Container started: {container.short_id}"
 
-        return await process.wait()
+            # Stream logs
+            # container.logs(stream=True) returns a blocking generator.
+            # We need to iterate it without blocking the event loop.
+            # Since we can't easily await the generator yield, we might need to run the whole log consumption in a thread
+            # and put lines into a queue, or just iterate and accept it blocks the loop briefly for each chunk.
+            # Given this is a CLI tool, blocking the loop briefly might be acceptable, but for long running tasks it's bad.
+            # However, `docker-py` logs stream is blocking.
 
-    async def run_detached(
-        self,
-        name: str,
-        volumes: Dict[str, str] = {},
-        env: Dict[str, str] = {},
-        workdir: Optional[str] = None,
-        entrypoint: Optional[str] = None,
-    ) -> str:
-        """
-        Start a detached container. Returns the container ID/name.
-        """
-        cmd_parts = ["docker", "run", "-d", "--name", name, "--rm"]
+            # Better approach for async generator from blocking generator:
+            queue = asyncio.Queue()
+            loop = asyncio.get_running_loop()
 
-        for host_path, container_path in volumes.items():
-            cmd_parts.extend(["-v", f"{host_path}:{container_path}"])
+            def log_reader():
+                try:
+                    for line in container.logs(
+                        stream=True, follow=True, stdout=True, stderr=True
+                    ):
+                        loop.call_soon_threadsafe(queue.put_nowait, line)
+                    loop.call_soon_threadsafe(queue.put_nowait, None)  # Sentinel
+                except Exception as e:
+                    loop.call_soon_threadsafe(queue.put_nowait, e)
 
-        for key, value in env.items():
-            if value:
-                cmd_parts.extend(["-e", f"{key}={value}"])
+            # Start log reader in a separate thread
+            import threading
 
-        if workdir:
-            cmd_parts.extend(["-w", workdir])
+            thread = threading.Thread(target=log_reader)
+            thread.start()
 
-        if entrypoint:
-            cmd_parts.extend(["--entrypoint", entrypoint])
+            while True:
+                line = await queue.get()
+                if line is None:
+                    break
+                if isinstance(line, Exception):
+                    yield f"Error reading logs: {line}"
+                    break
+                # Decode bytes
+                decoded_line = line.decode("utf-8", errors="replace")
+                yield decoded_line
 
-        cmd_parts.extend([self.image, "tail", "-f", "/dev/null"])  # Keep alive
+            thread.join()
 
-        process = await asyncio.create_subprocess_exec(
-            *cmd_parts, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
-        )
-        stdout, stderr = await process.communicate()
+            # Wait for container to finish and get exit code
+            result = container.wait()
+            exit_code = result.get("StatusCode", 0)
 
-        if process.returncode != 0:
-            raise RuntimeError(f"Failed to start container: {stderr.decode()}")
+            if exit_code != 0:
+                yield f"Container exited with code {exit_code}"
 
-        return name
-
-    async def exec_command(
-        self,
-        container: str,
-        command: str,
-        output_callback: Optional[Callable[[str], None]] = None,
-    ) -> int:
-        """
-        Execute a command in a running container.
-        """
-        cmd_parts = ["docker", "exec", container]
-        cmd_parts.extend(shlex.split(command))
-
-        process = await asyncio.create_subprocess_exec(
-            *cmd_parts, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.STDOUT
-        )
-
-        if process.stdout:
-            async for line in process.stdout:
-                decoded = line.decode().strip()
-                if output_callback:
-                    output_callback(f"[{container}] {decoded}")
-                else:
-                    print(f"[{container}] {decoded}")
-
-        return await process.wait()
-
-    async def stop(self, container: str):
-        """Stop a running container."""
-        process = await asyncio.create_subprocess_exec(
-            "docker",
-            "stop",
-            container,
-            stdout=asyncio.subprocess.DEVNULL,
-            stderr=asyncio.subprocess.DEVNULL,
-        )
-        await process.wait()
-
-    async def stream_logs(
-        self,
-        container: str,
-        output_callback: Callable[[str], None],
-    ):
-        """
-        Stream logs from a container using `docker logs -f`.
-        """
-        process = await asyncio.create_subprocess_exec(
-            "docker",
-            "logs",
-            "-f",
-            container,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.STDOUT,
-        )
-
-        if process.stdout:
-            async for line in process.stdout:
-                decoded = line.decode().strip()
-                output_callback(f"[{container}] {decoded}")
-
-        await process.wait()
-
-    async def remove(self, container: str, force: bool = True):
-        """Remove a container."""
-        cmd = ["docker", "rm"]
-        if force:
-            cmd.append("-f")
-        cmd.append(container)
-
-        process = await asyncio.create_subprocess_exec(
-            *cmd,
-            stdout=asyncio.subprocess.DEVNULL,
-            stderr=asyncio.subprocess.DEVNULL,
-        )
-        await process.wait()
+        except Exception as e:
+            yield f"Error running container: {e}"
+        finally:
+            if container:
+                try:
+                    container.stop()
+                    container.remove()
+                except Exception:
+                    pass

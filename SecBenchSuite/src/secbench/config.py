@@ -1,4 +1,5 @@
 import yaml
+import os
 from pathlib import Path
 from typing import Any, Dict, Optional
 from dataclasses import dataclass
@@ -8,7 +9,7 @@ from dataclasses import dataclass
 class Config:
     openai_api_key: Optional[str] = None
     openrouter_api_key: Optional[str] = None
-    default_model: str = "openai/gpt-3.5-turbo"
+    default_model: str = "openai/gpt-4o-mini"
     output_dir: str = "results"
 
     @classmethod
@@ -29,5 +30,11 @@ class Config:
                 config.output_dir = data.get("output_dir", config.output_dir)
             except Exception as e:
                 print(f"Warning: Failed to load config: {e}")
+
+        # Fallback to environment variables
+        if not config.openai_api_key:
+            config.openai_api_key = os.environ.get("OPENAI_API_KEY")
+        if not config.openrouter_api_key:
+            config.openrouter_api_key = os.environ.get("OPENROUTER_API_KEY")
 
         return config

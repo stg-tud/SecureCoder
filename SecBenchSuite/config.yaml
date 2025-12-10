@@ -1,0 +1,4 @@
+# openai_api_key: "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"
+openrouter_api_key: "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"
+default_model: "openai/gpt-4o-mini"
+output_dir: "results"

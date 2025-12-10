@@ -1,135 +1,124 @@
-import asyncio
-import os
 from pathlib import Path
-from typing import Optional, Callable
-
+from typing import Callable, Optional
+import platform
 from secbench.config import Config
 from secbench.runners.docker_runner import DockerRunner
 
 
 class CWEvalBenchmark:
-    IMAGE = "co1lin/cweval"
-    CONTAINER_WORKDIR = "/home/ubuntu/CWEval"
-
-    def __init__(self, config: Config, benchmark_path: Path):
+    def __init__(self, config: Config, bench_path: Path):
         self.config = config
-        self.benchmark_path = benchmark_path.resolve()
-        self.runner = DockerRunner(self.IMAGE)
+        self.bench_path = bench_path
+        self.runner = DockerRunner()
+        self.working_dir = "/home/ubuntu/CWEval"
 
     async def run_pipeline(
         self,
         model: str,
         output_dir: Path,
-        n: int = 1,
-        temperature: float = 0.8,
-        output_callback: Optional[Callable[[str], None]] = None,
+        n: int,
+        temperature: float,
+        output_callback: Callable[[str], None],
+        sanity_check: bool = False,
+        benchmark_type: str = "instruct",
+        eval_only: bool = False,
     ):
-        """
-        Run the full CWEval pipeline: Generation -> Evaluation.
-        """
-        container_name = "secbench_cweval"
-        output_dir = output_dir.resolve()
+        # Pull image first
+        async for log in self.runner.pull_image():
+            output_callback(log)
+
+        # Ensure output directory exists
         output_dir.mkdir(parents=True, exist_ok=True)
+        abs_output_dir = output_dir.resolve()
 
-        def log(msg):
-            if output_callback:
-                output_callback(msg)
-            else:
-                print(msg)
+        # We mount the output directory to /app/evals inside the container
+        container_eval_path = "/app/evals"
 
-        # Map host paths to container paths
-        volumes = {
-            str(self.benchmark_path): self.CONTAINER_WORKDIR,
-            str(output_dir): f"{self.CONTAINER_WORKDIR}/evals_output",
-        }
+        volumes = {str(abs_output_dir): {"bind": container_eval_path, "mode": "rw"}}
 
-        # Environment variables for API keys
+        # Environment variables
         env = {"PYTHONUNBUFFERED": "1"}
         if self.config.openai_api_key:
             env["OPENAI_API_KEY"] = self.config.openai_api_key
         if self.config.openrouter_api_key:
-            # CWEval uses litellm, which supports OPENAI_API_KEY.
-            # If using OpenRouter, we might need to set OPENAI_API_BASE or similar if the model name implies it.
-            # But litellm usually handles 'openrouter/...' models if OPENROUTER_API_KEY is set.
             env["OPENROUTER_API_KEY"] = self.config.openrouter_api_key
-            env["OPENAI_API_KEY"] = self.config.openrouter_api_key  # Fallback/Alias
-
-        log(f"Starting CWEval container ({container_name})...")
-
-        # Cleanup existing container if any
-        await self.runner.remove(container_name)
-
-        try:
-            # Start container
-            await self.runner.run_detached(
-                name=container_name,
-                volumes=volumes,
-                env=env,
-                workdir=self.CONTAINER_WORKDIR,
-            )
-
-            # Fix for missing tenacity dependency in the docker image
-            # litellm requires tenacity but it seems to be missing in the current image
-            # We need to install it in the 'cweval' environment (activated via .env)
-            install_cmd = f'zsh -c "source ~/miniforge3/bin/activate && source {self.CONTAINER_WORKDIR}/.env && pip install tenacity"'
-            log("Installing missing dependency: tenacity...")
-            await self.runner.exec_command(
-                container_name, install_cmd, output_callback=output_callback
-            )
-
-            # 1. Setup/Check environment (optional but good for sanity)
-            # await self.runner.exec_command(container_name, "python cweval/commons.py compile_all_in --path benchmark/")
-
-            # 2. Generate
-            # Note: eval_path inside container should map to the mounted output volume
-            eval_path_container = "evals_output/current_run"
-
-            # Adjust model name for OpenRouter if needed
-            # The user requested to prepend 'openrouter/' if using OpenRouter
+            # Auto-prepend openrouter/ prefix if using OpenRouter key and no OpenAI key is present
+            # This matches the behavior suggested in gen_config.md
             if self.config.openrouter_api_key and not model.startswith("openrouter/"):
+                output_callback(f"Auto-prepending 'openrouter/' to model name: {model}")
                 model = f"openrouter/{model}"
-                log(f"Using OpenRouter: Adjusted model name to {model}")
 
-            # We use zsh to source the environment variables and activate conda
-            # This ensures PYTHONPATH and other deps are set correctly as per CWEval docs
-            gen_cmd_inner = (
-                f"python -u cweval/generate.py gen "
-                f"--model {model} "
+        # DEBUG:
+        print(f"Using model: {model}")
+        print(f"Volumes: {volumes}")
+        print(f"Environment: {env}")
+        print(f'openai_api_key present: {"OPENAI_API_KEY" in env}')
+        print(f'openrouter_api_key present: {"OPENROUTER_API_KEY" in env}')
+
+        # Construct the shell command
+        # We use zsh as in the example
+
+        is_arm = platform.machine().lower() in ("arm64", "aarch64")
+        cgo_env = "CGO_ENABLED=0 " if is_arm else ""
+
+        # Chain commands
+        cmds = [
+            "echo '[Container] Starting shell...'",
+            "source ~/miniforge3/bin/activate",
+            f"cd {self.working_dir}",
+            "source .env",
+            "echo '[Container] Installing tenacity...'",
+            "pip install tenacity",
+        ]
+
+        if sanity_check:
+            cmds.extend(
+                [
+                    "echo '[Container] Tidy Go modules...'",
+                    "go mod tidy",
+                    "echo '[Container] Compiling reference solutions...'",
+                    f"{cgo_env}python -u cweval/commons.py compile_all_in --path benchmark/",
+                    "echo '[Container] Running tests...'",
+                    "pytest benchmark/ -x -n 4",
+                ]
+            )
+
+        # Generation command
+        # python cweval/generate.py gen --n <n> --temperature <temp> --eval_path <path> --model <model>
+        # We use --num_proc 4 to be safe, or we could expose it as a parameter
+        # We pipe 'y' to the command because generate.py asks for confirmation if the directory exists
+        if not eval_only:
+            gen_cmd = (
+                f"echo 'y' | python cweval/generate.py gen "
                 f"--n {n} "
                 f"--temperature {temperature} "
-                f"--eval_path {eval_path_container} "
+                f"--eval_path {container_eval_path} "
+                f"--model {model} "
                 f"--num_proc 4"
             )
-            gen_cmd = f'zsh -c "source ~/miniforge3/bin/activate && source .env && {gen_cmd_inner}"'
+            cmds.append(f"echo '[Container] Generating samples with {model}...'")
+            cmds.append(gen_cmd)
+        else:
+            cmds.append(f"echo '[Container] Skipping generation (eval-only mode)...'")
 
-            log(f"Running Generation: {gen_cmd}")
-            exit_code = await self.runner.exec_command(
-                container_name, gen_cmd, output_callback=output_callback
-            )
-            if exit_code != 0:
-                log("Generation failed.")
-                return
+        # Evaluation command
+        # python cweval/evaluate.py pipeline --eval_path <path> --docker False
+        eval_cmd = (
+            f"python cweval/evaluate.py pipeline "
+            f"--eval_path {container_eval_path} "
+            f"--docker False "
+            f"--num_proc 4"
+        )
+        cmds.append(f"echo '[Container] Evaluating samples...'")
+        cmds.append(eval_cmd)
 
-            # 3. Evaluate
-            # --docker False because we are ALREADY inside docker
-            eval_cmd_inner = (
-                f"python -u cweval/evaluate.py pipeline "
-                f"--eval_path {eval_path_container} "
-                f"--docker False "
-                f"--num_proc 4"
-            )
-            eval_cmd = f'zsh -c "source ~/miniforge3/bin/activate && source .env && {eval_cmd_inner}"'
+        # Combine into one zsh command
+        full_command = 'zsh -l -c "' + " && ".join(cmds) + '"'
 
-            log(f"Running Evaluation: {eval_cmd}")
-            exit_code = await self.runner.exec_command(
-                container_name, eval_cmd, output_callback=output_callback
-            )
-            if exit_code != 0:
-                log("Evaluation failed.")
-                return
+        output_callback(f"Starting container execution...")
+        output_callback(f"Output directory: {abs_output_dir}")
 
-            log(f"CWEval pipeline completed. Results in {output_dir}/current_run")
-
-        finally:
-            log("Stopping container...")
-            await self.runner.stop(container_name)
+        async for log in self.runner.run(
+            full_command, environment=env, volumes=volumes
+        ):
+            output_callback(log)
