@@ -1,6 +1,7 @@
 plugins {
     id("buildsrc.convention.kotlin-jvm")
     alias(libs.plugins.kotlin.serialization)
+    application
 }
 
 dependencies {
@@ -11,4 +12,9 @@ dependencies {
     implementation(libs.ktor.serialization.json)
     implementation(libs.ktor.server.content.negotiation)
     runtimeOnly(libs.logback)
+}
+
+application {
+    // Ktor server entrypoint
+    mainClass.set("de.tuda.stg.securecoder.openapibridge.MainKt")
 }
