@@ -17,7 +17,7 @@ import com.intellij.openapi.ui.Messages
 
 class PromptInputPanel(
     private val project: Project,
-    private val onSubmit: (promptText: String, onStreaming: () -> Unit, onFinished: () -> Unit) -> Unit
+    private val onSubmit: (promptText: String, projectAsContext: Boolean, onFinished: () -> Unit) -> Unit
 ) {
     val component: JPanel
 
@@ -91,17 +91,15 @@ class PromptInputPanel(
                 return@addActionListener
             }
 
-            val onStreaming = {
-                submit.isEnabled = false
-                submit.text = SecureCoderBundle.message("toolwindow.streaming")
-            }
+            submit.isEnabled = false
+            submit.text = SecureCoderBundle.message("toolwindow.streaming")
 
             val onFinished = {
                 submit.isEnabled = true
                 submit.text = SecureCoderBundle.message("toolwindow.submit")
             }
 
-            onSubmit(text, onStreaming, onFinished)
+            onSubmit(text, checkBox.isSelected, onFinished)
         }
     }
 }

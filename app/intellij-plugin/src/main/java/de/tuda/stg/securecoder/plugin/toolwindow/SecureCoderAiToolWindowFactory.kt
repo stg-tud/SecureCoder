@@ -69,9 +69,7 @@ class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
 
         val root = JPanel(BorderLayout())
 
-        val promptPanel = PromptInputPanel(project) { promptText, onStreaming, onFinished ->
-            onStreaming()
-
+        val promptPanel = PromptInputPanel(project) { promptText, projectAsContext, onFinished ->
             val runner = project.service<EngineRunnerService>()
             eventsPanel.removeAll()
             eventsPanel.revalidate()
@@ -82,7 +80,8 @@ class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
                 onUiEvent = { event -> withContext(Dispatchers.EDT) {
                     addEventCard(event, project)
                 }},
-                onComplete = { withContext(Dispatchers.EDT) { onFinished() } }
+                onComplete = { withContext(Dispatchers.EDT) { onFinished() } },
+                reduceContextToOpenFiles = !projectAsContext
             )
         }
         root.add(promptPanel.component, BorderLayout.NORTH)
