@@ -4,6 +4,7 @@ import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.application.EDT
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.service
 import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.project.DumbAware
@@ -23,6 +24,8 @@ import de.tuda.stg.securecoder.plugin.engine.EngineRunnerService
 import de.tuda.stg.securecoder.plugin.engine.IntelliJProjectFileSystem
 import de.tuda.stg.securecoder.plugin.engine.event.UiStreamEvent
 import de.tuda.stg.securecoder.plugin.settings.SecureCoderSettingsConfigurable
+import de.tuda.stg.securecoder.plugin.settings.SecureCoderSettingsState
+import de.tuda.stg.securecoder.plugin.settings.SecureCoderSettingsState.SecureCoderSettingsListener
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.awt.BorderLayout
@@ -61,43 +64,79 @@ class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
                 }
             }
         ))
+
+        val connection = ApplicationManager.getApplication().messageBus.connect(toolWindow.disposable)
+        connection.subscribe(SecureCoderSettingsState.topic, SecureCoderSettingsListener {
+            SwingUtilities.invokeLater {
+                content.component = createRoot(project)
+            }
+        })
     }
 
-    private fun createRoot(project: Project): JPanel = JPanel(BorderLayout()).apply {
-        val inputArea = createInputArea()
-        val scroll = wrapTextInScrollPane(inputArea)
-        val preferredHeight = scroll.preferredSize.height
-        scroll.maximumSize = Dimension(Int.MAX_VALUE, preferredHeight)
-        val submit = createSubmitButton(preferredHeight)
-        val checkBox = JCheckBox(SecureCoderBundle.message("toolwindow.useWholeProject"), true).apply {
-            alignmentX = Component.LEFT_ALIGNMENT
-            border = Borders.emptyLeft(4)
-            toolTipText = SecureCoderBundle.message("toolwindow.useWholeProject.tooltip")
+    private fun createRoot(project: Project): JPanel {
+        if (!service<SecureCoderSettingsState>().state.hasLLMProviderConfigured()) {
+            return JPanel(BorderLayout()).apply {
+                border = Borders.empty(12)
+                val panel = JPanel().apply {
+                    layout = BoxLayout(this, BoxLayout.Y_AXIS)
+                    alignmentX = Component.LEFT_ALIGNMENT
+                }
+                val title = JLabel(SecureCoderBundle.message("toolwindow.notConfigured.title")).apply {
+                    font = JBFont.h2()
+                    border = Borders.emptyBottom(6)
+                }
+                val desc = JLabel(SecureCoderBundle.message("toolwindow.notConfigured.desc"))
+                val openSettings = JButton(SecureCoderBundle.message("toolwindow.notConfigured.openSettings")).apply {
+                    alignmentX = Component.LEFT_ALIGNMENT
+                    addActionListener {
+                        ShowSettingsUtil.getInstance()
+                            .showSettingsDialog(project, SecureCoderSettingsConfigurable::class.java)
+                    }
+                }
+                panel.add(title)
+                panel.add(desc)
+                panel.add(Box.createRigidArea(Dimension(0, JBUI.scale(8))))
+                panel.add(openSettings)
+                add(panel, BorderLayout.NORTH)
+            }
         }
-        val header = JPanel().apply {
-            layout = BoxLayout(this, BoxLayout.Y_AXIS)
-            border = Borders.empty(8)
-            alignmentX = Component.LEFT_ALIGNMENT
-        }
-        val textRow = buildTextRow(scroll)
-        val controlsRow = buildControlsRow(checkBox, submit)
 
-        header.add(textRow)
-        header.add(Box.createRigidArea(Dimension(0, JBUI.scale(8))))
-        header.add(controlsRow)
-        add(header, BorderLayout.NORTH)
+        return JPanel(BorderLayout()).apply {
+            val inputArea = createInputArea()
+            val scroll = wrapTextInScrollPane(inputArea)
+            val preferredHeight = scroll.preferredSize.height
+            scroll.maximumSize = Dimension(Int.MAX_VALUE, preferredHeight)
+            val submit = createSubmitButton(preferredHeight)
+            val checkBox = JCheckBox(SecureCoderBundle.message("toolwindow.useWholeProject"), true).apply {
+                alignmentX = Component.LEFT_ALIGNMENT
+                border = Borders.emptyLeft(4)
+                toolTipText = SecureCoderBundle.message("toolwindow.useWholeProject.tooltip")
+            }
+            val header = JPanel().apply {
+                layout = BoxLayout(this, BoxLayout.Y_AXIS)
+                border = Borders.empty(8)
+                alignmentX = Component.LEFT_ALIGNMENT
+            }
+            val textRow = buildTextRow(scroll)
+            val controlsRow = buildControlsRow(checkBox, submit)
 
-        eventsPanel = JPanel().apply {
-            layout = BoxLayout(this, BoxLayout.Y_AXIS)
-            border = Borders.empty(8)
+            header.add(textRow)
+            header.add(Box.createRigidArea(Dimension(0, JBUI.scale(8))))
+            header.add(controlsRow)
+            add(header, BorderLayout.NORTH)
+
+            eventsPanel = JPanel().apply {
+                layout = BoxLayout(this, BoxLayout.Y_AXIS)
+                border = Borders.empty(8)
+            }
+            eventsScrollPane = JBScrollPane(eventsPanel).apply {
+                verticalScrollBarPolicy = ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED
+                horizontalScrollBarPolicy = ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER
+                border = Borders.empty()
+            }
+            add(eventsScrollPane, BorderLayout.CENTER)
+            setupSubmitAction(project, inputArea, submit)
         }
-        eventsScrollPane = JBScrollPane(eventsPanel).apply {
-            verticalScrollBarPolicy = ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED
-            horizontalScrollBarPolicy = ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER
-            border = Borders.empty()
-        }
-        add(eventsScrollPane, BorderLayout.CENTER)
-        setupSubmitAction(project, inputArea, submit)
     }
 
     private fun buildControlsRow(checkBox: JCheckBox, submit: JButton): JPanel = JPanel().apply {

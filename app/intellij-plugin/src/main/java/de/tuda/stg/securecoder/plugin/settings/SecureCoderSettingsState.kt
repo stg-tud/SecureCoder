@@ -31,9 +31,11 @@ class SecureCoderSettingsState : PersistentStateComponent<SecureCoderSettingsSta
         var enableDummyGuardian: Boolean = true,
         var enableCodeQLGuardian: Boolean = false,
         var codeqlBinary: String = "codeql",
-    )
+    ) {
+        fun hasLLMProviderConfigured() = llmProvider == LlmProvider.OLLAMA || openrouterApiKey.isNotBlank()
+    }
 
-    interface SecureCoderSettingsListener {
+    fun interface SecureCoderSettingsListener {
         fun settingsChanged(state: StateData)
     }
 
