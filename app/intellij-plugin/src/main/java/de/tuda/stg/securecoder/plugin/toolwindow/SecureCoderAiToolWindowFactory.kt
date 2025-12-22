@@ -1,10 +1,10 @@
-package de.tuda.stg.securecoder.plugin
+package de.tuda.stg.securecoder.plugin.toolwindow
 
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.application.EDT
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.EDT
 import com.intellij.openapi.components.service
 import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.project.DumbAware
@@ -17,15 +17,13 @@ import com.intellij.ui.components.JBTextArea
 import com.intellij.ui.content.ContentFactory
 import com.intellij.util.ui.JBFont
 import com.intellij.util.ui.JBUI
-import com.intellij.util.ui.JBUI.Borders
-import com.intellij.util.ui.JBUI.CurrentTheme.CustomFrameDecorations.separatorForeground
+import de.tuda.stg.securecoder.plugin.SecureCoderBundle
 import de.tuda.stg.securecoder.plugin.edit.buildEditFilesPanel
 import de.tuda.stg.securecoder.plugin.engine.EngineRunnerService
 import de.tuda.stg.securecoder.plugin.engine.IntelliJProjectFileSystem
 import de.tuda.stg.securecoder.plugin.engine.event.UiStreamEvent
 import de.tuda.stg.securecoder.plugin.settings.SecureCoderSettingsConfigurable
 import de.tuda.stg.securecoder.plugin.settings.SecureCoderSettingsState
-import de.tuda.stg.securecoder.plugin.settings.SecureCoderSettingsState.SecureCoderSettingsListener
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.awt.BorderLayout
@@ -66,24 +64,26 @@ class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
         ))
 
         val connection = ApplicationManager.getApplication().messageBus.connect(toolWindow.disposable)
-        connection.subscribe(SecureCoderSettingsState.topic, SecureCoderSettingsListener {
-            SwingUtilities.invokeLater {
-                content.component = createRoot(project)
-            }
-        })
+        connection.subscribe(
+            SecureCoderSettingsState.topic,
+            SecureCoderSettingsState.SecureCoderSettingsListener {
+                SwingUtilities.invokeLater {
+                    content.component = createRoot(project)
+                }
+            })
     }
 
     private fun createRoot(project: Project): JPanel {
         if (!service<SecureCoderSettingsState>().state.hasLLMProviderConfigured()) {
             return JPanel(BorderLayout()).apply {
-                border = Borders.empty(12)
+                border = JBUI.Borders.empty(12)
                 val panel = JPanel().apply {
                     layout = BoxLayout(this, BoxLayout.Y_AXIS)
                     alignmentX = Component.LEFT_ALIGNMENT
                 }
                 val title = JLabel(SecureCoderBundle.message("toolwindow.notConfigured.title")).apply {
                     font = JBFont.h2()
-                    border = Borders.emptyBottom(6)
+                    border = JBUI.Borders.emptyBottom(6)
                 }
                 val desc = JLabel(SecureCoderBundle.message("toolwindow.notConfigured.desc"))
                 val openSettings = JButton(SecureCoderBundle.message("toolwindow.notConfigured.openSettings")).apply {
@@ -109,12 +109,12 @@ class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
             val submit = createSubmitButton(preferredHeight)
             val checkBox = JCheckBox(SecureCoderBundle.message("toolwindow.useWholeProject"), true).apply {
                 alignmentX = Component.LEFT_ALIGNMENT
-                border = Borders.emptyLeft(4)
+                border = JBUI.Borders.emptyLeft(4)
                 toolTipText = SecureCoderBundle.message("toolwindow.useWholeProject.tooltip")
             }
             val header = JPanel().apply {
                 layout = BoxLayout(this, BoxLayout.Y_AXIS)
-                border = Borders.empty(8)
+                border = JBUI.Borders.empty(8)
                 alignmentX = Component.LEFT_ALIGNMENT
             }
             val textRow = buildTextRow(scroll)
@@ -127,12 +127,12 @@ class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
 
             eventsPanel = JPanel().apply {
                 layout = BoxLayout(this, BoxLayout.Y_AXIS)
-                border = Borders.empty(8)
+                border = JBUI.Borders.empty(8)
             }
             eventsScrollPane = JBScrollPane(eventsPanel).apply {
                 verticalScrollBarPolicy = ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED
                 horizontalScrollBarPolicy = ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER
-                border = Borders.empty()
+                border = JBUI.Borders.empty()
             }
             add(eventsScrollPane, BorderLayout.CENTER)
             setupSubmitAction(project, inputArea, submit)
@@ -141,7 +141,7 @@ class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
 
     private fun buildControlsRow(checkBox: JCheckBox, submit: JButton): JPanel = JPanel().apply {
         layout = BoxLayout(this, BoxLayout.X_AXIS)
-        border = Borders.empty()
+        border = JBUI.Borders.empty()
         checkBox.alignmentY = Component.CENTER_ALIGNMENT
         checkBox.maximumSize = checkBox.preferredSize
         submit.alignmentY = Component.CENTER_ALIGNMENT
@@ -156,7 +156,7 @@ class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
         wrapStyleWord = true
         rows = 5
         columns = 30
-        border = Borders.empty(8)
+        border = JBUI.Borders.empty(8)
         getEmptyText().setText(SecureCoderBundle.message("edit.placeholder"));
     }
 
@@ -171,7 +171,7 @@ class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
 
     private fun buildTextRow(scroll: JBScrollPane): JPanel = JPanel().apply {
         layout = BoxLayout(this, BoxLayout.X_AXIS)
-        border = Borders.empty()
+        border = JBUI.Borders.empty()
         add(scroll.apply {
             alignmentX = Component.LEFT_ALIGNMENT
             maximumSize = Dimension(Int.MAX_VALUE, preferredSize.height)
@@ -217,14 +217,14 @@ class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
         }.apply {
             layout = BoxLayout(this, BoxLayout.Y_AXIS)
             border = BorderFactory.createCompoundBorder(
-                Borders.customLine(separatorForeground(), 1),
-                Borders.empty(6)
+                JBUI.Borders.customLine(JBUI.CurrentTheme.CustomFrameDecorations.separatorForeground(), 1),
+                JBUI.Borders.empty(6)
             )
         }
 
         val titlePanel = JPanel().apply {
             layout = BoxLayout(this, BoxLayout.X_AXIS)
-            border = Borders.emptyBottom(4)
+            border = JBUI.Borders.emptyBottom(4)
             alignmentX = Component.LEFT_ALIGNMENT
         }
         val title = when (event) {
@@ -245,11 +245,15 @@ class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
                 isEditable = false
                 lineWrap = true
                 wrapStyleWord = true
-                border = Borders.empty()
+                border = JBUI.Borders.empty()
                 background = card.background
                 alignmentX = Component.LEFT_ALIGNMENT
             }
-            is UiStreamEvent.EditFiles -> buildEditFilesPanel(project, event.changes, IntelliJProjectFileSystem(project))
+            is UiStreamEvent.EditFiles -> buildEditFilesPanel(
+                project,
+                event.changes,
+                IntelliJProjectFileSystem(project)
+            )
         }
 
         card.add(titlePanel)
@@ -266,4 +270,3 @@ class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
         }
     }
 }
-
