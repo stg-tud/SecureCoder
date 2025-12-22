@@ -162,4 +162,12 @@ class SecureCoderSettingsConfigurable : BoundConfigurable(SecureCoderBundle.mess
             }.enabledIf(codeql.selected)
         }
     }
+
+    override fun apply() {
+        super.apply()
+        ApplicationManager.getApplication()
+            .messageBus
+            .syncPublisher(SecureCoderSettingsState.topic)
+            .settingsChanged(settings.state)
+    }
 }

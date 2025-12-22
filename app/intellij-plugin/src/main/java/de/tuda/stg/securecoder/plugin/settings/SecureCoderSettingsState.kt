@@ -4,6 +4,7 @@ import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
+import com.intellij.util.messages.Topic
 
 @State(name = "SecureCoderSettings", storages = [Storage("SecureCoderSettings.xml")])
 @Service(Service.Level.APP)
@@ -22,7 +23,7 @@ class SecureCoderSettingsState : PersistentStateComponent<SecureCoderSettingsSta
 
     data class StateData(
         var enricherUrl: String = "http://localhost:7070",
-        var llmProvider: LlmProvider = LlmProvider.OLLAMA,
+        var llmProvider: LlmProvider = LlmProvider.OPENROUTER,
         var ollamaModel: String = "gpt-oss:20b",
         var openrouterApiKey: String = "",
         var openrouterModel: String = "openai/gpt-oss-20b",
@@ -31,6 +32,17 @@ class SecureCoderSettingsState : PersistentStateComponent<SecureCoderSettingsSta
         var enableCodeQLGuardian: Boolean = false,
         var codeqlBinary: String = "codeql",
     )
+
+    interface SecureCoderSettingsListener {
+        fun settingsChanged(state: StateData)
+    }
+
+    companion object {
+        val topic: Topic<SecureCoderSettingsListener> = Topic.create(
+            "SecureCoderSettingsChanged",
+            SecureCoderSettingsListener::class.java
+        )
+    }
 
     private var state: StateData = StateData()
 
