@@ -118,6 +118,7 @@ class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
         rows = 5
         columns = 30
         border = Borders.empty(8)
+        getEmptyText().setText(SecureCoderBundle.message("edit.placeholder"));
     }
 
     private fun wrapTextInScrollPane(inputArea: JBTextArea): JBScrollPane = JBScrollPane(inputArea).apply {
