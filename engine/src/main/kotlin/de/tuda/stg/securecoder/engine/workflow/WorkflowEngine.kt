@@ -35,7 +35,7 @@ class WorkflowEngine (
         val messages = mutableListOf(
             ChatMessage(Role.System, "You are a Security Engineering Agent mainly for writing secure code"),
             ChatMessage(Role.User, enrichedPrompt),
-            ChatMessage(Role.System, FilesInContextPromptBuilder.build(filesInContext, edit = true)),
+            ChatMessage(Role.User, FilesInContextPromptBuilder.build(filesInContext, edit = true)),
         )
         repeat(maxGuardianRetries) {
             val out = editFiles.chat(
@@ -43,7 +43,7 @@ class WorkflowEngine (
                 fileSystem = filesystem,
                 onParseError = {
                     onEvent(StreamEvent.InvalidLlmOutputWarning(it))
-                },
+                }
             )
             messages += out.changesMessage()
             val changes = out.changes ?: return EngineResult.Failure.GenerationFailure
