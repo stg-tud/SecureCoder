@@ -9,34 +9,23 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
 import com.intellij.ui.components.JBScrollPane
-import com.intellij.ui.components.JBTextArea
 import com.intellij.ui.content.ContentFactory
-import com.intellij.util.ui.JBFont
 import com.intellij.util.ui.JBUI
 import de.tuda.stg.securecoder.plugin.SecureCoderBundle
-import de.tuda.stg.securecoder.plugin.edit.buildEditFilesPanel
 import de.tuda.stg.securecoder.plugin.engine.EngineRunnerService
-import de.tuda.stg.securecoder.plugin.engine.IntelliJProjectFileSystem
 import de.tuda.stg.securecoder.plugin.engine.event.UiStreamEvent
 import de.tuda.stg.securecoder.plugin.settings.SecureCoderSettingsConfigurable
 import de.tuda.stg.securecoder.plugin.settings.SecureCoderSettingsState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.awt.BorderLayout
-import java.awt.Component
 import java.awt.Dimension
-import javax.swing.BorderFactory
 import javax.swing.Box
 import javax.swing.BoxLayout
-import javax.swing.JButton
-import javax.swing.JCheckBox
-import javax.swing.JLabel
 import javax.swing.JPanel
-import javax.swing.JTextArea
 import javax.swing.ScrollPaneConstants
 import javax.swing.SwingUtilities
 
@@ -75,190 +64,48 @@ class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
 
     private fun createRoot(project: Project): JPanel {
         if (!service<SecureCoderSettingsState>().state.hasLLMProviderConfigured()) {
-            return JPanel(BorderLayout()).apply {
-                border = JBUI.Borders.empty(12)
-                val panel = JPanel().apply {
-                    layout = BoxLayout(this, BoxLayout.Y_AXIS)
-                    alignmentX = Component.LEFT_ALIGNMENT
-                }
-                val title = JLabel(SecureCoderBundle.message("toolwindow.notConfigured.title")).apply {
-                    font = JBFont.h2()
-                    border = JBUI.Borders.emptyBottom(6)
-                }
-                val desc = JLabel(SecureCoderBundle.message("toolwindow.notConfigured.desc"))
-                val openSettings = JButton(SecureCoderBundle.message("toolwindow.notConfigured.openSettings")).apply {
-                    alignmentX = Component.LEFT_ALIGNMENT
-                    addActionListener {
-                        ShowSettingsUtil.getInstance()
-                            .showSettingsDialog(project, SecureCoderSettingsConfigurable::class.java)
-                    }
-                }
-                panel.add(title)
-                panel.add(desc)
-                panel.add(Box.createRigidArea(Dimension(0, JBUI.scale(8))))
-                panel.add(openSettings)
-                add(panel, BorderLayout.NORTH)
-            }
+            return NotConfiguredPanel.build(project)
         }
 
-        return JPanel(BorderLayout()).apply {
-            val inputArea = createInputArea()
-            val scroll = wrapTextInScrollPane(inputArea)
-            val preferredHeight = scroll.preferredSize.height
-            scroll.maximumSize = Dimension(Int.MAX_VALUE, preferredHeight)
-            val submit = createSubmitButton(preferredHeight)
-            val checkBox = JCheckBox(SecureCoderBundle.message("toolwindow.useWholeProject"), true).apply {
-                alignmentX = Component.LEFT_ALIGNMENT
-                border = JBUI.Borders.emptyLeft(4)
-                toolTipText = SecureCoderBundle.message("toolwindow.useWholeProject.tooltip")
-            }
-            val header = JPanel().apply {
-                layout = BoxLayout(this, BoxLayout.Y_AXIS)
-                border = JBUI.Borders.empty(8)
-                alignmentX = Component.LEFT_ALIGNMENT
-            }
-            val textRow = buildTextRow(scroll)
-            val controlsRow = buildControlsRow(checkBox, submit)
+        val root = JPanel(BorderLayout())
 
-            header.add(textRow)
-            header.add(Box.createRigidArea(Dimension(0, JBUI.scale(8))))
-            header.add(controlsRow)
-            add(header, BorderLayout.NORTH)
+        val promptPanel = PromptInputPanel(project) { promptText, onStreaming, onFinished ->
+            onStreaming()
 
-            eventsPanel = JPanel().apply {
-                layout = BoxLayout(this, BoxLayout.Y_AXIS)
-                border = JBUI.Borders.empty(8)
-            }
-            eventsScrollPane = JBScrollPane(eventsPanel).apply {
-                verticalScrollBarPolicy = ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED
-                horizontalScrollBarPolicy = ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER
-                border = JBUI.Borders.empty()
-            }
-            add(eventsScrollPane, BorderLayout.CENTER)
-            setupSubmitAction(project, inputArea, submit)
+            val runner = project.service<EngineRunnerService>()
+            eventsPanel.removeAll()
+            eventsPanel.revalidate()
+            eventsPanel.repaint()
+
+            runner.runEngine(
+                promptText,
+                onUiEvent = { event -> withContext(Dispatchers.EDT) {
+                    addEventCard(event, project)
+                }},
+                onComplete = { withContext(Dispatchers.EDT) { onFinished() } }
+            )
         }
-    }
+        root.add(promptPanel.component, BorderLayout.NORTH)
 
-    private fun buildControlsRow(checkBox: JCheckBox, submit: JButton): JPanel = JPanel().apply {
-        layout = BoxLayout(this, BoxLayout.X_AXIS)
-        border = JBUI.Borders.empty()
-        checkBox.alignmentY = Component.CENTER_ALIGNMENT
-        checkBox.maximumSize = checkBox.preferredSize
-        submit.alignmentY = Component.CENTER_ALIGNMENT
-        submit.maximumSize = Dimension(submit.preferredSize.width, submit.preferredSize.height)
-        add(checkBox)
-        add(Box.createHorizontalGlue())
-        add(submit)
-    }
-
-    private fun createInputArea(): JBTextArea = JBTextArea().apply {
-        lineWrap = true
-        wrapStyleWord = true
-        rows = 5
-        columns = 30
-        border = JBUI.Borders.empty(8)
-        getEmptyText().setText(SecureCoderBundle.message("edit.placeholder"));
-    }
-
-    private fun wrapTextInScrollPane(inputArea: JBTextArea): JBScrollPane = JBScrollPane(inputArea).apply {
-        verticalScrollBarPolicy = ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED
-        horizontalScrollBarPolicy = ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER
-    }
-
-    private fun createSubmitButton(height: Int): JButton = JButton(SecureCoderBundle.message("toolwindow.submit")).apply {
-        maximumSize = Dimension(preferredSize.width, height)
-    }
-
-    private fun buildTextRow(scroll: JBScrollPane): JPanel = JPanel().apply {
-        layout = BoxLayout(this, BoxLayout.X_AXIS)
-        border = JBUI.Borders.empty()
-        add(scroll.apply {
-            alignmentX = Component.LEFT_ALIGNMENT
-            maximumSize = Dimension(Int.MAX_VALUE, preferredSize.height)
-        })
-    }
-
-    private fun setupSubmitAction(project: Project, inputArea: JBTextArea, submit: JButton) {
-        submit.addActionListener {
-            val text = inputArea.text.trim()
-            if (text.isEmpty()) {
-                Messages.showWarningDialog(
-                    project,
-                    SecureCoderBundle.message("warning.emptyPrompt"),
-                    SecureCoderBundle.message("product.name")
-                )
-            } else {
-                submit.isEnabled = false
-                submit.text = SecureCoderBundle.message("toolwindow.streaming")
-
-                eventsPanel.removeAll()
-                eventsPanel.revalidate()
-                eventsPanel.repaint()
-                val runner = project.service<EngineRunnerService>()
-                runner.runEngine(
-                    text,
-                    onUiEvent = { event ->
-                        withContext(Dispatchers.EDT) { addEventCard(event, project) }
-                    },
-                    onComplete = {
-                        withContext(Dispatchers.EDT) {
-                            submit.isEnabled = true
-                            submit.text = SecureCoderBundle.message("toolwindow.submit")
-                        }
-                    }
-                )
-            }
-        }
-    }
-
-    private fun addEventCard(event: UiStreamEvent, project: Project) {
-        val card = object : JPanel() {
-            override fun getMaximumSize() = Dimension(Int.MAX_VALUE, preferredSize.height)
-        }.apply {
+        eventsPanel = JPanel().apply {
             layout = BoxLayout(this, BoxLayout.Y_AXIS)
-            border = BorderFactory.createCompoundBorder(
-                JBUI.Borders.customLine(JBUI.CurrentTheme.CustomFrameDecorations.separatorForeground(), 1),
-                JBUI.Borders.empty(6)
-            )
+            border = JBUI.Borders.empty(8)
         }
+        eventsScrollPane = JBScrollPane(eventsPanel).apply {
+            verticalScrollBarPolicy = ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED
+            horizontalScrollBarPolicy = ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER
+            border = JBUI.Borders.empty()
+        }
+        root.add(eventsScrollPane, BorderLayout.CENTER)
 
-        val titlePanel = JPanel().apply {
-            layout = BoxLayout(this, BoxLayout.X_AXIS)
-            border = JBUI.Borders.emptyBottom(4)
-            alignmentX = Component.LEFT_ALIGNMENT
-        }
-        val title = when (event) {
-            is UiStreamEvent.Message -> event.title
-            is UiStreamEvent.EditFiles -> "Edit Files"
-        }
-        val icon = when (event) {
-            is UiStreamEvent.Message -> event.icon
-            is UiStreamEvent.EditFiles -> AllIcons.Actions.EditSource
-        }
-        val titleLabel = JLabel(title, icon, JLabel.LEADING).apply {
-            font = JBFont.label().asBold()
-        }
-        titlePanel.add(titleLabel)
+        return root
+    }
 
-        val content = when (event) {
-            is UiStreamEvent.Message -> JTextArea(event.description).apply {
-                isEditable = false
-                lineWrap = true
-                wrapStyleWord = true
-                border = JBUI.Borders.empty()
-                background = card.background
-                alignmentX = Component.LEFT_ALIGNMENT
-            }
-            is UiStreamEvent.EditFiles -> buildEditFilesPanel(
-                project,
-                event.changes,
-                IntelliJProjectFileSystem(project)
-            )
-        }
-
-        card.add(titlePanel)
-        card.add(content)
-
+    private fun addEventCard(
+        event: UiStreamEvent,
+        project: Project
+    ) {
+        val card = EventsPanel.addEventCard(event, project)
         eventsPanel.add(card)
         eventsPanel.add(Box.createRigidArea(Dimension(0, JBUI.scale(8))))
         eventsPanel.revalidate()
