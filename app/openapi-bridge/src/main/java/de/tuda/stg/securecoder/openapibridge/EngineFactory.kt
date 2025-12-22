@@ -18,18 +18,21 @@ object EngineFactory {
     }
 
     private fun createLlmClientFromEnvironment(): LlmClient {
-        val openRouterKey = System.getenv("OPENROUTER_KEY")
+        fun propOrEnv(name: String): String? = System.getProperty(name) ?: System.getenv(name)
+
+        val openRouterKey = propOrEnv("OPENROUTER_KEY")
         if (openRouterKey != null) {
             return OpenRouterClient(
                 openRouterKey,
-                System.getenv("MODEL") ?: "openai/gpt-oss-20b",
+                propOrEnv("MODEL") ?: "openai/gpt-oss-20b",
                 "securecoder/openapi-bridge"
             )
         }
         return OllamaClient(
-            model = System.getenv("MODEL"),
-            baseUrl = System.getenv("OLLAMA_BASE_URL") ?: "http://127.0.0.1:11434",
-            keepAlive = System.getenv("OLLAMA_KEEP_ALIVE") ?: "5m"
+            model = propOrEnv("MODEL")
+                ?: throw IllegalStateException("Need at least one of OPENROUTER_KEY or MODEL to be set"),
+            baseUrl = propOrEnv("OLLAMA_BASE_URL") ?: "http://127.0.0.1:11434",
+            keepAlive = propOrEnv("OLLAMA_KEEP_ALIVE") ?: "5m"
         )
     }
 }

@@ -6,8 +6,8 @@ This module contains the HTTP server. It exposes a minimal OpenAI-style `POST /v
 - Optional but recommended for security analysis features: CodeQL CLI in `PATH` (the Guardian uses it when analyzing code). If not present, some security analysis steps may fail.
 
 
-## Configuration (Environment Variables)
-The server reads its configuration from environment variables:
+## Configuration (Environment Variables or -D system properties)
+The server reads its configuration from either environment variables or JVM system properties (`-DNAME=value`).
 
 - `PORT` — HTTP port (default: `8080`)
 - LLM selection (EngineFactory picks the first matching provider):
@@ -22,11 +22,18 @@ The server reads its configuration from environment variables:
 
 ## How to run the server
 
-On macOS/Linux:
+On macOS/Linux (using -D system properties):
 
 ```
-./gradlew :app:openapi-bridge:run \
-  -Dorg.gradle.jvmargs="-DOPENROUTER_KEY=... -DMODEL=..."
+./gradlew :app:openapi-bridge:run -DOPENROUTER_KEY=... -DMODEL=...
+```
+
+Or with environment variables:
+
+```
+export OPENROUTER_KEY=...
+export MODEL=...
+./gradlew :app:openapi-bridge:run
 ```
 
 On Windows
