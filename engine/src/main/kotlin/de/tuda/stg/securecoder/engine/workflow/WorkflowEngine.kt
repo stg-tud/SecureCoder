@@ -41,8 +41,8 @@ class WorkflowEngine (
             val out = editFiles.chat(
                 messages = messages,
                 fileSystem = filesystem,
-                onParseError = {
-                    onEvent(StreamEvent.InvalidLlmOutputWarning(it))
+                onParseError = { parseErrors, chatExchange ->
+                    onEvent(StreamEvent.InvalidLlmOutputWarning(parseErrors, chatExchange))
                 }
             )
             messages += out.changesMessage()
