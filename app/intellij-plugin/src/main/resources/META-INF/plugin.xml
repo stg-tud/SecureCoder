@@ -13,7 +13,7 @@
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow id="securecoder"
                     anchor="right"
-                    factoryClass="de.tuda.stg.securecoder.plugin.SecureCoderAiToolWindowFactory"/>
+                    factoryClass="de.tuda.stg.securecoder.plugin.toolwindow.SecureCoderAiToolWindowFactory"/>
         <applicationConfigurable id="de.tuda.securecoder.settings"
                                  parentId="tools"
                                  key="settings.configurable.display.name"

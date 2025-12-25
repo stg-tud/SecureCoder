@@ -59,7 +59,7 @@ public class CodeQLInstaller {
         try {
             return fetchLatestVersion();
         } catch (IOException e) {
-            LOG.warn(SecureCoderBundle.INSTANCE.message("codeql.fetchLatestVersion.failed", FALLBACK_VERSION), e);
+            LOG.warn("Failed to fetch latest CodeQL version from GitHub API. Falling back to " + FALLBACK_VERSION, e);
             return FALLBACK_VERSION;
         }
     }
@@ -76,13 +76,13 @@ public class CodeQLInstaller {
                         LOG.info("Detected latest CodeQL version: " + version);
                         return version;
                     }
-                    throw new IOException(SecureCoderBundle.INSTANCE.message("codeql.parseVersion.error"));
+                    throw new IOException("Could not parse version from GitHub API response");
                 });
     }
 
     private void installCodeQL(String version, Path installDir, ProgressIndicator indicator) throws IOException {
         String downloadUrl = getDownloadUrl(version);
-        LOG.info(SecureCoderBundle.INSTANCE.message("codeql.downloading.from", downloadUrl));
+        LOG.info("Downloading CodeQL from: " + downloadUrl);
 
         File tempZip = FileUtil.createTempFile("codeql", ".zip");
 
@@ -102,7 +102,7 @@ public class CodeQLInstaller {
                         return parent != null && "bin".equals(parent.getFileName().toString()) && Files.isRegularFile(p);
                     }).forEach(this::setExecutablePermissions);
                 } catch (IOException e) {
-                    LOG.warn(SecureCoderBundle.INSTANCE.message("codeql.walkToolsDir.failed", toolsDir.toString()), e);
+                    LOG.warn("Failed to walk tools directory for permissions: " + toolsDir.toString(), e);
                 }
             }
             setExecutablePermissions(executable);
@@ -127,7 +127,7 @@ public class CodeQLInstaller {
         } else if (SystemInfo.isLinux) {
             platform = "linux64";
         } else {
-            throw new IllegalStateException(SecureCoderBundle.INSTANCE.message("codeql.unsupported.os", SystemInfo.OS_NAME));
+            throw new IllegalStateException("Unsupported operating system: " + SystemInfo.OS_NAME);
         }
         return DOWNLOAD_BASE_URL + version + "/codeql-" + platform + ".zip";
     }
@@ -136,10 +136,10 @@ public class CodeQLInstaller {
         try {
             File file = executable.toFile();
             if (!file.setExecutable(true, true)) {
-                throw new IOException(SecureCoderBundle.INSTANCE.message("codeql.setPermissions.failed", executable.toString()));
+                throw new IOException("");
             }
         } catch (Exception e) {
-            LOG.warn(SecureCoderBundle.INSTANCE.message("codeql.setPermissions.failed", executable.toString()), e);
+            LOG.warn("Failed to set executable permissions for: " + executable, e);
         }
     }
 }
