@@ -1,26 +1,22 @@
 import argparse
-import asyncio
 import sys
 import questionary
 from pathlib import Path
 from rich.console import Console, Group
 from rich.panel import Panel
 from rich.live import Live
-
-# Text is available in rich.text but sometimes pylance complains if not installed in env
-# We can use simple strings or import inside function if needed, but let's try explicit import again
-# or just use strings in Group which works fine for simple text
-
+import datetime
+import yaml
 
 from secbench.config import Config
-from secbench.runners.generation import GenerationRunner
+
 from secbench.benchmarks.cweval import CWEvalBenchmark
 from secbench.benchmarks.cyberseceval import CyberSecEvalBenchmark
 
 console = Console()
 
 
-async def run_generation(args, config: Config):
+def run_generation(args, config: Config):
     api_key = config.openrouter_api_key or config.openai_api_key
     if not api_key:
         console.print(
@@ -41,16 +37,12 @@ async def run_generation(args, config: Config):
         )
 
     with Live(generate_view(), refresh_per_second=10) as live:
-        async for line in runner.generate(args.model, args.prompt, args.count):
+        for line in runner.generate(args.model, args.prompt, args.count):
             output_lines.append(line)
             live.update(generate_view())
 
 
-import datetime
-import yaml
-
-
-async def run_cweval(args, config: Config):
+def run_cweval(args, config: Config):
     # Assuming CWEval is located at ./Benchmarks/CWEval relative to project root
     # In a real app, this path might be configured or discovered
     bench_path = Path("Benchmarks/CWEval")
@@ -89,11 +81,13 @@ async def run_cweval(args, config: Config):
             border_style="magenta",
         )
 
-    def update_output(msg: str):
-        output_lines.append(msg)
-
     with Live(generate_view(), refresh_per_second=10) as live:
-        await benchmark.run_pipeline(
+
+        def update_output(msg: str):
+            output_lines.append(msg)
+            live.update(generate_view())
+
+        benchmark.run_pipeline(
             model=args.model,
             output_dir=output_dir,
             n=args.n,
@@ -106,7 +100,7 @@ async def run_cweval(args, config: Config):
         live.update(generate_view())
 
 
-async def run_cyberseceval(args, config: Config):
+def run_cyberseceval(args, config: Config):
     # Assuming CyberSecEval is located at ./Benchmarks/PurpleLlama relative to project root
     bench_path = Path("Benchmarks/PurpleLlama")
     if not bench_path.exists():
@@ -116,7 +110,26 @@ async def run_cyberseceval(args, config: Config):
         return
 
     benchmark = CyberSecEvalBenchmark(config, bench_path, runner_type=args.runner)
-    output_dir = Path(config.output_dir) / "cyberseceval"
+
+    # Create timestamped output directory
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    sanitized_model = args.model.replace("/", "_").replace(":", "_")
+    run_id = f"{timestamp}_{sanitized_model}"
+    output_dir = Path(config.output_dir) / "cyberseceval" / run_id
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    # Save run configuration
+    run_config = {
+        "timestamp": timestamp,
+        "model": args.model,
+        "n": args.n,
+        "temperature": args.temperature,
+        "benchmark": "cyberseceval",
+        "benchmark_type": args.benchmark_type,
+        "runner": args.runner,
+    }
+    with open(output_dir / "run_config.yaml", "w") as f:
+        yaml.dump(run_config, f)
 
     output_lines = []
 
@@ -127,11 +140,13 @@ async def run_cyberseceval(args, config: Config):
             border_style="cyan",
         )
 
-    def update_output(msg: str):
-        output_lines.append(msg)
-
     with Live(generate_view(), refresh_per_second=10) as live:
-        await benchmark.run_pipeline(
+
+        def update_output(msg: str):
+            output_lines.append(msg)
+            live.update(generate_view())
+
+        benchmark.run_pipeline(
             model=args.model,
             output_dir=output_dir,
             n=args.n,
@@ -163,7 +178,7 @@ def interactive_mode(config: Config):
 
         # Mock args object
         args = argparse.Namespace(model=model, prompt=prompt, count=count)
-        asyncio.run(run_generation(args, config))
+        run_generation(args, config)
 
 
 def main():
@@ -221,12 +236,12 @@ def main():
     config = Config.load(args.config)
 
     if args.command == "generate":
-        asyncio.run(run_generation(args, config))
+        run_generation(args, config)
     elif args.command == "evaluate":
         if args.benchmark == "cweval":
-            asyncio.run(run_cweval(args, config))
+            run_cweval(args, config)
         elif args.benchmark == "cyberseceval":
-            asyncio.run(run_cyberseceval(args, config))
+            run_cyberseceval(args, config)
         else:
             print("Evaluation not implemented yet.")
     else:

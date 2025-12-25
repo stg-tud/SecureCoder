@@ -1,252 +1,168 @@
-# from pathlib import Path
-# from typing import Optional, Callable
-# from secbench.config import Config
-# from secbench.runners.docker_runner import DockerRunner
-# from secbench.runners.local_runner import LocalRunner
-# from secbench.benchmarks.base import Benchmark
+from pathlib import Path
+from typing import Callable, Optional
+import sys
+from secbench.config import Config
+from secbench.runners.docker_runner import DockerRunner
+from secbench.benchmarks.base import Benchmark
 
 
-# class CyberSecEvalBenchmark(Benchmark):
-#     IMAGE = "python:3.10"
-#     CONTAINER_WORKDIR = "/app"
+class CyberSecEvalBenchmark(Benchmark):
+    def __init__(self, config: Config, bench_path: Path, runner_type: str = "docker"):
+        super().__init__(config, bench_path)
+        self.runner_type = runner_type
+        # Use standard python image
+        self.runner = DockerRunner()
+        self.image_name = "python:3.10"
 
-#     def __init__(
-#         self, config: Config, benchmark_path: Path, runner_type: str = "local"
-#     ):
-#         super().__init__(config, benchmark_path)
-#         self.runner_type = runner_type
-#         if runner_type == "docker":
-#             self.runner = DockerRunner(self.IMAGE)
-#         elif runner_type == "local":
-#             # Use the path suggested by CyberSecEval README
-#             venv_path = Path(".venvs") / "CybersecurityBenchmarks"
+    def run_pipeline(
+        self,
+        model: str,
+        output_dir: Path,
+        n: int,
+        temperature: float,
+        output_callback: Callable[[str], None],
+        benchmark_type: str = "instruct",
+        **kwargs,
+    ):
+        # 1. Pull Image
+        self.runner.pull_image(self.image_name, output_callback)
 
-#             # Try to find python3.10 as required by CyberSecEval
-#             import shutil
+        # 2. Prepare Output Directory
+        output_dir.mkdir(parents=True, exist_ok=True)
+        abs_output_dir = output_dir.resolve()
 
-#             python_interpreter = shutil.which("python3.10")
-#             if not python_interpreter:
-#                 print(
-#                     "Warning: python3.10 not found. Using current python interpreter. This might cause issues as CyberSecEval requires python 3.10."
-#                 )
-#                 import sys
+        # 3. Define Volumes
+        # Only mount output directory. We will clone the repo inside the container.
+        container_output_path = "/app/output"
 
-#                 python_interpreter = sys.executable
-#             else:
-#                 print(f"Using python3.10 at {python_interpreter}")
+        volumes = {
+            str(abs_output_dir): {"bind": container_output_path, "mode": "rw"},
+        }
 
-#             self.runner = LocalRunner(
-#                 venv_path=venv_path, python_interpreter=python_interpreter
-#             )
-#         else:
-#             raise ValueError(f"Unknown runner type: {runner_type}")
+        # 4. Construct LLM Argument
+        # Format: PROVIDER::MODEL::KEY[::BASE_URL]
+        llm_arg = ""
 
-#     async def run_pipeline(
-#         self,
-#         model: str,
-#         output_dir: Path,
-#         n: int = 1,
-#         temperature: float = 0.8,
-#         output_callback: Optional[Callable[[str], None]] = None,
-#         benchmark_type: str = "instruct",
-#         **kwargs,
-#     ):
-#         container_name = "secbench_cyberseceval"
-#         output_dir = output_dir.resolve()
-#         output_dir.mkdir(parents=True, exist_ok=True)
+        # Check if we should treat this as an OpenRouter request
+        # 1. Explicit OpenRouter key present
+        # 2. Model name implies OpenRouter (contains '/')
+        is_openrouter_model = "/" in model
 
-#         def log(msg):
-#             if output_callback:
-#                 output_callback(msg)
-#             else:
-#                 print(msg)
+        if self.config.openrouter_api_key or (
+            is_openrouter_model and self.config.openai_api_key
+        ):
+            # OpenRouter
+            provider = "OPENAI"
+            # Use OpenRouter key if available, otherwise fallback to OpenAI key (common pattern)
+            api_key = self.config.openrouter_api_key or self.config.openai_api_key
+            base_url = "https://openrouter.ai/api/v1"
 
-#         # Construct LLM string
-#         # Format: PROVIDER::MODEL::KEY[::BASE_URL]
-#         llm_arg = ""
-#         if self.config.openrouter_api_key:
-#             # OpenRouter
-#             model_name = model
-#             if model_name.startswith("openrouter/"):
-#                 model_name = model_name.replace("openrouter/", "")
+            # OpenRouter expects model ID like 'openai/gpt-4o-mini'
+            # If the user passed just 'gpt-4o-mini' but has OpenRouter key, we might want to prepend 'openai/'?
+            # But usually users pass full ID.
+            llm_arg = f"{provider}::{model}::{api_key}::{base_url}"
 
-#             llm_arg = f"OPENAI::{model_name}::{self.config.openrouter_api_key}::https://openrouter.ai/api/v1"
-#         elif self.config.openai_api_key:
-#             llm_arg = f"OPENAI::{model}::{self.config.openai_api_key}"
-#         else:
-#             log("Error: No API key found for OpenAI or OpenRouter.")
-#             return
+            if not self.config.openrouter_api_key:
+                output_callback(
+                    "Warning: Using OPENAI_API_KEY for OpenRouter request (inferred from model name)."
+                )
 
-#         if self.runner_type == "docker":
-#             await self._run_docker(
-#                 container_name,
-#                 output_dir,
-#                 llm_arg,
-#                 benchmark_type,
-#                 log,
-#                 output_callback,
-#             )
-#         else:
-#             await self._run_local(
-#                 output_dir, llm_arg, benchmark_type, log, output_callback
-#             )
+        elif self.config.openai_api_key:
+            # OpenAI Direct
+            # Strip 'openai/' prefix if present, as OpenAI API expects just 'gpt-4o-mini'
+            real_model = model
+            if real_model.startswith("openai/"):
+                real_model = real_model[7:]
+            llm_arg = f"OPENAI::{real_model}::{self.config.openai_api_key}"
+        else:
+            output_callback("Error: No API key found for OpenAI or OpenRouter.")
+            return
 
-#     async def _run_docker(
-#         self,
-#         container_name: str,
-#         output_dir: Path,
-#         llm_arg: str,
-#         benchmark_type: str,
-#         log: Callable[[str], None],
-#         output_callback: Optional[Callable[[str], None]],
-#     ):
-#         # Map host paths to container paths
-#         volumes = {
-#             str(self.benchmark_path): self.CONTAINER_WORKDIR,
-#             str(output_dir): f"{self.CONTAINER_WORKDIR}/results",
-#         }
+        # 5. Construct Command
+        # We clone PurpleLlama to /app/PurpleLlama
+        repo_root = "/app/PurpleLlama"
+        bench_root = f"{repo_root}/CybersecurityBenchmarks"
 
-#         env = {
-#             "DATASETS": f"{self.CONTAINER_WORKDIR}/CybersecurityBenchmarks/datasets",
-#             "PYTHONUNBUFFERED": "1",
-#         }
+        # Paths inside container
+        requirements_path = f"{bench_root}/requirements.txt"
+        response_path = f"{container_output_path}/responses.json"
+        stat_path = f"{container_output_path}/stats.json"
 
-#         log(f"Starting CyberSecEval container ({container_name})...")
-#         await self.runner.remove(container=container_name)
+        # Benchmark specific paths
+        cmd_args = ""
+        if benchmark_type == "instruct":
+            prompt_path = f"{bench_root}/datasets/instruct/instruct-v2.json"
+            cmd_args = (
+                f"--benchmark=instruct "
+                f"--prompt-path={prompt_path} "
+                f"--response-path={response_path} "
+                f"--stat-path={stat_path} "
+                f'--llm-under-test "{llm_arg}" '
+            )
+        elif benchmark_type == "autocomplete":
+            prompt_path = f"{bench_root}/datasets/autocomplete/autocomplete.json"
+            cmd_args = (
+                f"--benchmark=autocomplete "
+                f"--prompt-path={prompt_path} "
+                f"--response-path={response_path} "
+                f"--stat-path={stat_path} "
+                f'--llm-under-test "{llm_arg}" '
+            )
+        elif benchmark_type == "mitre":
+            prompt_path = f"{bench_root}/datasets/mitre/mitre_benchmark_100_per_category_with_augmentation.json"
+            cmd_args = (
+                f"--benchmark=mitre "
+                f"--prompt-path={prompt_path} "
+                f"--response-path={response_path} "
+                f"--stat-path={stat_path} "
+                f'--llm-under-test "{llm_arg}" '
+                f'--judge-llm "{llm_arg}" '
+                f'--expansion-llm "{llm_arg}" '
+            )
+        else:
+            output_callback(f"Benchmark type '{benchmark_type}' not supported.")
+            return
 
-#         try:
-#             # Start container
-#             await self.runner.run_detached(
-#                 name=container_name,
-#                 volumes=volumes,
-#                 env=env,
-#                 workdir=self.CONTAINER_WORKDIR,
-#             )
+        # Environment variables for container
+        env = {
+            "DATASETS": f"{bench_root}/datasets",
+            "PYTHONPATH": repo_root,
+            "PYTHONUNBUFFERED": "1",
+        }
+        if self.config.openai_api_key:
+            env["OPENAI_API_KEY"] = self.config.openai_api_key
+        if self.config.openrouter_api_key:
+            env["OPENROUTER_API_KEY"] = self.config.openrouter_api_key
 
-#             # Install dependencies
-#             log("Installing dependencies...")
-#             install_cmd = "pip install -r CybersecurityBenchmarks/requirements.txt"
-#             await self.runner.exec_command(
-#                 command=install_cmd, output_callback=output_callback
-#             )
+        # Chained command: Install git -> Clone -> Install deps -> Run benchmark
+        # We use /bin/bash -c to execute the chain
+        full_command = (
+            "apt-get update && apt-get install -y git && "
+            "git clone https://github.com/Meta-Llama/PurpleLlama.git /app/PurpleLlama && "
+            f"pip install -r {requirements_path} && "
+            f"cd {bench_root} && "
+            f"python -m CybersecurityBenchmarks.benchmark.run {cmd_args}"
+        )
 
-#             # Run benchmark
-#             cmd = (
-#                 f"python3 -m CybersecurityBenchmarks.benchmark.run "
-#                 f"--benchmark={benchmark_type} "
-#                 f'--llm-under-test "{llm_arg}" '
-#                 f"--response-path /app/results/responses.json "
-#                 f"--stat-path /app/results/stats.json "
-#             )
+        output_callback(
+            f"Running {benchmark_type} benchmark in Docker (cloning repo)..."
+        )
+        output_callback(f"Image: python:3.10")
 
-#             log(f"Running Benchmark: {cmd}")
-#             # Mask API key in logs
-#             cmd_log = cmd
-#             if self.config.openrouter_api_key:
-#                 cmd_log = cmd_log.replace(self.config.openrouter_api_key, "***")
-#             if self.config.openai_api_key:
-#                 cmd_log = cmd_log.replace(self.config.openai_api_key, "***")
+        # Mask API keys in logs
+        safe_cmd = full_command.replace(
+            self.config.openrouter_api_key or "___", "***"
+        ).replace(self.config.openai_api_key or "___", "***")
+        output_callback(f"Command: {safe_cmd}")
 
-#             log(f"Command: {cmd_log}")
+        # Run via DockerRunner
+        # We wrap in bash -c to handle &&
+        docker_cmd = f'/bin/bash -c "{full_command}"'
 
-#             exit_code = await self.runner.exec_command(
-#                 command=cmd, output_callback=output_callback
-#             )
-
-#             if exit_code != 0:
-#                 log("Benchmark failed.")
-#             else:
-#                 log("Benchmark completed.")
-
-#         finally:
-#             log("Stopping container...")
-#             await self.runner.stop()
-
-#     async def _run_local(
-#         self,
-#         output_dir: Path,
-#         llm_arg: str,
-#         benchmark_type: str,
-#         log: Callable[[str], None],
-#         output_callback: Optional[Callable[[str], None]],
-#     ):
-#         # For local run, we use the benchmark path directly
-#         workdir = self.benchmark_path
-
-#         # Set environment variables
-#         env = {
-#             "DATASETS": str(workdir / "CybersecurityBenchmarks/datasets"),
-#             "PYTHONPATH": str(workdir),  # Ensure we can import CybersecurityBenchmarks
-#             "PYTHONUNBUFFERED": "1",
-#         }
-
-#         log(f"Preparing local environment in {workdir}...")
-
-#         # Initialize runner (creates venv if needed)
-#         # We pass workdir as the directory where commands should run
-#         await self.runner.run_detached(
-#             name="local_cyberseceval", workdir=str(workdir), env=env
-#         )
-
-#         # Install dependencies
-#         log("Installing dependencies...")
-
-#         # Install requests and build tools first to ensure they are available
-#         # requests is needed by anthropic provider but missing from requirements.txt
-#         # typing_extensions is needed by anthropic provider
-#         # pillow is needed by benchmark_utils
-#         exit_code = await self.runner.exec_command(
-#             command="pip install --upgrade pip wheel setuptools requests typing_extensions pillow",
-#             output_callback=output_callback,
-#         )
-#         if exit_code != 0:
-#             log("Failed to install pre-requisites.")
-#             return
-
-#         # We assume requirements.txt is in CybersecurityBenchmarks/requirements.txt relative to workdir
-#         install_cmd = "pip install -r CybersecurityBenchmarks/requirements.txt"
-#         exit_code = await self.runner.exec_command(
-#             command=install_cmd, output_callback=output_callback
-#         )
-#         if exit_code != 0:
-#             log("Failed to install requirements.txt. Proceeding with caution...")
-#             # We don't return here because some requirements might have failed but others succeeded
-#             # and we might still be able to run if the critical ones are there.
-#             # But ideally we should probably stop. Given the pydantic-core issue, let's warn but try to continue
-#             # if the user really wants to, or maybe we should stop.
-#             # For now, let's just log it clearly.
-
-#         response_path = output_dir / "responses.json"
-#         stat_path = output_dir / "stats.json"
-
-#         # Run benchmark
-#         cmd = (
-#             f"python3 -m CybersecurityBenchmarks.benchmark.run "
-#             f"--benchmark={benchmark_type} "
-#             f'--llm-under-test "{llm_arg}" '
-#             f'--response-path "{response_path}" '
-#             f'--stat-path "{stat_path}" '
-#         )
-
-#         log(f"Running Benchmark: {cmd}")
-#         # Mask API key in logs
-#         cmd_log = cmd
-#         if self.config.openrouter_api_key:
-#             cmd_log = cmd_log.replace(self.config.openrouter_api_key, "***")
-#         if self.config.openai_api_key:
-#             cmd_log = cmd_log.replace(self.config.openai_api_key, "***")
-
-#         log(f"Command: {cmd_log}")
-
-#         exit_code = await self.runner.exec_command(
-#             command=cmd, output_callback=output_callback
-#         )
-
-#         if exit_code != 0:
-#             log("Benchmark failed.")
-#         else:
-#             log("Benchmark completed.")
-
-
-class CyberSecEvalBenchmark:
-    pass
+        self.runner.run(
+            image=self.image_name,
+            command=docker_cmd,
+            environment=env,
+            volumes=volumes,
+            output_callback=output_callback,
+        )

@@ -10,7 +10,7 @@ class Benchmark(ABC):
         self.benchmark_path = benchmark_path.resolve()
 
     @abstractmethod
-    async def run_pipeline(
+    def run_pipeline(
         self,
         model: str,
         output_dir: Path,
