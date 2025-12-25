@@ -36,9 +36,28 @@ object StreamEventMapper {
             UiStreamEvent.Message(
                 title = SecureCoderBundle.message("warning.llm.title"),
                 description = SecureCoderBundle.message("warning.llm.description", event.parseErrors.joinToString("\n")),
-                icon = AllIcons.General.Warning
+                icon = AllIcons.General.Warning,
+                debugText = buildExchangeText(event)
             )
         }
+    }
+
+    private fun buildExchangeText(event: StreamEvent.InvalidLlmOutputWarning): String {
+        val sb = StringBuilder()
+        sb.appendLine("Input messages:")
+        event.chatExchange.input.forEachIndexed { idx, msg ->
+            sb.appendLine("#${idx + 1} ${msg.role}:")
+            sb.appendLine(msg.content)
+            sb.appendLine()
+        }
+        sb.appendLine("Model output:")
+        sb.appendLine(event.chatExchange.output)
+        sb.appendLine()
+        sb.appendLine("Parse errors:")
+        event.parseErrors.forEachIndexed { index, error ->
+            sb.appendLine("#${index + 1}: $error")
+        }
+        return sb.toString()
     }
 
     fun mapException(exception: Exception): UiStreamEvent.Message {
