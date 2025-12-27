@@ -1,5 +1,4 @@
 import yaml
-import os
 from pathlib import Path
 from typing import Any, Dict, Optional
 from dataclasses import dataclass
@@ -9,7 +8,11 @@ from dataclasses import dataclass
 class Config:
     openai_api_key: Optional[str] = None
     openrouter_api_key: Optional[str] = None
+    api_base_url: str = "http://localhost:8080/v1"
     default_model: str = "openai/gpt-4o-mini"
+    system_prompt: str = (
+        "You are a security-aware code assistant. Generate secure code."
+    )
     output_dir: str = "results"
 
     @classmethod
@@ -26,15 +29,11 @@ class Config:
 
                 config.openai_api_key = data.get("openai_api_key")
                 config.openrouter_api_key = data.get("openrouter_api_key")
+                config.api_base_url = data.get("api_base_url", config.api_base_url)
                 config.default_model = data.get("default_model", config.default_model)
+                config.system_prompt = data.get("system_prompt", config.system_prompt)
                 config.output_dir = data.get("output_dir", config.output_dir)
             except Exception as e:
                 print(f"Warning: Failed to load config: {e}")
-
-        # Fallback to environment variables
-        if not config.openai_api_key:
-            config.openai_api_key = os.environ.get("OPENAI_API_KEY")
-        if not config.openrouter_api_key:
-            config.openrouter_api_key = os.environ.get("OPENROUTER_API_KEY")
 
         return config

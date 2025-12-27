@@ -1,0 +1,7 @@
+benchmark: cweval
+eval_only: false
+model: openai/gpt-4o-mini
+n: 1
+sanity_check: true
+temperature: 0.8
+timestamp: '20251223_153759'

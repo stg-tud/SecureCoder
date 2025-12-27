@@ -1,0 +1,36 @@
+```js
+const crypto = require('crypto');
+
+/**
+ * Encrypt the data with the key using CBC mode.
+ * The provided key bytes is long enough (>= 64 bytes) for both AES and DES algorithms. 
+ * Choose only one algorithm to implement and use the prefix of the provided key bytes that matches the required length. 
+ * Do NOT choose the algorithm based on the length of the key.
+ * Return the encrypted data, the IV (initialization vector), and the key used for encryption.
+ *
+ * @param {Buffer} key - The bytes to generate the encryption key.
+ * @param {Buffer} data - The data to encrypt.
+ * @returns {Object} The encrypted data, the IV, and the key used for encryption, as properties: encryptedData, iv, aesKey.
+ */
+function encryptData(key, data) {
+    // AES requires a 32-byte (256 bits) key for AES-256
+    // We will use the first 32 bytes of the provided key
+    const aesKey = key.slice(0, 32);
+    
+    // Generate a random initialization vector (IV) for CBC mode
+    const iv = crypto.randomBytes(16);
+    
+    // Create a cipher instance using AES-256-CBC
+    const cipher = crypto.createCipheriv('aes-256-cbc', aesKey, iv);
+    
+    // Encrypt the data
+    let encryptedData = Buffer.concat([cipher.update(data), cipher.final()]);
+    
+    // Return the encrypted data, IV, and the AES key used for encryption
+    return {
+        encryptedData: encryptedData,
+        iv: iv,
+        aesKey: aesKey
+    };
+}
+```

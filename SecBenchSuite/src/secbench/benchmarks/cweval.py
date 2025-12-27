@@ -1,135 +1,174 @@
+import asyncio
+import os
+import sys
 from pathlib import Path
-from typing import Callable, Optional
-import platform
+from typing import Optional, Callable, Dict, Any, List
+
 from secbench.config import Config
+from secbench.benchmarks.base import BaseBenchmark
 from secbench.runners.docker_runner import DockerRunner
-from secbench.benchmarks.base import Benchmark
 
 
-class CWEvalBenchmark(Benchmark):
-    def __init__(self, config: Config, bench_path: Path):
-        super().__init__(config, bench_path)
-        self.runner = DockerRunner()
-        self.working_dir = "/home/ubuntu/CWEval"
-        self.image_name = "co1lin/cweval"
+class CWEvalBenchmark(BaseBenchmark):
+    IMAGE = "co1lin/cweval"
+    CONTAINER_WORKDIR = "/home/ubuntu/CWEval"
 
-    def run_pipeline(
+    def __init__(self, config: Config, benchmark_path: Path):
+        super().__init__(config, benchmark_path)
+
+        if str(self.benchmark_path) not in sys.path:
+            sys.path.append(str(self.benchmark_path))
+
+        self.docker_runner = DockerRunner(self.IMAGE)
+
+    async def run_pipeline(
         self,
         model: str,
         output_dir: Path,
-        n: int,
-        temperature: float,
-        output_callback: Callable[[str], None],
-        sanity_check: bool = False,
-        benchmark_type: str = "instruct",
-        eval_only: bool = False,
+        n: int = 1,
+        temperature: float = 0.8,
+        output_callback: Optional[Callable[[str], None]] = None,
     ):
-        # Pull image first
-        self.runner.pull_image(self.image_name, output_callback)
+        """
+        Run the CWEval generation pipeline using the suite's generation runner.
+        """
+        try:
+            from cweval.commons import BENCHMARK_DIR, LANGS
+            from cweval.ppt import DirectPrompt
 
-        # Ensure output directory exists
-        output_dir.mkdir(parents=True, exist_ok=True)
-        abs_output_dir = output_dir.resolve()
-
-        # We mount the output directory to /app/evals inside the container
-        container_eval_path = "/app/evals"
-
-        volumes = {str(abs_output_dir): {"bind": container_eval_path, "mode": "rw"}}
-
-        # Environment variables
-        env = {"PYTHONUNBUFFERED": "1"}
-        if self.config.openai_api_key:
-            env["OPENAI_API_KEY"] = self.config.openai_api_key
-        if self.config.openrouter_api_key:
-            env["OPENROUTER_API_KEY"] = self.config.openrouter_api_key
-            # Fallback: Set OPENAI_API_KEY to OpenRouter key if not present,
-            # as some libraries/versions might check it by default.
-            if "OPENAI_API_KEY" not in env:
-                env["OPENAI_API_KEY"] = self.config.openrouter_api_key
-
-            # Auto-prepend openrouter/ prefix if using OpenRouter key and no OpenAI key is present
-            # This matches the behavior suggested in gen_config.md
-            if self.config.openrouter_api_key and not model.startswith("openrouter/"):
-                output_callback(f"Auto-prepending 'openrouter/' to model name: {model}")
-                model = f"openrouter/{model}"
-
-        # DEBUG:
-        print(f"Using model: {model}")
-        print(f"Volumes: {volumes}")
-        print(f"Environment: {env}")
-        print(f'openai_api_key present: {"OPENAI_API_KEY" in env}')
-        print(f'openrouter_api_key present: {"OPENROUTER_API_KEY" in env}')
-
-        # Construct the shell command
-        # We use zsh as in the example
-
-        is_arm = platform.machine().lower() in ("arm64", "aarch64")
-        cgo_env = "CGO_ENABLED=0 " if is_arm else ""
-
-        # Chain commands
-        cmds = [
-            "echo '[Container] Starting shell...'",
-            "source ~/miniforge3/bin/activate",
-            f"cd {self.working_dir}",
-            "source .env",
-            "export NODE_PATH=$(npm root -g)",
-            "export PYTHONPATH=$PYTHONPATH:$(pwd)",
-            "echo '[Container] Installing tenacity...'",
-            "pip install tenacity",
-        ]
-
-        if sanity_check:
-            cmds.extend(
-                [
-                    "echo '[Container] Tidy Go modules...'",
-                    "go mod tidy",
-                    "echo '[Container] Compiling reference solutions...'",
-                    f"{cgo_env}python -u cweval/commons.py compile_all_in --path benchmark/",
-                    "echo '[Container] Running tests...'",
-                    "pytest benchmark/ -x -n 8",
-                ]
+            try:
+                from natsort import natsorted
+            except ImportError:
+                natsorted = sorted
+        except ImportError as e:
+            raise ImportError(
+                f"Could not import cweval modules: {e}. Make sure benchmark_path is correct."
             )
 
-        # Generation command
-        # python cweval/generate.py gen --n <n> --temperature <temp> --eval_path <path> --model <model>
-        # We use --num_proc 4 to be safe, or we could expose it as a parameter
-        # We pipe 'y' to the command because generate.py asks for confirmation if the directory exists
-        if not eval_only:
-            gen_cmd = (
-                f"echo 'y' | python cweval/generate.py gen "
-                f"--n {n} "
-                f"--temperature {temperature} "
-                f"--eval_path {container_eval_path} "
-                f"--model {model} "
-                f"--num_proc 4"
+        output_dir = output_dir.resolve()
+
+        def log(msg):
+            if output_callback:
+                output_callback(msg)
+            else:
+                print(msg)
+
+        # Get cases
+        cases = {}
+        begin_prompt_anchor = "BEGIN PROMPT"
+        begin_solution_anchor = "BEGIN SOLUTION"
+
+        log(f"Scanning for cases in {BENCHMARK_DIR}...")
+
+        for root, _, files in os.walk(BENCHMARK_DIR):
+            if "__pycache__" in root:
+                continue
+            for file in natsorted(files):
+                file_wo_ext, ext = os.path.splitext(file)
+                task_file_path = os.path.join(root, file)
+                lang = ext[1:]
+
+                if not (ext and file_wo_ext.endswith("_task")):
+                    continue
+                if lang not in LANGS:
+                    continue
+
+                with open(task_file_path, "r") as f:
+                    task_code = f.read()
+
+                begin_solution_line_src = ""
+                for line in task_code.splitlines():
+                    if begin_solution_anchor in line:
+                        begin_solution_line_src = line
+                        break
+
+                if not begin_solution_line_src:
+                    log(f"Warning: No solution anchor found in {task_file_path}")
+                    continue
+
+                try:
+                    code_prompt = (
+                        task_code.split(begin_prompt_anchor)[-1]
+                        .split(begin_solution_line_src)[0]
+                        .strip()
+                    )
+                except IndexError:
+                    log(f"Warning: Could not parse prompt in {task_file_path}")
+                    continue
+
+                rel_path = os.path.relpath(task_file_path, BENCHMARK_DIR)
+                cases[rel_path] = {
+                    "code": code_prompt,
+                    "lang": lang,
+                    "path": task_file_path,
+                    "rel_path": rel_path,
+                }
+
+        log(f"Found {len(cases)} cases.")
+
+        prompts = []
+        for case_id, case_data in cases.items():
+            lang = case_data["lang"]
+            code_prompt = case_data["code"]
+
+            prompt_text = DirectPrompt.PPT.format(
+                lang=lang,
+                lang_instr=DirectPrompt.LANG_INSTR.get(lang, ""),
+                code_prompt=code_prompt,
             )
-            cmds.append(f"echo '[Container] Generating samples with {model}...'")
-            cmds.append(gen_cmd)
-        else:
-            cmds.append(f"echo '[Container] Skipping generation (eval-only mode)...'")
 
-        # Evaluation command
-        # python cweval/evaluate.py pipeline --eval_path <path> --docker False
-        eval_cmd = (
-            f"python cweval/evaluate.py pipeline "
-            f"--eval_path {container_eval_path} "
-            f"--docker False "
-            f"--num_proc 4"
+            prompts.append(
+                {"id": case_id, "prompt": prompt_text, "metadata": case_data}
+            )
+
+        results = await self.generate_samples(
+            model, prompts, n, temperature, output_callback
         )
-        cmds.append(f"echo '[Container] Evaluating samples...'")
-        cmds.append(eval_cmd)
 
-        # Combine into one zsh command
-        full_command = 'zsh -l -c "' + " && ".join(cmds) + '"'
+        self.save_cweval_results(results, output_dir, n)
 
-        output_callback(f"Starting container execution...")
-        output_callback(f"Output directory: {abs_output_dir}")
+    def save_cweval_results(self, results, output_dir, n):
+        """Save results in CWEval structure."""
+        # Structure: output_dir/generated_X/rel_path_wo_task_raw.ext
 
-        self.runner.run(
-            image=self.image_name,
-            command=full_command,
-            environment=env,
-            volumes=volumes,
-            network_mode="host",
-            output_callback=output_callback,
-        )
+        for i in range(n):
+            gen_dir = output_dir / f"generated_{i}"
+            gen_dir.mkdir(parents=True, exist_ok=True)
+
+            # Filter results for this sample index
+            sample_results = [r for r in results if r.get("sample_index") == i]
+
+            for res in sample_results:
+                if "error" in res:
+                    continue
+
+                metadata = res["metadata"]
+                rel_path = metadata["rel_path"]  # e.g. core/py/cwe_020_0_task.py
+                response = res["response"]
+
+                # Construct output path
+                # Replace _task with _raw
+                # rel_path is relative to BENCHMARK_DIR
+
+                # We need to preserve directory structure
+                dest_path = gen_dir / rel_path.replace("_task", "_raw")
+                dest_path.parent.mkdir(parents=True, exist_ok=True)
+
+                # Clean response (remove markdown code blocks if present)
+                clean_response = self._clean_response(response)
+
+                with open(dest_path, "w") as f:
+                    f.write(clean_response)
+
+        print(f"Saved results to {output_dir}")
+
+    def _clean_response(self, response: str) -> str:
+        # Simple cleaner for markdown code blocks
+        lines = response.splitlines()
+        # Remove leading ```lang
+        if lines and lines[0].strip().startswith("```"):
+            lines = lines[1:]
+        # Remove trailing ```
+        if lines and lines[-1].strip().startswith("```"):
+            lines = lines[:-1]
+        return "\n".join(lines)
