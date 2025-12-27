@@ -3,10 +3,10 @@
 # https://docs.gradle.org/current/userguide/platforms.html#sub::toml-dependencies-format
 
 [versions]
-kotlin = "2.2.0"
+kotlin = "2.2.21"
 ktor = "3.0.0"
 serialization = "1.7.3"
-intellijPlugin = "1.17.3"
+intellijPlugin = "2.10.5"
 logback = "1.5.8"
 coroutines = "1.10.2"
 
@@ -25,5 +25,5 @@ ktor-server-test-host = { module = "io.ktor:ktor-server-test-host-jvm", version.
 logback = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 
 [plugins]
-intellij = { id = "org.jetbrains.intellij", version.ref = "intellijPlugin" }
+intellij = { id = "org.jetbrains.intellij.platform", version.ref = "intellijPlugin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }

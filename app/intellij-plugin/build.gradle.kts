@@ -3,19 +3,23 @@ plugins {
     alias(libs.plugins.intellij)
 }
 
-intellij {
-    version.set("2024.2")
-    type.set("IC")
-    plugins.set(listOf()) // java
+repositories {
+    mavenCentral()
+    intellijPlatform {
+        defaultRepositories()
+    }
 }
 
 dependencies {
     implementation(project(":engine"))
+    implementation(project(":guardian:codeql"))
     implementation(project(":enricher:client"))
+    intellijPlatform {
+        create("IC", "2025.2.5")
+    }
 }
-configurations.all {
-    exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-core")
-    exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-jdk8")
+kotlin {
+    jvmToolchain(21)
 }
 
 tasks {
@@ -23,10 +27,6 @@ tasks {
         changeNotes.set("""
             Initial preview.
         """.trimIndent())
-    }
-
-    runIde {
-        // ideDir.set(file(System.getProperty("user.home") + "/.cache/JetBrains/Toolbox/apps/IDEA-C/ch-0/242.xxxxx"))
     }
 
     buildPlugin {}

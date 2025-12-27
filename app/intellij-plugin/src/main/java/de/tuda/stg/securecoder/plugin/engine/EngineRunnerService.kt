@@ -12,6 +12,7 @@ import de.tuda.stg.securecoder.engine.llm.OpenRouterClient
 import de.tuda.stg.securecoder.engine.workflow.WorkflowEngine
 import de.tuda.stg.securecoder.enricher.EnricherClient
 import de.tuda.stg.securecoder.enricher.PromptEnricher
+import de.tuda.stg.securecoder.guardian.CodeQLGuardian
 import de.tuda.stg.securecoder.guardian.DummyGuardian
 import de.tuda.stg.securecoder.plugin.engine.event.EngineResultMapper
 import de.tuda.stg.securecoder.plugin.engine.event.StreamEventMapper
@@ -51,7 +52,8 @@ class EngineRunnerService(
             PromptEnricher.PASSTHROUGH
         }
         val guardians = listOfNotNull(
-            if (settings.enableDummyGuardian) DummyGuardian() else null
+            if (settings.enableDummyGuardian) DummyGuardian() else null,
+            if (settings.enableCodeQLGuardian) CodeQLGuardian(settings.codeqlBinary) else null
         )
         
         //return EngineHandle(DummyAgentStreamer(), {})

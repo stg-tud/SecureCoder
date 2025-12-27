@@ -28,6 +28,8 @@ class SecureCoderSettingsState : PersistentStateComponent<SecureCoderSettingsSta
         var openrouterModel: String = "openai/gpt-oss-20b",
         var enablePromptEnriching: Boolean = true,
         var enableDummyGuardian: Boolean = true,
+        var enableCodeQLGuardian: Boolean = false,
+        var codeqlBinary: String = "codeql",
     )
 
     private var state: StateData = StateData()
