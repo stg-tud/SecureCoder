@@ -6,7 +6,7 @@ import java.nio.file.Path
 import kotlin.io.path.exists
 
 class CodeQLGuardian(
-    private val codeqlBinary: String = "codeql",
+    private val codeQlBinary: String = "codeql",
     private val defaultQueryPacksByLanguage: Map<String, String> = mapOf(
         "javascript" to "codeql/javascript-queries",
         "python" to "codeql/python-queries",
@@ -28,7 +28,7 @@ class CodeQLGuardian(
             val sarifPaths = mutableListOf<Path>()
             println("detected languages $languages for files ${req.files.joinToString(",")}")
             
-            val runner = CodeQLRunner(codeqlBinary)
+            val runner = CodeQLRunner(codeQlBinary)
             for (language in languages) {
                 val dbDir = workRoot.resolve("db-$language")
                 val outSarif = workRoot.resolve("results-$language.sarif")

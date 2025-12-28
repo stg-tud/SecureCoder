@@ -9,6 +9,7 @@ import de.tuda.stg.securecoder.engine.file.edit.EditFilesLlmWrapper
 import de.tuda.stg.securecoder.engine.llm.FilesInContextPromptBuilder
 import de.tuda.stg.securecoder.engine.llm.LlmClient
 import de.tuda.stg.securecoder.engine.stream.StreamEvent
+import de.tuda.stg.securecoder.engine.stream.ProposalId
 import de.tuda.stg.securecoder.engine.workflow.FeedbackBuilder.buildFeedbackForLlm
 import de.tuda.stg.securecoder.enricher.PromptEnricher
 import de.tuda.stg.securecoder.filesystem.FileSystem
@@ -49,11 +50,15 @@ class WorkflowEngine (
             )
             messages += out.changesMessage()
             val changes = out.changes ?: return EngineResult.Failure.GenerationFailure
+            val proposalId = ProposalId.newId()
+            onEvent(StreamEvent.ProposedEdits(proposalId, changes))
+            onEvent(StreamEvent.ValidationStarted(proposalId))
             val guardianResult = guardianExecutor.analyze(filesystem, changes)
             if (guardianResult.hasNoViolations()) {
+                onEvent(StreamEvent.ValidationSucceeded(proposalId))
                 return EngineResult.Success(changes)
             }
-            onEvent(StreamEvent.GuardianWarning(guardianResult))
+            onEvent(StreamEvent.GuardianWarning(proposalId, guardianResult))
             messages += ChatMessage(Role.User, guardianResult.buildFeedbackForLlm())
         }
         return EngineResult.Failure.ValidationFailure(maxGuardianRetries)

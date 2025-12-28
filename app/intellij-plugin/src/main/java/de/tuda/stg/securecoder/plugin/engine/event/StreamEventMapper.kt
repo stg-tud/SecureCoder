@@ -6,7 +6,17 @@ import de.tuda.stg.securecoder.plugin.SecureCoderBundle
 
 object StreamEventMapper {
     fun map(event: StreamEvent): UiStreamEvent = when (event) {
-        is StreamEvent.EditFiles -> UiStreamEvent.EditFiles(event.changes)
+        is StreamEvent.ProposedEdits -> UiStreamEvent.EditFiles(event.changes)
+        is StreamEvent.ValidationStarted -> UiStreamEvent.Message(
+            title = "Validation started",
+            description = "",
+            icon = AllIcons.General.Information
+        )
+        is StreamEvent.ValidationSucceeded -> UiStreamEvent.Message(
+            title = "Validation succeeded",
+            description = "",
+            icon = AllIcons.General.InspectionsOK
+        )
 
         is StreamEvent.SendDebugMessage -> {
             UiStreamEvent.Message(

@@ -6,6 +6,7 @@ import de.tuda.stg.securecoder.engine.file.edit.Changes
 import de.tuda.stg.securecoder.engine.file.edit.Changes.*
 import de.tuda.stg.securecoder.engine.stream.EventIcon
 import de.tuda.stg.securecoder.engine.stream.StreamEvent
+import de.tuda.stg.securecoder.engine.stream.ProposalId
 import de.tuda.stg.securecoder.filesystem.FileSystem
 import kotlinx.coroutines.delay
 import java.util.concurrent.ThreadLocalRandom
@@ -39,7 +40,7 @@ class DummyAgentStreamer : Engine {
             val icon = randomPick(EventIcon.entries)
             onEvent(StreamEvent.SendDebugMessage(title, desc, icon))
             if (idx % 3 == 0) {
-                onEvent(StreamEvent.EditFiles(Changes(listOf(
+                onEvent(StreamEvent.ProposedEdits(ProposalId.newId(), Changes(listOf(
                     SearchReplace("app.py", SearchedText.append(), "print(\"Hello World!\")"),
                     SearchReplace("app2.py", SearchedText.append(), "print(\"Hello World!\")"),
                     SearchReplace("app.py", SearchedText.append(), "\nprint(\"Hello World!2\")"),
