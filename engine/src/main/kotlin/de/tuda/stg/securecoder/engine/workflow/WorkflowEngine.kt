@@ -51,7 +51,7 @@ class WorkflowEngine (
             if (guardianResult.hasNoViolations()) {
                 return EngineResult.Success(changes)
             }
-            onEvent(StreamEvent.GuardianWarning(guardianResult.violations.toString()))
+            onEvent(StreamEvent.GuardianWarning(guardianResult))
             messages += ChatMessage(Role.User, guardianResult.buildFeedbackForLlm())
         }
         return EngineResult.Failure.ValidationFailure(maxGuardianRetries)

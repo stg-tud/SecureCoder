@@ -27,7 +27,7 @@ object StreamEventMapper {
         is StreamEvent.GuardianWarning -> {
             UiStreamEvent.Message(
                 title = SecureCoderBundle.message("warning.guardian.title"),
-                description = SecureCoderBundle.message("warning.guardian.description", event.violations),
+                description = SecureCoderBundle.message("warning.guardian.description", event.result.violations.toString()),
                 icon = AllIcons.General.Warning
             )
         }

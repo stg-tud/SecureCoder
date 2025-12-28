@@ -85,9 +85,8 @@ class EditFilesLlmWrapper(
         val allErrors = mutableListOf<String>()
         val contentCopy = if (content.endsWith("\n")) content else content + "\n"
         val editsRegex = Regex(
-            "<EDIT(\\d{0,2})>(.*?)</EDIT\\1>", setOf(
-                RegexOption.MULTILINE, RegexOption.DOT_MATCHES_ALL
-            )
+            "<EDIT(\\d{0,2})>(.*?)</EDIT\\1>",
+            setOf(RegexOption.MULTILINE, RegexOption.DOT_MATCHES_ALL)
         )
         val matches = editsRegex.findAll(contentCopy).toList()
 
