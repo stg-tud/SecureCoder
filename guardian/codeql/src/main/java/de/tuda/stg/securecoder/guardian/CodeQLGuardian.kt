@@ -48,6 +48,7 @@ class CodeQLGuardian(
             }
             return AnalyzeResponse(violations)
         } finally {
+            // todo
             // workRoot.toFile().deleteRecursively()
         }
     }
