@@ -19,6 +19,7 @@ class WorkflowEngine (
     llmClient: LlmClient,
     guardians: List<Guardian> = emptyList(),
     private val maxGuardianRetries: Int = 6,
+    private val parseChangesAttempts: Int = 3,
 ) : Engine {
     private val promptEnrichRunner = PromptEnrichRunner(enricher)
     private val editFiles = EditFilesLlmWrapper(llmClient)
@@ -43,7 +44,8 @@ class WorkflowEngine (
                 fileSystem = filesystem,
                 onParseError = { parseErrors, chatExchange ->
                     onEvent(StreamEvent.InvalidLlmOutputWarning(parseErrors, chatExchange))
-                }
+                },
+                attempts = parseChangesAttempts
             )
             messages += out.changesMessage()
             val changes = out.changes ?: return EngineResult.Failure.GenerationFailure
