@@ -52,7 +52,7 @@ class EngineRunnerService(
             PromptEnricher.PASSTHROUGH
         }
         val guardians = listOfNotNull(
-            if (settings.enableDummyGuardian) DummyGuardian() else null,
+            if (settings.enableDummyGuardian) DummyGuardian(sleepMillis = 2000) else null,
             if (settings.enableCodeQLGuardian) CodeQLGuardian(settings.codeqlBinary) else null
         )
         
