@@ -10,6 +10,7 @@ import de.tuda.stg.securecoder.plugin.edit.buildEditFilesPanel
 import de.tuda.stg.securecoder.plugin.SecureCoderBundle
 import de.tuda.stg.securecoder.plugin.engine.IntelliJProjectFileSystem
 import de.tuda.stg.securecoder.plugin.engine.event.UiStreamEvent
+import de.tuda.stg.securecoder.plugin.engine.event.UiStreamEvent.EditFilesValidation
 import java.awt.Component
 import java.awt.Dimension
 import javax.swing.BorderFactory
@@ -50,6 +51,31 @@ object EventsPanel {
         }
         titlePanel.add(titleLabel)
 
+        if (event is UiStreamEvent.EditFiles) {
+            titlePanel.add(JPanel().apply { layout = BoxLayout(this, BoxLayout.X_AXIS) })
+            val statusLabel = when(event.validation) {
+                is EditFilesValidation.NotAvailable -> null
+                is EditFilesValidation.Running -> JLabel(
+                    SecureCoderBundle.message("validation.in_progress"),
+                    AllIcons.Actions.Refresh,
+                    JLabel.LEADING
+                )
+                is EditFilesValidation.Succeeded -> JLabel(
+                    SecureCoderBundle.message("validation.succeeded"),
+                    AllIcons.General.InspectionsOK,
+                    JLabel.LEADING
+                )
+                is EditFilesValidation.Failed -> JLabel(
+                    SecureCoderBundle.message("validation.warnings"),
+                    AllIcons.General.Warning,
+                    JLabel.LEADING
+                )
+            }
+            if (statusLabel != null) {
+                titlePanel.add(statusLabel)
+            }
+        }
+
         if (event is UiStreamEvent.Message && event.debugText != null) {
             val debugButton = JButton(AllIcons.General.Information).apply {
                 border = JBUI.Borders.empty()
@@ -79,9 +105,28 @@ object EventsPanel {
                 event.changes,
                 IntelliJProjectFileSystem(project)
             )
+            else -> JTextArea("").apply {
+                isEditable = false
+                border = JBUI.Borders.empty()
+                background = card.background
+                alignmentX = Component.LEFT_ALIGNMENT
+            }
         }
 
         card.add(titlePanel)
+        if (event is UiStreamEvent.EditFiles && event.validation is EditFilesValidation.Failed) {
+            val hints = event.validation.guardianHints
+            val hintsPanel = JPanel().apply {
+                layout = BoxLayout(this, BoxLayout.Y_AXIS)
+                border = JBUI.Borders.emptyBottom(4)
+                alignmentX = Component.LEFT_ALIGNMENT
+            }
+            hints.forEach { hint ->
+                val label = JLabel("• $hint")
+                hintsPanel.add(label)
+            }
+            card.add(hintsPanel)
+        }
         card.add(content)
         return card
     }

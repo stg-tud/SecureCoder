@@ -32,6 +32,9 @@ import javax.swing.SwingUtilities
 class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
     private lateinit var eventsPanel: JPanel
     private lateinit var eventsScrollPane: JBScrollPane
+    private val editCardsByProposal = mutableMapOf<String, EditCardState>()
+
+    private data class EditCardState(var event: UiStreamEvent.EditFiles, var panel: JPanel)
 
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
         val root = createRoot(project)
@@ -74,6 +77,7 @@ class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
             eventsPanel.removeAll()
             eventsPanel.revalidate()
             eventsPanel.repaint()
+            editCardsByProposal.clear()
 
             runner.runEngine(
                 promptText,
@@ -104,9 +108,22 @@ class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
         event: UiStreamEvent,
         project: Project
     ) {
+        val existingState = (event as? UiStreamEvent.EditFiles)?.let { editCardsByProposal[it.proposalId] }
+        val existingIndex = existingState?.panel?.let { eventsPanel.getComponentZOrder(it) } ?: -1
         val card = EventsPanel.addEventCard(event, project)
-        eventsPanel.add(card)
-        eventsPanel.add(Box.createRigidArea(Dimension(0, JBUI.scale(8))))
+
+        if (existingIndex >= 0 && existingState != null) {
+            eventsPanel.remove(existingState.panel)
+            eventsPanel.add(card, existingIndex)
+        } else {
+            eventsPanel.add(card)
+            eventsPanel.add(Box.createRigidArea(Dimension(0, JBUI.scale(8))))
+        }
+
+        if (event is UiStreamEvent.EditFiles) {
+            editCardsByProposal[event.proposalId] = EditCardState(event, card)
+        }
+
         eventsPanel.revalidate()
         eventsPanel.repaint()
 

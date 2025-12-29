@@ -78,19 +78,20 @@ class EngineRunnerService(
             withBackgroundProgress(project, "Running engine…", cancellable = false) {
                 val fileSystem = IntelliJProjectFileSystem(project)
                 var handle: EngineHandle? = null
+                val mapper = StreamEventMapper()
 
                 try {
                     handle = buildEngine()
                     val result = handle.engine.run(
                         text,
                         fileSystem,
-                        { engineEvent -> onUiEvent(StreamEventMapper.map(engineEvent)) },
+                        { engineEvent -> onUiEvent(mapper.map(engineEvent)) },
                         buildContext(reduceContextToOpenFiles)
                     )
-                    onUiEvent(EngineResultMapper.map(result))
+                    EngineResultMapper.map(mapper, result)?.let { onUiEvent(it) }
                 } catch (exception: Exception) {
                     thisLogger().error("Uncaught exception within the engine", exception)
-                    onUiEvent(StreamEventMapper.mapException(exception))
+                    onUiEvent(mapper.mapException(exception))
                 } finally {
                     runCatching { handle?.close?.invoke() }.onFailure {
                         thisLogger().warn("Failed closing engine handle", it)

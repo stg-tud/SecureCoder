@@ -3,20 +3,31 @@ package de.tuda.stg.securecoder.plugin.engine.event
 import com.intellij.icons.AllIcons
 import de.tuda.stg.securecoder.engine.stream.StreamEvent
 import de.tuda.stg.securecoder.plugin.SecureCoderBundle
+import de.tuda.stg.securecoder.plugin.engine.event.UiStreamEvent.EditFilesValidation
 
-object StreamEventMapper {
+class StreamEventMapper {
+    private val proposals = mutableMapOf<String, UiStreamEvent.EditFiles>()
+
     fun map(event: StreamEvent): UiStreamEvent = when (event) {
-        is StreamEvent.ProposedEdits -> UiStreamEvent.EditFiles(event.changes)
-        is StreamEvent.ValidationStarted -> UiStreamEvent.Message(
-            title = "Validation started",
-            description = "",
-            icon = AllIcons.General.Information
-        )
-        is StreamEvent.ValidationSucceeded -> UiStreamEvent.Message(
-            title = "Validation succeeded",
-            description = "",
-            icon = AllIcons.General.InspectionsOK
-        )
+        is StreamEvent.ProposedEdits -> {
+            val pid = event.id.value
+            val current = proposals[pid]
+            val merged = (current ?: UiStreamEvent.EditFiles(
+                changes = event.changes,
+                proposalId = pid,
+                validation = EditFilesValidation.NotAvailable,
+            )).copy(changes = event.changes)
+            proposals[pid] = merged
+            merged
+        }
+        is StreamEvent.ValidationStarted -> {
+            val pid = event.id.value
+            updateProposalValidation(pid, EditFilesValidation.Running)
+        }
+        is StreamEvent.ValidationSucceeded -> {
+            val pid = event.id.value
+            updateProposalValidation(pid, EditFilesValidation.Succeeded)
+        }
 
         is StreamEvent.SendDebugMessage -> {
             UiStreamEvent.Message(
@@ -35,11 +46,14 @@ object StreamEventMapper {
         }
 
         is StreamEvent.GuardianWarning -> {
-            UiStreamEvent.Message(
-                title = SecureCoderBundle.message("warning.guardian.title"),
-                description = SecureCoderBundle.message("warning.guardian.description", event.result.violations.toString()),
-                icon = AllIcons.General.Warning
-            )
+            val hints = event.result.violations.map { v ->
+                if (v.rule.name.isNullOrBlank()) v.rule.id else v.rule.name!!
+            } + event.result.failures.map { f ->
+                "Guardian '${f.guardian}' failed: ${f.message}"
+            }
+
+            val pid = event.id.value
+            updateProposalValidation(pid, EditFilesValidation.Failed(hints))
         }
 
         is StreamEvent.InvalidLlmOutputWarning -> {
@@ -50,6 +64,13 @@ object StreamEventMapper {
                 debugText = buildExchangeText(event)
             )
         }
+    }
+
+    private fun updateProposalValidation(pid: String, newValidation: EditFilesValidation): UiStreamEvent.EditFiles {
+        val current = proposals[pid] ?: throw IllegalStateException("Unknown proposal $pid")
+        val merged = current.copy(validation = newValidation)
+        proposals[pid] = merged
+        return merged
     }
 
     private fun buildExchangeText(event: StreamEvent.InvalidLlmOutputWarning): String {

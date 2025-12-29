@@ -2,12 +2,18 @@ package de.tuda.stg.securecoder.engine.stream
 
 import de.tuda.stg.securecoder.engine.file.edit.Changes
 import de.tuda.stg.securecoder.engine.llm.ChatExchange
-import de.tuda.stg.securecoder.engine.workflow.GuardianExecutor
+import de.tuda.stg.securecoder.engine.workflow.GuardianExecutor.GuardianResult
 
 sealed interface StreamEvent {
-    data class SendDebugMessage(val title: String, val description: String, val icon: EventIcon) : StreamEvent
+    data class SendDebugMessage(
+        val title: String,
+        val description: String,
+        val icon: EventIcon
+    ) : StreamEvent
 
-    data class EnrichmentWarning(val errorMessage: String) : StreamEvent
+    data class EnrichmentWarning(
+        val errorMessage: String
+    ) : StreamEvent
     
     data class InvalidLlmOutputWarning(
         val parseErrors: List<String>,
@@ -23,7 +29,10 @@ sealed interface StreamEvent {
         val id: ProposalId,
     ) : StreamEvent
 
-    data class GuardianWarning(val id: ProposalId, val result: GuardianExecutor.GuardianResult) : StreamEvent
+    data class GuardianWarning(
+        val id: ProposalId,
+        val result: GuardianResult
+    ) : StreamEvent
 
     data class ValidationSucceeded(
         val id: ProposalId

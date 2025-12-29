@@ -13,7 +13,18 @@ sealed interface UiStreamEvent {
         val debugText: String? = null
     ) : UiStreamEvent
 
-    data class EditFiles(val changes: Changes) : UiStreamEvent
+    data class EditFiles(
+        val changes: Changes,
+        val proposalId: String,
+        val validation: EditFilesValidation,
+    ) : UiStreamEvent
+
+    sealed interface EditFilesValidation {
+        object NotAvailable : EditFilesValidation
+        object Running : EditFilesValidation
+        object Succeeded : EditFilesValidation
+        data class Failed(val guardianHints: List<String>) : EditFilesValidation
+    }
 }
 
 fun EventIcon.toIntellijIcon(): Icon = when (this) {
