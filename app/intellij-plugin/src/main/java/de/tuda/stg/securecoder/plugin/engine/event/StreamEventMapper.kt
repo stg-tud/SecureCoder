@@ -50,13 +50,15 @@ class StreamEventMapper {
             } + event.result.failures.map { f ->
                 "Guardian '${f.guardian}' failed: ${f.message}"
             }
-            updateProposalValidation(event.id, EditFilesValidation.Failed(hints))
+            val details = buildGuardianDetailsText(event)
+            val hint = hints.joinToString(" ")
+            updateProposalValidation(event.id, EditFilesValidation.Failed(hint, details))
         }
 
         is StreamEvent.InvalidLlmOutputWarning -> {
             UiStreamEvent.Message(
                 title = SecureCoderBundle.message("warning.llm.title"),
-                description = SecureCoderBundle.message("warning.llm.description", event.parseErrors.joinToString("\n")),
+                description = SecureCoderBundle.message("warning.llm.description"),
                 icon = AllIcons.General.Warning,
                 debugText = buildExchangeText(event)
             )
@@ -68,6 +70,39 @@ class StreamEventMapper {
         val merged = current.copy(validation = newValidation)
         proposals[pid] = merged
         return merged
+    }
+
+    private fun buildGuardianDetailsText(event: StreamEvent.GuardianWarning): String {
+        val result = event.result
+        val sb = StringBuilder()
+        if (result.violations.isNotEmpty()) {
+            sb.appendLine("Violations:")
+            result.violations.forEachIndexed { index, v ->
+                val ruleName = if (v.rule.name.isNullOrBlank()) v.rule.id else v.rule.name
+                sb.appendLine("#${index + 1} - Rule: $ruleName (id=${v.rule.id})")
+                sb.appendLine("Message: ${v.message}")
+                sb.appendLine("Location: ${v.location.file}:${v.location.startLine ?: "?"}-${v.location.endLine ?: "?"}")
+                v.confidence?.let { sb.appendLine("Confidence: $it") }
+                v.raw?.let { sb.appendLine("Raw: $it") }
+                sb.appendLine()
+            }
+        } else {
+            sb.appendLine("No violations reported.")
+        }
+
+        if (result.failures.isNotEmpty()) {
+            sb.appendLine("Guardian Failures:")
+            result.failures.forEachIndexed { index, f ->
+                sb.appendLine("#${index + 1} - ${f.guardian}: ${f.message}")
+            }
+            sb.appendLine()
+        }
+
+        if (result.files.isNotEmpty()) {
+            sb.appendLine("Analyzed files:")
+            result.files.forEach { f -> sb.appendLine("- ${f.name}") }
+        }
+        return sb.toString()
     }
 
     private fun buildExchangeText(event: StreamEvent.InvalidLlmOutputWarning): String {

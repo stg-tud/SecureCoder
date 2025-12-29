@@ -24,7 +24,10 @@ sealed interface UiStreamEvent {
         object NotAvailable : EditFilesValidation
         object Running : EditFilesValidation
         object Succeeded : EditFilesValidation
-        data class Failed(val guardianHints: List<String>) : EditFilesValidation
+        data class Failed(
+            val summary: String,
+            val details: String,
+        ) : EditFilesValidation
     }
 }
 
