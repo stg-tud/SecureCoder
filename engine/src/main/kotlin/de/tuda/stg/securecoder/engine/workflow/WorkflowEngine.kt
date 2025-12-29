@@ -9,6 +9,7 @@ import de.tuda.stg.securecoder.engine.file.edit.EditFilesLlmWrapper
 import de.tuda.stg.securecoder.engine.llm.FilesInContextPromptBuilder
 import de.tuda.stg.securecoder.engine.llm.LlmClient
 import de.tuda.stg.securecoder.engine.stream.StreamEvent
+import de.tuda.stg.securecoder.engine.stream.ProposalId
 import de.tuda.stg.securecoder.engine.workflow.FeedbackBuilder.buildFeedbackForLlm
 import de.tuda.stg.securecoder.enricher.PromptEnricher
 import de.tuda.stg.securecoder.filesystem.FileSystem
@@ -19,6 +20,7 @@ class WorkflowEngine (
     llmClient: LlmClient,
     guardians: List<Guardian> = emptyList(),
     private val maxGuardianRetries: Int = 6,
+    private val parseChangesAttempts: Int = 3,
 ) : Engine {
     private val promptEnrichRunner = PromptEnrichRunner(enricher)
     private val editFiles = EditFilesLlmWrapper(llmClient)
@@ -35,23 +37,28 @@ class WorkflowEngine (
         val messages = mutableListOf(
             ChatMessage(Role.System, "You are a Security Engineering Agent mainly for writing secure code"),
             ChatMessage(Role.User, enrichedPrompt),
-            ChatMessage(Role.System, FilesInContextPromptBuilder.build(filesInContext, edit = true)),
+            ChatMessage(Role.User, FilesInContextPromptBuilder.build(filesInContext, edit = true)),
         )
         repeat(maxGuardianRetries) {
             val out = editFiles.chat(
                 messages = messages,
                 fileSystem = filesystem,
-                onParseError = {
-                    onEvent(StreamEvent.InvalidLlmOutputWarning(it))
+                onParseError = { parseErrors, chatExchange ->
+                    onEvent(StreamEvent.InvalidLlmOutputWarning(parseErrors, chatExchange))
                 },
+                attempts = parseChangesAttempts
             )
             messages += out.changesMessage()
             val changes = out.changes ?: return EngineResult.Failure.GenerationFailure
+            val proposalId = ProposalId.newId()
+            onEvent(StreamEvent.ProposedEdits(proposalId, changes))
+            onEvent(StreamEvent.ValidationStarted(proposalId))
             val guardianResult = guardianExecutor.analyze(filesystem, changes)
             if (guardianResult.hasNoViolations()) {
+                onEvent(StreamEvent.ValidationSucceeded(proposalId))
                 return EngineResult.Success(changes)
             }
-            onEvent(StreamEvent.GuardianWarning(guardianResult.violations.toString()))
+            onEvent(StreamEvent.GuardianWarning(proposalId, guardianResult))
             messages += ChatMessage(Role.User, guardianResult.buildFeedbackForLlm())
         }
         return EngineResult.Failure.ValidationFailure(maxGuardianRetries)

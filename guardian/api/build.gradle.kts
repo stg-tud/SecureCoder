@@ -10,4 +10,5 @@ base {
 dependencies {
     api(libs.kotlinx.serialization.json)
     api(project(":filesystem"))
+    implementation(libs.kotlinx.coroutines.core)
 }

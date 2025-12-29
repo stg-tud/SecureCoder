@@ -5,6 +5,7 @@ import de.tuda.stg.securecoder.engine.llm.ChatMessage
 import de.tuda.stg.securecoder.engine.llm.ChatMessage.Role
 import de.tuda.stg.securecoder.engine.llm.LlmClient
 import de.tuda.stg.securecoder.filesystem.FileSystem
+import de.tuda.stg.securecoder.engine.llm.ChatExchange
 import kotlin.collections.plusAssign
 
 class EditFilesLlmWrapper(
@@ -40,20 +41,21 @@ class EditFilesLlmWrapper(
         messages: List<ChatMessage>,
         fileSystem: FileSystem,
         params: LlmClient.GenerationParams = LlmClient.GenerationParams(),
-        onParseError: suspend (List<String>) -> Unit = {},
+        onParseError: suspend (parseErrors: List<String>, llm: ChatExchange) -> Unit = { _, _ -> },
         attempts: Int = 3
     ): ChatResult {
         val messages = messages.toMutableList()
         messages += ChatMessage(Role.System, prompt)
         repeat(attempts) {
-            val response = llmClient.chat(messages, params)
+            val llmInput = messages.toList()
+            val response = llmClient.chat(llmInput, params)
             messages += ChatMessage(Role.Assistant, response)
             when (val result = parse(response, fileSystem)) {
                 is ParseResult.Ok -> return ChatResult(messages, result.value)
                 is ParseResult.Err -> {
                     println("LLM parse failed: ${result.buildMessage()}")
                     messages += ChatMessage(Role.User, result.buildMessage())
-                    onParseError(result.messages)
+                    onParseError(result.messages, ChatExchange(llmInput, response))
                 }
             }
         }
@@ -83,9 +85,8 @@ class EditFilesLlmWrapper(
         val allErrors = mutableListOf<String>()
         val contentCopy = if (content.endsWith("\n")) content else content + "\n"
         val editsRegex = Regex(
-            "<EDIT(\\d{0,2})>(.*?)</EDIT\\1>", setOf(
-                RegexOption.MULTILINE, RegexOption.DOT_MATCHES_ALL
-            )
+            "<EDIT(\\d{0,2})>(.*?)</EDIT\\1>",
+            setOf(RegexOption.MULTILINE, RegexOption.DOT_MATCHES_ALL)
         )
         val matches = editsRegex.findAll(contentCopy).toList()
 
