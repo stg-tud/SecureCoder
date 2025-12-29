@@ -3,6 +3,7 @@ package de.tuda.stg.securecoder.plugin.engine.event
 import com.intellij.icons.AllIcons
 import de.tuda.stg.securecoder.engine.file.edit.Changes
 import de.tuda.stg.securecoder.engine.stream.EventIcon
+import de.tuda.stg.securecoder.engine.stream.ProposalId
 import javax.swing.Icon
 
 sealed interface UiStreamEvent {
@@ -15,7 +16,7 @@ sealed interface UiStreamEvent {
 
     data class EditFiles(
         val changes: Changes,
-        val proposalId: String,
+        val proposalId: ProposalId,
         val validation: EditFilesValidation,
     ) : UiStreamEvent
 

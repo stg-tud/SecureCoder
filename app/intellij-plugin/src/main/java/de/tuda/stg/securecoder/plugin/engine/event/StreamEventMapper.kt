@@ -1,16 +1,17 @@
 package de.tuda.stg.securecoder.plugin.engine.event
 
 import com.intellij.icons.AllIcons
+import de.tuda.stg.securecoder.engine.stream.ProposalId
 import de.tuda.stg.securecoder.engine.stream.StreamEvent
 import de.tuda.stg.securecoder.plugin.SecureCoderBundle
 import de.tuda.stg.securecoder.plugin.engine.event.UiStreamEvent.EditFilesValidation
 
 class StreamEventMapper {
-    private val proposals = mutableMapOf<String, UiStreamEvent.EditFiles>()
+    private val proposals = mutableMapOf<ProposalId, UiStreamEvent.EditFiles>()
 
     fun map(event: StreamEvent): UiStreamEvent = when (event) {
         is StreamEvent.ProposedEdits -> {
-            val pid = event.id.value
+            val pid = event.id
             val current = proposals[pid]
             val merged = (current ?: UiStreamEvent.EditFiles(
                 changes = event.changes,
@@ -21,12 +22,10 @@ class StreamEventMapper {
             merged
         }
         is StreamEvent.ValidationStarted -> {
-            val pid = event.id.value
-            updateProposalValidation(pid, EditFilesValidation.Running)
+            updateProposalValidation(event.id, EditFilesValidation.Running)
         }
         is StreamEvent.ValidationSucceeded -> {
-            val pid = event.id.value
-            updateProposalValidation(pid, EditFilesValidation.Succeeded)
+            updateProposalValidation(event.id, EditFilesValidation.Succeeded)
         }
 
         is StreamEvent.SendDebugMessage -> {
@@ -51,9 +50,7 @@ class StreamEventMapper {
             } + event.result.failures.map { f ->
                 "Guardian '${f.guardian}' failed: ${f.message}"
             }
-
-            val pid = event.id.value
-            updateProposalValidation(pid, EditFilesValidation.Failed(hints))
+            updateProposalValidation(event.id, EditFilesValidation.Failed(hints))
         }
 
         is StreamEvent.InvalidLlmOutputWarning -> {
@@ -66,7 +63,7 @@ class StreamEventMapper {
         }
     }
 
-    private fun updateProposalValidation(pid: String, newValidation: EditFilesValidation): UiStreamEvent.EditFiles {
+    private fun updateProposalValidation(pid: ProposalId, newValidation: EditFilesValidation): UiStreamEvent.EditFiles {
         val current = proposals[pid] ?: throw IllegalStateException("Unknown proposal $pid")
         val merged = current.copy(validation = newValidation)
         proposals[pid] = merged

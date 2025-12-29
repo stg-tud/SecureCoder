@@ -14,6 +14,7 @@ import com.intellij.openapi.wm.ToolWindowFactory
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.content.ContentFactory
 import com.intellij.util.ui.JBUI
+import de.tuda.stg.securecoder.engine.stream.ProposalId
 import de.tuda.stg.securecoder.plugin.SecureCoderBundle
 import de.tuda.stg.securecoder.plugin.engine.EngineRunnerService
 import de.tuda.stg.securecoder.plugin.engine.event.UiStreamEvent
@@ -32,7 +33,7 @@ import javax.swing.SwingUtilities
 class SecureCoderAiToolWindowFactory : ToolWindowFactory, DumbAware {
     private lateinit var eventsPanel: JPanel
     private lateinit var eventsScrollPane: JBScrollPane
-    private val editCardsByProposal = mutableMapOf<String, EditCardState>()
+    private val editCardsByProposal = mutableMapOf<ProposalId, EditCardState>()
 
     private data class EditCardState(var event: UiStreamEvent.EditFiles, var panel: JPanel)
 
