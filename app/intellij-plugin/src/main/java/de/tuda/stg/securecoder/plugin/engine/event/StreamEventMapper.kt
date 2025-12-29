@@ -45,14 +45,27 @@ class StreamEventMapper {
         }
 
         is StreamEvent.GuardianWarning -> {
-            val hints = event.result.violations.map { v ->
-                if (v.rule.name.isNullOrBlank()) v.rule.id else v.rule.name!!
-            } + event.result.failures.map { f ->
-                "Guardian '${f.guardian}' failed: ${f.message}"
+            val messages = mutableListOf<String>()
+            val ruleNames = event.result.violations.map { v ->
+                val n = v.rule.name
+                if (n.isNullOrBlank()) v.rule.id else n
+            }.distinct()
+            if (ruleNames.isNotEmpty()) {
+                messages += SecureCoderBundle.message(
+                    "warning.guardian.short.violation",
+                    ruleNames.joinToString { "\"$it\"" },
+                )
             }
+            if (event.result.failures.isNotEmpty()) {
+                messages += SecureCoderBundle.message(
+                    "warning.guardian.short.failure",
+                    event.result.failures.joinToString { f -> f.guardian }
+                )
+            }
+
+            val summary = messages.joinToString(" ")
             val details = buildGuardianDetailsText(event)
-            val hint = hints.joinToString(" ")
-            updateProposalValidation(event.id, EditFilesValidation.Failed(hint, details))
+            updateProposalValidation(event.id, EditFilesValidation.Failed(summary, details))
         }
 
         is StreamEvent.InvalidLlmOutputWarning -> {
@@ -128,7 +141,7 @@ class StreamEventMapper {
             title = SecureCoderBundle.message("error.uncaught.title"),
             description = SecureCoderBundle.message(
                 "error.uncaught.description",
-                exception.message ?: "N/A",
+                exception.message ?: SecureCoderBundle.message("common.notAvailable"),
                 exception.javaClass.simpleName
             ),
             icon = AllIcons.General.Error
