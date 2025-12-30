@@ -15,22 +15,22 @@ This module contains the HTTP server. It exposes a minimal OpenAI-style `POST /v
 ### Build and run
 Make sure you have Docker installed and are in the project root directory.
 ```
-docker build -f app/openapi-bridge/Dockerfile -t openapi-bridge:latest .
+docker build -f app/openai-bridge/Dockerfile -t openai-bridge:latest .
 ```
 
 Run with Ollama on the host (macOS/Windows):
 ```
 docker run --rm -p 8080:8080 \
-  -e MODEL="llama3.1:8b" \
-  openapi-bridge:latest
+  -e MODEL="gpt-oss:20b" \
+  openai-bridge:latest
 ```
 
 Run with Ollama on the host (Linux):
 ```
 docker run --rm -p 8080:8080 \
   --add-host=host.docker.internal:host-gateway \
-  -e MODEL="llama3.1:8b" \
-  openapi-bridge:latest
+  -e MODEL="gpt-oss:20b" \
+  openai-bridge:latest
 ```
 
 Run using OpenRouter instead of Ollama:
@@ -38,7 +38,7 @@ Run using OpenRouter instead of Ollama:
 docker run --rm -p 8080:8080 \
   -e OPENROUTER_KEY=... \
   -e MODEL=openai/gpt-oss-20b \
-  openapi-bridge:latest
+  openai-bridge:latest
 ```
 
 ## Endpoint

@@ -3,7 +3,7 @@ WORKDIR /work
 
 COPY . .
 
-RUN chmod +x ./gradlew && ./gradlew --no-daemon :app:openapi-bridge:installDist -x test
+RUN chmod +x ./gradlew && ./gradlew --no-daemon :app:openai-bridge:installDist -x test
 
 FROM eclipse-temurin:21-jdk
 ENV DEBIAN_FRONTEND=noninteractive
@@ -21,7 +21,7 @@ RUN mkdir -p /opt/codeql \
  && rm /tmp/codeql.tgz
 ENV PATH="/opt/codeql:${PATH}"
 
-COPY --from=builder /work/app/openapi-bridge/build/install/openapi-bridge /opt/openapi-bridge
+COPY --from=builder /work/app/openai-bridge/build/install/openai-bridge /opt/openai-bridge
 
 ENV PORT="8080"
 ENV OLLAMA_BASE_URL="http://host.docker.internal:11434"
@@ -29,4 +29,4 @@ ENV OLLAMA_KEEP_ALIVE="5m"
 
 EXPOSE 8080
 
-ENTRYPOINT ["/opt/openapi-bridge/bin/openapi-bridge"]
+ENTRYPOINT ["/opt/openai-bridge/bin/openai-bridge"]
