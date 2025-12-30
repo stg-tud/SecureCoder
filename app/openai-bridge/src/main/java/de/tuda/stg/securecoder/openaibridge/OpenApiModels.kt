@@ -1,4 +1,4 @@
-package de.tuda.stg.securecoder.openapibridge
+package de.tuda.stg.securecoder.openaibridge
 
 import kotlinx.serialization.Serializable
 

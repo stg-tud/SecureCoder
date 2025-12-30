@@ -15,5 +15,5 @@ dependencies {
 }
 
 application {
-    mainClass.set("de.tuda.stg.securecoder.openapibridge.MainKt")
+    mainClass.set("de.tuda.stg.securecoder.openaibridge.MainKt")
 }
