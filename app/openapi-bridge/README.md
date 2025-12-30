@@ -1,55 +1,50 @@
 # OpenAPI Bridge Server
 This module contains the HTTP server. It exposes a minimal OpenAI-style `POST /v1/chat/completions` endpoint backed by the SecureCoder engine.
 
-## Prerequisites
-- JDK 21
-- Optional but recommended for security analysis features: CodeQL CLI in `PATH` (the Guardian uses it when analyzing code). If not present, some security analysis steps may fail.
+## Run with Docker
 
+### Configuration
+- OpenRouter mode:
+  - `OPENROUTER_KEY` — your OpenRouter API key
+  - `MODEL` — model ID (e.g.: `openai/gpt-oss-20b`)
+- Ollama mode (used when `OPENROUTER_KEY` is not set):
+  - `MODEL` — Ollama model name (e.g.: `gpt-oss:20`)
+  - `OLLAMA_BASE_URL` — base URL to Ollama (default: 11434 on the host)
+  - `OLLAMA_KEEP_ALIVE` — keep-alive duration (default: `5m`)
 
-## Configuration (Environment Variables or -D system properties)
-The server reads its configuration from either environment variables or JVM system properties (`-DNAME=value`).
-
-- `PORT` — HTTP port (default: `8080`)
-- LLM selection (EngineFactory picks the first matching provider):
-    - OpenRouter mode:
-        - `OPENROUTER_KEY` — your OpenRouter API key
-        - `MODEL` — model ID (default: `openai/gpt-oss-20b`)
-    - Ollama mode (used when `OPENROUTER_KEY` is not set):
-        - `MODEL` — Ollama model name, e.g. `llama3.1:8b`
-        - `OLLAMA_BASE_URL` — base URL to Ollama (default: `http://127.0.0.1:11434`)
-        - `OLLAMA_KEEP_ALIVE` — keep-alive duration (default: `5m`)
-
-
-## How to run the server
-
-On macOS/Linux (using -D system properties):
-
+### Build and run
+Make sure you have Docker installed and are in the project root directory.
 ```
-./gradlew :app:openapi-bridge:run -DOPENROUTER_KEY=... -DMODEL=...
+docker build -f app/openapi-bridge/Dockerfile -t openapi-bridge:latest .
 ```
 
-Or with environment variables:
-
+Run with Ollama on the host (macOS/Windows):
 ```
-export OPENROUTER_KEY=...
-export MODEL=...
-./gradlew :app:openapi-bridge:run
+docker run --rm -p 8080:8080 \
+  -e MODEL="llama3.1:8b" \
+  openapi-bridge:latest
 ```
 
-On Windows
-
+Run with Ollama on the host (Linux):
 ```
-set OPENROUTER_KEY=...
-set MODEL=...
-gradlew.bat :app:openapi-bridge:run
+docker run --rm -p 8080:8080 \
+  --add-host=host.docker.internal:host-gateway \
+  -e MODEL="llama3.1:8b" \
+  openapi-bridge:latest
+```
+
+Run using OpenRouter instead of Ollama:
+```
+docker run --rm -p 8080:8080 \
+  -e OPENROUTER_KEY=... \
+  -e MODEL=openai/gpt-oss-20b \
+  openapi-bridge:latest
 ```
 
 ## Endpoint
-
 - `POST /v1/chat/completions` — accepts a minimal OpenAI-style request and returns a single choice with the SecureCoder engine’s response.
 
-Example request (curl):
-
+Example request (from host):
 ```
 curl -X POST "http://localhost:8080/v1/chat/completions" \
   -H "Content-Type: application/json" \
