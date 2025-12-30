@@ -14,7 +14,7 @@ class AgentService(private val engine: Engine) {
         val fileSystem = InMemoryFileSystem()
         val userPrompt = messages.lastOrNull { it.role == "user" }?.content ?: ""
         val result = engine.run(
-            prompt = userPrompt,
+            prompt = "$userPrompt\nOnly create ONE file!",
             filesystem = fileSystem,
             onEvent = { event ->
                 println("Internal Agent Event: $event")
