@@ -11,6 +11,7 @@ import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
@@ -49,6 +50,9 @@ class OllamaClient(
         val message: OllamaMsg
     )
 
+    @Serializable
+    private data class OllamaError(val error: String)
+
     override suspend fun chat(
         messages: List<ChatMessage>,
         params: GenerationParams
@@ -81,6 +85,14 @@ class OllamaClient(
         }
         val body = resp.bodyAsText()
         println("Got llm response: $body")
+        if (!resp.status.isSuccess()) {
+            val errorMessage = try {
+                json.decodeFromString<OllamaError>(body).error
+            } catch (_: SerializationException) {
+                body.ifBlank { "<Empty response>" }
+            }
+            throw RuntimeException("Failed to call Ollama got ${resp.status}: ${errorMessage}")
+        }
         val respObj = json.decodeFromString<OllamaChatResponse>(body)
 
         return respObj.message.content

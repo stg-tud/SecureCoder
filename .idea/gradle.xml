@@ -21,13 +21,19 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/app/benchmark-securityeval" />
             <option value="$PROJECT_DIR$/app/intellij-plugin" />
+            <option value="$PROJECT_DIR$/app/openai-bridge" />
             <option value="$PROJECT_DIR$/app/placeholder-enricher" />
             <option value="$PROJECT_DIR$/buildSrc" />
             <option value="$PROJECT_DIR$/engine" />
             <option value="$PROJECT_DIR$/enricher" />
             <option value="$PROJECT_DIR$/enricher/api" />
             <option value="$PROJECT_DIR$/enricher/client" />
+            <option value="$PROJECT_DIR$/filesystem" />
+            <option value="$PROJECT_DIR$/guardian" />
+            <option value="$PROJECT_DIR$/guardian/api" />
+            <option value="$PROJECT_DIR$/guardian/codeql" />
           </set>
         </option>
       </GradleProjectSettings>
