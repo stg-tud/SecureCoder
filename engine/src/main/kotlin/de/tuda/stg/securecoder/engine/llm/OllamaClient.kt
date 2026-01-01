@@ -16,12 +16,14 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
+import org.slf4j.LoggerFactory
 
 class OllamaClient(
     private val model: String,
     baseUrl: String = "http://127.0.0.1:11434",
     private val keepAlive: String = "5m",
 ) : LlmClient {
+    private val logger = LoggerFactory.getLogger("OllamaClient")
     private val json: Json = Json {
         ignoreUnknownKeys = true
         explicitNulls = false
@@ -77,14 +79,14 @@ class OllamaClient(
             options = options,
             keepAlive = keepAlive
         )
-        println("Sending llm request: $req")
+        logger.debug("Sending llm request: {}", req)
         val resp = http.post(endpoint) {
             contentType(ContentType.Application.Json)
             accept(ContentType.Application.Json)
             setBody(req)
         }
         val body = resp.bodyAsText()
-        println("Got llm response: $body")
+        logger.debug("Got llm response: {}", body)
         if (!resp.status.isSuccess()) {
             val errorMessage = try {
                 json.decodeFromString<OllamaError>(body).error

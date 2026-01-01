@@ -20,12 +20,14 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
+import org.slf4j.LoggerFactory
 
 class OpenRouterClient (
     private val apiKey: String,
     private val model: String,
     private val siteName: String? = null,
 ) : LlmClient {
+    private val logger = LoggerFactory.getLogger("OpenRouterClient")
     private val json: Json = Json {
         ignoreUnknownKeys = true
         explicitNulls = false
@@ -76,6 +78,7 @@ class OpenRouterClient (
             maxTokens = params.maxTokens
         )
 
+        logger.debug("Sending llm request: {}", req)
         val resp: HttpResponse = http.post(endpoint) {
             contentType(ContentType.Application.Json)
             accept(ContentType.Application.Json)
@@ -88,8 +91,7 @@ class OpenRouterClient (
         if (!resp.status.isSuccess()) {
             error("OpenRouter Error ${resp.status.value}: $body")
         }
-
-        println("OpenRouter response: $body")
+        logger.debug("Got llm response: {}", body)
         val obj = json.decodeFromString<OpenRouterChatResponse>(body)
         val content = obj.choices.firstOrNull()?.message?.content
             ?: error("OpenRouter lieferte keine Antwortnachricht.")
