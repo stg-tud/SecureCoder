@@ -6,25 +6,31 @@ import de.tuda.stg.securecoder.engine.file.edit.Matcher.MatchResult.Success
 interface Matcher {
     sealed interface MatchResult {
         sealed interface Error : MatchResult {
-            object ReplaceOnEmpty : Error
+            object ReplaceOnNotExistent : Error
             object NoMatch : Error
             data class MultipleMatch (val matches: List<Int>) : Error
         }
         sealed interface Success : MatchResult {
             object Append : Success
-            class Match (val start: Int, val end: Int) : Success
+            class Match (val start: Int, val end: Int) : Success {
+                init {
+                    require(end >= start) {
+                        "End index ($end) cannot be less than start index ($start)"
+                    }
+                }
+            }
         }
     }
 
-    fun match(text: String, search: Changes.SearchedText): MatchResult
+    fun match(text: String?, search: Changes.SearchedText): MatchResult
 
     object RootMatcher : Matcher {
-        override fun match(text: String, search: Changes.SearchedText): MatchResult {
+        override fun match(text: String?, search: Changes.SearchedText): MatchResult {
             if (search.isAppend()) {
                 return Success.Append
             }
-            if (text.isEmpty()) {
-                return Error.ReplaceOnEmpty
+            if (text == null) {
+                return Error.ReplaceOnNotExistent
             }
             val matchers = listOf(IndexOfMatcher, TrimmedLinesMatcher)
             matchers.forEach {
@@ -37,9 +43,12 @@ interface Matcher {
 
     object IndexOfMatcher : Matcher {
         override fun match(
-            text: String,
+            text: String?,
             search: Changes.SearchedText
         ): MatchResult {
+            if (text == null) {
+                return Error.NoMatch
+            }
             val idx = text.indexesOf(search.text)
             return when (idx.size) {
                 1 -> Success.Match(idx.first(), idx.first() + search.text.length)
@@ -63,7 +72,10 @@ interface Matcher {
     }
 
     object TrimmedLinesMatcher : Matcher {
-        override fun match(text: String, search: Changes.SearchedText): MatchResult {
+        override fun match(text: String?, search: Changes.SearchedText): MatchResult {
+            if (text == null) {
+                return Error.NoMatch
+            }
             val searchedTrimmed = splitToLinesAndTrimLast(search.text).map { it.trim() }
             val documentLines = text.split("\n")
             val documentLinesTrimmed = documentLines.map { it.trim() }
@@ -81,7 +93,8 @@ interface Matcher {
 
             val lineStarts = IntArray(documentLines.size + 1)
             for (i in documentLines.indices) {
-                lineStarts[i + 1] = lineStarts[i] + documentLines[i].length + 1
+                val newline = if (i < documentLines.lastIndex) 1 else 0
+                lineStarts[i + 1] = lineStarts[i] + documentLines[i].length + newline
             }
 
             val startOffset = lineStarts[firstLine]

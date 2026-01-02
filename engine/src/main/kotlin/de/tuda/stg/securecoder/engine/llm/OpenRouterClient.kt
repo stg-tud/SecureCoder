@@ -18,6 +18,7 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
 import org.slf4j.LoggerFactory
@@ -92,9 +93,14 @@ class OpenRouterClient (
             error("OpenRouter Error ${resp.status.value}: $body")
         }
         logger.debug("Got llm response: {}", body)
-        val obj = json.decodeFromString<OpenRouterChatResponse>(body)
+        val obj = try {
+            json.decodeFromString<OpenRouterChatResponse>(body)
+        } catch (e: SerializationException) {
+            val formattedBody = body.ifBlank { "<Empty response>" }
+            throw RuntimeException("Failed to parse OpenRouter response body. Raw body: $formattedBody", e)
+        }
         val content = obj.choices.firstOrNull()?.message?.content
-            ?: error("OpenRouter lieferte keine Antwortnachricht.")
+            ?: error("OpenRouter did not return any response choices ")
         return content
     }
 

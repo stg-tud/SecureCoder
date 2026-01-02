@@ -20,7 +20,7 @@ class WorkflowEngine (
     llmClient: LlmClient,
     guardians: List<Guardian> = emptyList(),
     private val maxGuardianRetries: Int = 6,
-    private val parseChangesAttempts: Int = 3,
+    private val parseChangesAttempts: Int = 5,
 ) : Engine {
     private val promptEnrichRunner = PromptEnrichRunner(enricher)
     private val editFiles = EditFilesLlmWrapper(llmClient)
