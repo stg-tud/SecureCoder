@@ -15,12 +15,14 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 import io.ktor.serialization.kotlinx.json.json
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import org.slf4j.LoggerFactory
 
 class OpenRouterClient (
@@ -50,7 +52,8 @@ class OpenRouterClient (
         val temperature: Double? = null,
         @SerialName("max_tokens") val maxTokens: Int? = null,
         val stream: Boolean = false,
-        val metadata: JsonObject = buildJsonObject {}
+        val metadata: JsonObject = buildJsonObject {},
+        @SerialName("response_format") val responseFormat: JsonObject? = null,
     )
 
     @Serializable
@@ -59,11 +62,8 @@ class OpenRouterClient (
     @Serializable
     private data class OpenRouterChatResponse(val choices: List<OpenRouterChoice>)
 
-    override suspend fun chat(
-        messages: List<ChatMessage>,
-        params: LlmClient.GenerationParams
-    ): String {
-        val mapped = messages.map {
+    private fun mapMessages(messages: List<ChatMessage>): List<OpenRouterMessage> =
+        messages.map {
             val role = when (it.role) {
                 Role.System -> "system"
                 Role.User -> "user"
@@ -72,14 +72,10 @@ class OpenRouterClient (
             OpenRouterMessage(role, it.content)
         }
 
-        val req = OpenRouterChatRequest(
-            model = model,
-            messages = mapped,
-            temperature = params.temperature,
-            maxTokens = params.maxTokens
-        )
-
-        logger.debug("Sending llm request: {}", req)
+    private suspend fun performRequest(
+        req: OpenRouterChatRequest,
+    ): OpenRouterChatResponse {
+        logger.debug("Sending LLM request: {}", req)
         val resp: HttpResponse = http.post(endpoint) {
             contentType(ContentType.Application.Json)
             accept(ContentType.Application.Json)
@@ -89,19 +85,69 @@ class OpenRouterClient (
         }
 
         val body = resp.bodyAsText()
+        logger.debug("Got LLM response: {}", body)
         if (!resp.status.isSuccess()) {
-            error("OpenRouter Error ${resp.status.value}: $body")
+            val errorMessage = body.ifBlank { "<Empty response>" }
+            throw RuntimeException("OpenRouter Error ${resp.status.value}: $errorMessage")
         }
-        logger.debug("Got llm response: {}", body)
-        val obj = try {
-            json.decodeFromString<OpenRouterChatResponse>(body)
+        return try {
+            json.decodeFromString(body)
         } catch (e: SerializationException) {
             val formattedBody = body.ifBlank { "<Empty response>" }
             throw RuntimeException("Failed to parse OpenRouter response body. Raw body: $formattedBody", e)
         }
+    }
+
+    override suspend fun chat(
+        messages: List<ChatMessage>,
+        params: LlmClient.GenerationParams
+    ): String {
+        val mapped = mapMessages(messages)
+
+        val req = OpenRouterChatRequest(
+            model = model,
+            messages = mapped,
+            temperature = params.temperature,
+            maxTokens = params.maxTokens
+        )
+        val obj = performRequest(req)
         val content = obj.choices.firstOrNull()?.message?.content
             ?: error("OpenRouter did not return any response choices ")
         return content
+    }
+
+    override suspend fun <T> chatStructured(
+        messages: List<ChatMessage>,
+        serializer: KSerializer<T>,
+        params: LlmClient.GenerationParams
+    ): T {
+        val mapped = mapMessages(messages)
+
+        val schema = KxJsonSchemaFormat().format(serializer)
+        val responseFormat = buildJsonObject {
+            put("type", "json_schema")
+            put("json_schema", buildJsonObject {
+                put("name", serializer.descriptor.serialName.ifBlank { "securecoder_schema" })
+                put("strict", true)
+                put("schema", schema)
+            })
+        }
+
+        val req = OpenRouterChatRequest(
+            model = model,
+            messages = mapped,
+            temperature = params.temperature,
+            maxTokens = params.maxTokens,
+            responseFormat = responseFormat
+        )
+        val obj = performRequest(req)
+        val content = obj.choices.firstOrNull()?.message?.content
+            ?: error("OpenRouter did not return any response choices ")
+        return try {
+            json.decodeFromString(serializer, content)
+        } catch (e: Exception) {
+            throw RuntimeException("Failed to decode OpenRouter structured content into ${'$'}{serializer.descriptor.serialName}. Content: ${'$'}content", e)
+        }
     }
 
     override fun close() = http.close()
