@@ -152,12 +152,7 @@ class EditFilesLlmWrapper(
             return ParseResult.Err(allErrors)
         }
 
-        val seen = HashSet<Pair<String, String>>()
-        val deduped = results.filter { sr ->
-            seen.add(sr.fileName to sr.searchedText.text)
-        }
-
-        return ParseResult.Ok(Changes(deduped))
+        return ParseResult.Ok(Changes(results))
     }
 
     private fun getTextByXMLTag(container: String, tag: String): String? {
