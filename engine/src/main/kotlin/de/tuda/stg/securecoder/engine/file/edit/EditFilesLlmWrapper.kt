@@ -6,9 +6,6 @@ import de.tuda.stg.securecoder.engine.llm.ChatMessage.Role
 import de.tuda.stg.securecoder.engine.llm.LlmClient
 import de.tuda.stg.securecoder.filesystem.FileSystem
 import de.tuda.stg.securecoder.engine.llm.ChatExchange
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.toList
 import kotlin.collections.plusAssign
 
 class EditFilesLlmWrapper(
