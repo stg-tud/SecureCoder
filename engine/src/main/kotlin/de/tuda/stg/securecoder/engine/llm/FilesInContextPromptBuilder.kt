@@ -9,7 +9,7 @@ object FilesInContextPromptBuilder {
             appendLine("You have no files in the context.")
             appendLine("If you saw files they are only part of the prompt and dont exists yet!")
             if (edit) {
-                appendLine("You may create new files (keep in mind that searchedText needs to be empty in this case!)")
+                appendLine("You may create new files (keep in mind that searched text needs to be empty in this case!)")
             }
             return@buildString
         }
