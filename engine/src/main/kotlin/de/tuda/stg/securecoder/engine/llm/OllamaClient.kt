@@ -12,6 +12,7 @@ import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
@@ -43,7 +44,8 @@ class OllamaClient(
         val messages: List<OllamaMsg>,
         val stream: Boolean = false,
         val options: JsonObject = buildJsonObject {},
-        @SerialName("keep_alive") val keepAlive: String? = null
+        @SerialName("keep_alive") val keepAlive: String? = null,
+        val format: JsonObject? = null,
     )
 
     @Serializable
@@ -55,11 +57,8 @@ class OllamaClient(
     @Serializable
     private data class OllamaError(val error: String)
 
-    override suspend fun chat(
-        messages: List<ChatMessage>,
-        params: GenerationParams
-    ): String {
-        val mapped = messages.map {
+    private fun mapMessages(messages: List<ChatMessage>): List<OllamaMsg> =
+        messages.map {
             val role = when (it.role) {
                 Role.System -> "system"
                 Role.User -> "user"
@@ -68,10 +67,37 @@ class OllamaClient(
             OllamaMsg(role, it.content)
         }
 
-        val options = buildJsonObject {
-            params.temperature?.let { put("temperature", JsonPrimitive(it)) }
-            params.maxTokens?.let { put("num_predict", JsonPrimitive(it)) }
+    private fun buildOptions(params: GenerationParams) = buildJsonObject {
+        params.temperature?.let { put("temperature", JsonPrimitive(it)) }
+        params.maxTokens?.let { put("num_predict", JsonPrimitive(it)) }
+    }
+
+    private suspend fun performRequest(req: OllamaChatRequest): OllamaChatResponse {
+        logger.debug("Sending LLM request: {}", req)
+        val resp = http.post(endpoint) {
+            contentType(ContentType.Application.Json)
+            accept(ContentType.Application.Json)
+            setBody(req)
         }
+        val body = resp.bodyAsText()
+        logger.debug("Got LLM response: {}", body)
+        if (!resp.status.isSuccess()) {
+            val errorMessage = try {
+                json.decodeFromString<OllamaError>(body).error
+            } catch (_: SerializationException) {
+                body.ifBlank { "<Empty response>" }
+            }
+            throw RuntimeException("Failed to call Ollama got ${resp.status}: $errorMessage")
+        }
+        return json.decodeFromString(body)
+    }
+
+    override suspend fun chat(
+        messages: List<ChatMessage>,
+        params: GenerationParams
+    ): String {
+        val mapped = mapMessages(messages)
+        val options = buildOptions(params)
 
         val req = OllamaChatRequest(
             model = model,
@@ -79,25 +105,33 @@ class OllamaClient(
             options = options,
             keepAlive = keepAlive
         )
-        logger.debug("Sending llm request: {}", req)
-        val resp = http.post(endpoint) {
-            contentType(ContentType.Application.Json)
-            accept(ContentType.Application.Json)
-            setBody(req)
-        }
-        val body = resp.bodyAsText()
-        logger.debug("Got llm response: {}", body)
-        if (!resp.status.isSuccess()) {
-            val errorMessage = try {
-                json.decodeFromString<OllamaError>(body).error
-            } catch (_: SerializationException) {
-                body.ifBlank { "<Empty response>" }
-            }
-            throw RuntimeException("Failed to call Ollama got ${resp.status}: ${errorMessage}")
-        }
-        val respObj = json.decodeFromString<OllamaChatResponse>(body)
-
+        val respObj = performRequest(req)
         return respObj.message.content
+    }
+
+    override suspend fun <T> chatStructured(
+        messages: List<ChatMessage>,
+        serializer: KSerializer<T>,
+        params: GenerationParams
+    ): T {
+        val mapped = mapMessages(messages)
+        val options = buildOptions(params)
+
+        val schema = KxJsonSchemaFormat().format(serializer)
+        val req = OllamaChatRequest(
+            model = model,
+            messages = mapped,
+            options = options,
+            keepAlive = keepAlive,
+            format = schema
+        )
+        val respObj = performRequest(req)
+        val content = respObj.message.content
+        return try {
+            json.decodeFromString(serializer, content)
+        } catch (e: Exception) {
+            throw RuntimeException("Failed to decode Ollama structured content. Content: $content", e)
+        }
     }
 
     override fun close() = http.close()
