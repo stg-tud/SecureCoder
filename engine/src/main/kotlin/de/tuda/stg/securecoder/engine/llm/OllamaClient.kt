@@ -96,13 +96,10 @@ class OllamaClient(
         messages: List<ChatMessage>,
         params: GenerationParams
     ): String {
-        val mapped = mapMessages(messages)
-        val options = buildOptions(params)
-
         val req = OllamaChatRequest(
             model = model,
-            messages = mapped,
-            options = options,
+            messages = mapMessages(messages),
+            options = buildOptions(params),
             keepAlive = keepAlive
         )
         val respObj = performRequest(req)
@@ -114,14 +111,11 @@ class OllamaClient(
         serializer: KSerializer<T>,
         params: GenerationParams
     ): T {
-        val mapped = mapMessages(messages)
-        val options = buildOptions(params)
-
         val schema = KxJsonSchemaFormat().format(serializer)
         val req = OllamaChatRequest(
             model = model,
-            messages = mapped,
-            options = options,
+            messages = mapMessages(messages),
+            options = buildOptions(params),
             keepAlive = keepAlive,
             format = schema
         )

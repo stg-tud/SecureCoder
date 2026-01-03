@@ -51,7 +51,9 @@ class KxJsonSchemaFormat {
                     for (i in 0 until desc.elementsCount) {
                         val name = desc.getElementName(i)
                         val childDesc = desc.getElementDescriptor(i)
-                        put(name, schemaForDescriptor(childDesc, seen))
+                        val childSchema = schemaForDescriptor(childDesc, seen)
+                        val propDesc = getDescription(desc.getElementAnnotations(i))
+                        put(name, if (propDesc != null) addDescription(childSchema, propDesc) else childSchema)
                     }
                 })
                 val required = JsonArray(desc.requiredElements().map { name -> JsonPrimitive(name) })
@@ -65,7 +67,8 @@ class KxJsonSchemaFormat {
         if (desc.isNullable) {
             throw IllegalStateException("Nullable types are not supported")
         }
-        return jsonType
+        val selfDesc = getDescription(desc.annotations)
+        return if (selfDesc != null) addDescription(jsonType, selfDesc) else jsonType
     }
 
     private fun type(name: String, builderAction: JsonObjectBuilder.() -> Unit = {}): JsonObject =
@@ -79,4 +82,13 @@ class KxJsonSchemaFormat {
         .map { getElementName(it) }
 
     private fun JsonArray.isNotEmpty(): Boolean = this.size > 0
+
+    private fun getDescription(annotations: List<Annotation>): String? =
+        annotations.filterIsInstance<LLMDescription>().firstOrNull()?.text
+
+    private fun addDescription(obj: JsonObject, text: String): JsonObject =
+        buildJsonObject {
+            obj.forEach { (k, v) -> put(k, v) }
+            put("description", JsonPrimitive(text))
+        }
 }
