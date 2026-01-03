@@ -76,7 +76,7 @@ class EditFilesLlmWrapper(
                 appendLine("It violated the required format.")
                 appendLine("Errors:")
                 messages.forEach { appendLine(it) }
-                appendLine("Respond again with ONLY <EDITN> blocks that strictly follow the rules. Do NOT include prose, markdown, or explanations.")
+                appendLine("Respond again with ONLY edit blocks that strictly follow the rules. Do NOT include prose, markdown, or explanations.")
                 appendLine("IMPORTANT: Resend the COMPLETE set of edits you intend to apply from your previous message")
             }
         }
