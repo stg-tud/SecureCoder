@@ -5,7 +5,7 @@ plugins {
 }
 
 dependencies {
-    api(project(":engine"))
+    api(project(":engine:agent"))
     api(project(":guardian:codeql"))
     implementation(libs.ktor.server.core)
     implementation(libs.ktor.server.netty)

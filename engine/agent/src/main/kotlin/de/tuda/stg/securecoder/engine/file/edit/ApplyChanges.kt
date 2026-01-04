@@ -6,7 +6,7 @@ import de.tuda.stg.securecoder.engine.file.edit.Matcher.MatchResult.Success
 import de.tuda.stg.securecoder.filesystem.FileSystem
 
 object ApplyChanges {
-    fun applyInText(original: String, edits: List<Changes.SearchReplace>): String {
+    fun applyInText(original: String, edits: List<de.tuda.stg.securecoder.engine.file.edit.Changes.SearchReplace>): String {
         var text = original
         edits.forEach { sr ->
             when (val match = match(text, sr.searchedText)) {
@@ -17,7 +17,7 @@ object ApplyChanges {
         return text
     }
 
-    fun applyInText(original: String, action: Changes.SearchReplace, match: Success): String {
+    fun applyInText(original: String, action: de.tuda.stg.securecoder.engine.file.edit.Changes.SearchReplace, match: Success): String {
         return when (match) {
             is Success.Append -> original + action.replaceText
             is Success.Match -> buildString {
@@ -35,11 +35,11 @@ object ApplyChanges {
     }
 
     suspend fun applyAll(
-        changes: Changes,
+        changes: de.tuda.stg.securecoder.engine.file.edit.Changes,
         loadFile: suspend (file: String) -> String?,
         saveFile: suspend (file: String, content: String) -> Unit
     ) {
-        val byFile = changes.searchReplaces.groupBy(Changes.SearchReplace::fileName)
+        val byFile = changes.searchReplaces.groupBy(_root_ide_package_.de.tuda.stg.securecoder.engine.file.edit.Changes.SearchReplace::fileName)
         for ((file, edits) in byFile) {
             val original = loadFile(file) ?: ""
             val result = applyInText(original, edits)
@@ -47,8 +47,8 @@ object ApplyChanges {
         }
     }
 
-    fun match(text: String?, search: Changes.SearchedText): MatchResult {
-        return Matcher.RootMatcher.match(text, search)
+    fun match(text: String?, search: de.tuda.stg.securecoder.engine.file.edit.Changes.SearchedText): MatchResult {
+        return _root_ide_package_.de.tuda.stg.securecoder.engine.file.edit.Matcher.RootMatcher.match(text, search)
     }
 
     fun buildErrorMessage(file: String, failedPattern: String, matchResult: Error): String = buildString {
@@ -87,7 +87,7 @@ object ApplyChanges {
         }
     }
 
-    suspend fun FileSystem.applyEdits(edits: List<Changes.SearchReplace>) {
+    suspend fun FileSystem.applyEdits(edits: List<de.tuda.stg.securecoder.engine.file.edit.Changes.SearchReplace>) {
         edits.groupBy { it.fileName }.forEach { (fileName, list) ->
             val original = getFile(fileName)?.content() ?: ""
             val updated = applyInText(original, list)

@@ -11,7 +11,7 @@ repositories {
 }
 
 dependencies {
-    implementation(project(":engine"))
+    implementation(project(":engine:agent"))
     implementation(project(":guardian:codeql"))
     implementation(project(":enricher:client"))
     intellijPlatform {

@@ -5,7 +5,7 @@ plugins {
 }
 
 dependencies {
-    implementation(project(":engine"))
+    implementation(project(":engine:agent"))
     implementation(project(":enricher:client"))
     implementation(libs.kotlinx.coroutines.core)
 }
