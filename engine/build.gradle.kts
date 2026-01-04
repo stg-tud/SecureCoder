@@ -9,4 +9,7 @@ dependencies {
     implementation(libs.ktor.client.java)
     implementation(libs.ktor.client.content.negotiation)
     implementation(libs.ktor.serialization.json)
+    testImplementation(kotlin("test"))
+    testImplementation(libs.kotlinx.serialization.json)
+    testImplementation(libs.kotlinx.coroutines.core)
 }
