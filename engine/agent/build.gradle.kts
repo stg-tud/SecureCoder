@@ -6,6 +6,7 @@ plugins {
 dependencies {
     api(project(":enricher:api"))
     api(project(":guardian:api"))
+    api(project(":engine:llm-client"))
     implementation(libs.ktor.client.java)
     implementation(libs.ktor.client.content.negotiation)
     implementation(libs.ktor.serialization.json)
