@@ -27,7 +27,8 @@
             <option value="$PROJECT_DIR$/app/placeholder-enricher" />
             <option value="$PROJECT_DIR$/buildSrc" />
             <option value="$PROJECT_DIR$/engine" />
-            <option value="$PROJECT_DIR$/engine/workflow" />
+            <option value="$PROJECT_DIR$/engine/agent" />
+            <option value="$PROJECT_DIR$/engine/llm-client" />
             <option value="$PROJECT_DIR$/enricher" />
             <option value="$PROJECT_DIR$/enricher/api" />
             <option value="$PROJECT_DIR$/enricher/client" />
@@ -35,7 +36,6 @@
             <option value="$PROJECT_DIR$/guardian" />
             <option value="$PROJECT_DIR$/guardian/api" />
             <option value="$PROJECT_DIR$/guardian/codeql" />
-            <option value="$PROJECT_DIR$/llm-client" />
           </set>
         </option>
       </GradleProjectSettings>

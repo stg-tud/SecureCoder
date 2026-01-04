@@ -1,7 +1,7 @@
-package de.tuda.stg.securecoder.engine.llm
+package de.tuda.stg.securecoder.llm
 
-import de.tuda.stg.securecoder.engine.llm.ChatMessage.Role
-import de.tuda.stg.securecoder.engine.llm.LlmClient.GenerationParams
+import de.tuda.stg.securecoder.llm.ChatMessage.Role
+import de.tuda.stg.securecoder.llm.LlmClient.GenerationParams
 import io.ktor.client.*
 import io.ktor.client.engine.java.Java
 import io.ktor.client.plugins.contentnegotiation.*

@@ -2,7 +2,7 @@ package de.tuda.stg.securecoder.benchmark
 
 import de.tuda.stg.securecoder.engine.Engine
 import de.tuda.stg.securecoder.engine.file.edit.ApplyChanges.applyEdits
-import de.tuda.stg.securecoder.engine.llm.OllamaClient
+import de.tuda.stg.securecoder.llm.OllamaClient
 import de.tuda.stg.securecoder.engine.stream.EventIcon
 import de.tuda.stg.securecoder.engine.stream.StreamEvent
 import de.tuda.stg.securecoder.engine.workflow.WorkflowEngine

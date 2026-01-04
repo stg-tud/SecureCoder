@@ -3,11 +3,11 @@ package de.tuda.stg.securecoder.engine.workflow
 import de.tuda.stg.securecoder.engine.Engine
 import de.tuda.stg.securecoder.engine.Engine.Context
 import de.tuda.stg.securecoder.engine.Engine.EngineResult
-import de.tuda.stg.securecoder.engine.llm.ChatMessage
-import de.tuda.stg.securecoder.engine.llm.ChatMessage.Role
+import de.tuda.stg.securecoder.llm.ChatMessage
+import de.tuda.stg.securecoder.llm.ChatMessage.Role
 import de.tuda.stg.securecoder.engine.file.FilesInContextPromptBuilder
 import de.tuda.stg.securecoder.engine.file.edit.StructuredEditFilesLlmWrapper
-import de.tuda.stg.securecoder.engine.llm.LlmClient
+import de.tuda.stg.securecoder.llm.LlmClient
 import de.tuda.stg.securecoder.engine.stream.StreamEvent
 import de.tuda.stg.securecoder.engine.stream.ProposalId
 import de.tuda.stg.securecoder.engine.workflow.FeedbackBuilder.buildFeedbackForLlm

@@ -1,4 +1,4 @@
-package de.tuda.stg.securecoder.engine.llm
+package de.tuda.stg.securecoder.llm
 
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer

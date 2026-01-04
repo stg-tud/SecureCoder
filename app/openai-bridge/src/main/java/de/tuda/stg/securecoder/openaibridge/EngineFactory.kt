@@ -1,9 +1,9 @@
 package de.tuda.stg.securecoder.openaibridge
 
 import de.tuda.stg.securecoder.engine.Engine
-import de.tuda.stg.securecoder.engine.llm.LlmClient
-import de.tuda.stg.securecoder.engine.llm.OllamaClient
-import de.tuda.stg.securecoder.engine.llm.OpenRouterClient
+import de.tuda.stg.securecoder.llm.LlmClient
+import de.tuda.stg.securecoder.llm.OllamaClient
+import de.tuda.stg.securecoder.llm.OpenRouterClient
 import de.tuda.stg.securecoder.engine.workflow.WorkflowEngine
 import de.tuda.stg.securecoder.enricher.PromptEnricher
 import de.tuda.stg.securecoder.guardian.CodeQLGuardian

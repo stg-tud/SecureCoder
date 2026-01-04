@@ -7,8 +7,8 @@ import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import com.intellij.platform.ide.progress.withBackgroundProgress
 import de.tuda.stg.securecoder.engine.Engine
-import de.tuda.stg.securecoder.engine.llm.OllamaClient
-import de.tuda.stg.securecoder.engine.llm.OpenRouterClient
+import de.tuda.stg.securecoder.llm.OllamaClient
+import de.tuda.stg.securecoder.llm.OpenRouterClient
 import de.tuda.stg.securecoder.engine.workflow.WorkflowEngine
 import de.tuda.stg.securecoder.enricher.EnricherClient
 import de.tuda.stg.securecoder.enricher.PromptEnricher

@@ -1,13 +1,13 @@
 package de.tuda.stg.securecoder.engine.file.edit
 
 import de.tuda.stg.securecoder.engine.file.edit.Changes.SearchedText
-import de.tuda.stg.securecoder.engine.llm.ChatMessage
-import de.tuda.stg.securecoder.engine.llm.ChatMessage.Role
-import de.tuda.stg.securecoder.engine.llm.LlmClient
-import de.tuda.stg.securecoder.engine.llm.LLMDescription
-import de.tuda.stg.securecoder.engine.llm.chatStructured
+import de.tuda.stg.securecoder.llm.ChatMessage
+import de.tuda.stg.securecoder.llm.ChatMessage.Role
+import de.tuda.stg.securecoder.llm.LlmClient
+import de.tuda.stg.securecoder.llm.LLMDescription
+import de.tuda.stg.securecoder.llm.chatStructured
 import de.tuda.stg.securecoder.filesystem.FileSystem
-import de.tuda.stg.securecoder.engine.llm.ChatExchange
+import de.tuda.stg.securecoder.llm.ChatExchange
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
