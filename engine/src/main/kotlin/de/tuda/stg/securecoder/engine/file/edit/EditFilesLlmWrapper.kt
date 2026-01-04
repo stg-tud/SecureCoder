@@ -6,9 +6,6 @@ import de.tuda.stg.securecoder.engine.llm.ChatMessage.Role
 import de.tuda.stg.securecoder.engine.llm.LlmClient
 import de.tuda.stg.securecoder.filesystem.FileSystem
 import de.tuda.stg.securecoder.engine.llm.ChatExchange
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.toList
 import kotlin.collections.plusAssign
 
 class EditFilesLlmWrapper(
@@ -76,7 +73,7 @@ class EditFilesLlmWrapper(
                 appendLine("It violated the required format.")
                 appendLine("Errors:")
                 messages.forEach { appendLine(it) }
-                appendLine("Respond again with ONLY <EDITN> blocks that strictly follow the rules. Do NOT include prose, markdown, or explanations.")
+                appendLine("Respond again with ONLY edit blocks that strictly follow the rules. Do NOT include prose, markdown, or explanations.")
                 appendLine("IMPORTANT: Resend the COMPLETE set of edits you intend to apply from your previous message")
             }
         }
@@ -155,12 +152,7 @@ class EditFilesLlmWrapper(
             return ParseResult.Err(allErrors)
         }
 
-        val seen = HashSet<Pair<String, String>>()
-        val deduped = results.filter { sr ->
-            seen.add(sr.fileName to sr.searchedText.text)
-        }
-
-        return ParseResult.Ok(Changes(deduped))
+        return ParseResult.Ok(Changes(results))
     }
 
     private fun getTextByXMLTag(container: String, tag: String): String? {

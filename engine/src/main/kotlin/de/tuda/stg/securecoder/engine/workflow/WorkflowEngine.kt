@@ -5,8 +5,8 @@ import de.tuda.stg.securecoder.engine.Engine.Context
 import de.tuda.stg.securecoder.engine.Engine.EngineResult
 import de.tuda.stg.securecoder.engine.llm.ChatMessage
 import de.tuda.stg.securecoder.engine.llm.ChatMessage.Role
-import de.tuda.stg.securecoder.engine.file.edit.EditFilesLlmWrapper
-import de.tuda.stg.securecoder.engine.llm.FilesInContextPromptBuilder
+import de.tuda.stg.securecoder.engine.file.FilesInContextPromptBuilder
+import de.tuda.stg.securecoder.engine.file.edit.StructuredEditFilesLlmWrapper
 import de.tuda.stg.securecoder.engine.llm.LlmClient
 import de.tuda.stg.securecoder.engine.stream.StreamEvent
 import de.tuda.stg.securecoder.engine.stream.ProposalId
@@ -23,7 +23,7 @@ class WorkflowEngine (
     private val parseChangesAttempts: Int = 5,
 ) : Engine {
     private val promptEnrichRunner = PromptEnrichRunner(enricher)
-    private val editFiles = EditFilesLlmWrapper(llmClient)
+    private val editFiles = StructuredEditFilesLlmWrapper(llmClient)
     private val guardianExecutor = GuardianExecutor(guardians)
 
     override suspend fun run(
