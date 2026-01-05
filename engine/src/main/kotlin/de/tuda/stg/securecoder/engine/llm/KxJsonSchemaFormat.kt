@@ -13,6 +13,7 @@ import kotlinx.serialization.json.JsonObjectBuilder
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.putJsonArray
 
 @OptIn(ExperimentalSerializationApi::class)
 class KxJsonSchemaFormat {
@@ -24,7 +25,7 @@ class KxJsonSchemaFormat {
         if (!seen.add(key)) {
             throw IllegalStateException("Recursive type detected: $key")
         }
-        val jsonType = when (desc.kind) {
+        var jsonType = when (desc.kind) {
             PrimitiveKind.BOOLEAN -> type("boolean")
             PrimitiveKind.BYTE, PrimitiveKind.SHORT, PrimitiveKind.INT, PrimitiveKind.LONG -> type("integer")
             PrimitiveKind.FLOAT, PrimitiveKind.DOUBLE -> type("number")
@@ -65,10 +66,29 @@ class KxJsonSchemaFormat {
         }
         seen.remove(key)
         if (desc.isNullable) {
-            throw IllegalStateException("Nullable types are not supported")
+            jsonType = makeNullable(jsonType)
         }
         val selfDesc = getDescription(desc.annotations)
         return if (selfDesc != null) addDescription(jsonType, selfDesc) else jsonType
+    }
+
+    private fun makeNullable(schema: JsonObject): JsonObject {
+        val type = schema["type"]
+        if (type is JsonPrimitive && type.isString) {
+            return buildJsonObject {
+                schema.forEach(::put)
+                putJsonArray("type") {
+                    add(type)
+                    add(JsonPrimitive("null"))
+                }
+            }
+        }
+        return buildJsonObject {
+            put("anyOf", buildJsonArray {
+                add(schema)
+                add(type("null"))
+            })
+        }
     }
 
     private fun type(name: String, builderAction: JsonObjectBuilder.() -> Unit = {}): JsonObject =
@@ -88,7 +108,7 @@ class KxJsonSchemaFormat {
 
     private fun addDescription(obj: JsonObject, text: String): JsonObject =
         buildJsonObject {
-            obj.forEach { (k, v) -> put(k, v) }
+            obj.forEach(::put)
             put("description", JsonPrimitive(text))
         }
 }
