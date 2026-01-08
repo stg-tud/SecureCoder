@@ -1,4 +1,4 @@
-package de.tuda.stg.securecoder.openapibridge
+package de.tuda.stg.securecoder.openaibridge
 
 import io.ktor.server.request.*
 import io.ktor.server.response.*

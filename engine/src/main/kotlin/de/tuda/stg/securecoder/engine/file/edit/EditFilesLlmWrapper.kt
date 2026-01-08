@@ -5,6 +5,7 @@ import de.tuda.stg.securecoder.engine.llm.ChatMessage
 import de.tuda.stg.securecoder.engine.llm.ChatMessage.Role
 import de.tuda.stg.securecoder.engine.llm.LlmClient
 import de.tuda.stg.securecoder.filesystem.FileSystem
+import de.tuda.stg.securecoder.engine.llm.ChatExchange
 import kotlin.collections.plusAssign
 
 class EditFilesLlmWrapper(
@@ -40,20 +41,20 @@ class EditFilesLlmWrapper(
         messages: List<ChatMessage>,
         fileSystem: FileSystem,
         params: LlmClient.GenerationParams = LlmClient.GenerationParams(),
-        onParseError: suspend (List<String>) -> Unit = {},
+        onParseError: suspend (parseErrors: List<String>, llm: ChatExchange) -> Unit = { _, _ -> },
         attempts: Int = 3
     ): ChatResult {
         val messages = messages.toMutableList()
-        messages += ChatMessage(Role.System, prompt)
+        appendPromptToLastSystem(messages)
         repeat(attempts) {
-            val response = llmClient.chat(messages, params)
+            val llmInput = messages.toList()
+            val response = llmClient.chat(llmInput, params)
             messages += ChatMessage(Role.Assistant, response)
             when (val result = parse(response, fileSystem)) {
                 is ParseResult.Ok -> return ChatResult(messages, result.value)
                 is ParseResult.Err -> {
-                    println("LLM parse failed: ${result.buildMessage()}")
                     messages += ChatMessage(Role.User, result.buildMessage())
-                    onParseError(result.messages)
+                    onParseError(result.messages, ChatExchange(llmInput, response))
                 }
             }
         }
@@ -72,7 +73,7 @@ class EditFilesLlmWrapper(
                 appendLine("It violated the required format.")
                 appendLine("Errors:")
                 messages.forEach { appendLine(it) }
-                appendLine("Respond again with ONLY <EDITN> blocks that strictly follow the rules. Do NOT include prose, markdown, or explanations.")
+                appendLine("Respond again with ONLY edit blocks that strictly follow the rules. Do NOT include prose, markdown, or explanations.")
                 appendLine("IMPORTANT: Resend the COMPLETE set of edits you intend to apply from your previous message")
             }
         }
@@ -83,14 +84,30 @@ class EditFilesLlmWrapper(
         val allErrors = mutableListOf<String>()
         val contentCopy = if (content.endsWith("\n")) content else content + "\n"
         val editsRegex = Regex(
-            "<EDIT(\\d{0,2})>(.*?)</EDIT\\1>", setOf(
-                RegexOption.MULTILINE, RegexOption.DOT_MATCHES_ALL
-            )
+            "<EDIT(\\d{0,2})>(.*?)</EDIT\\1>",
+            setOf(RegexOption.MULTILINE, RegexOption.DOT_MATCHES_ALL)
         )
         val matches = editsRegex.findAll(contentCopy).toList()
 
         if (matches.isEmpty()) {
-            allErrors += "Did not find any *SEARCH/REPLACE* block within the `<EDIT>` tag"
+            allErrors += """
+                Could not find any edit blocks in the response.
+                Example for the expected format:
+                <EDIT1>
+                <FILE_PATH>src/Main.java</FILE_PATH>
+                <SEARCH>
+                ...exact old text...
+                </SEARCH>
+                <REPLACE>
+                ...new text...
+                </REPLACE>
+                </EDIT1>
+                <EDIT2>
+                <FILE_PATH>src/new.java</FILE_PATH>
+                <SEARCH></SEARCH>
+                <REPLACE>append</REPLACE>
+                </EDIT2>
+                """.trimIndent()
             return ParseResult.Err(allErrors)
         }
 
@@ -122,7 +139,7 @@ class EditFilesLlmWrapper(
                 continue
             }
             val replace = Changes.SearchReplace(currentFileName, SearchedText(searchPart ?: ""), replacePart ?: "")
-            val content = fileSystem.getFile(currentFileName)?.content() ?: ""
+            val content = fileSystem.getFile(currentFileName)?.content()
             val match = ApplyChanges.match(content, replace.searchedText)
             if (match is Matcher.MatchResult.Error) {
                 allErrors += ApplyChanges.buildErrorMessage(currentFileName, searchPart ?: "", match)
@@ -135,21 +152,30 @@ class EditFilesLlmWrapper(
             return ParseResult.Err(allErrors)
         }
 
-        val seen = HashSet<Pair<String, String>>()
-        val deduped = results.filter { sr ->
-            seen.add(sr.fileName to sr.searchedText.text)
-        }
-
-        return ParseResult.Ok(Changes(deduped))
+        return ParseResult.Ok(Changes(results))
     }
 
     private fun getTextByXMLTag(container: String, tag: String): String? {
-        val regex = Regex("<$tag>(.*?)</$tag>", setOf(RegexOption.MULTILINE, RegexOption.DOT_MATCHES_ALL))
+        val regex = Regex(
+            "<$tag>(.*?)</$tag>",
+            setOf(RegexOption.MULTILINE, RegexOption.DOT_MATCHES_ALL)
+        )
         return regex.find(container)?.groups?.get(1)?.value
     }
 
     private fun removeStartingEmptyLine(content: String?): String? {
         if (content == null) return null
         return content.replaceFirst(Regex("^\\n"), "")
+    }
+
+    private fun appendPromptToLastSystem(messages: MutableList<ChatMessage>) {
+        val lastSystemIndex = messages.indexOfLast { it.role == Role.System }
+        if (lastSystemIndex >= 0) {
+            val existing = messages[lastSystemIndex]
+            val combined = "${existing.content}\n\n$prompt"
+            messages[lastSystemIndex] = ChatMessage(Role.System, combined)
+        } else {
+            messages += ChatMessage(Role.System, prompt)
+        }
     }
 }

@@ -1,13 +1,18 @@
 package de.tuda.stg.securecoder.guardian
 
 import kotlin.random.Random
+import kotlinx.coroutines.delay
 
 class DummyGuardian(
     private val flagProbabilityPerFile: Double = 0.8,
     private val hardRejet: Boolean = false,
     private val rng: Random = Random,
+    private val sleepMillis: Long = 0,
 ) : Guardian {
     override suspend fun run(req: AnalyzeRequest): AnalyzeResponse {
+        if (sleepMillis > 0) {
+            delay(sleepMillis)
+        }
         val violations = req.files
             .filter { rng.nextDouble() < flagProbabilityPerFile }
             .map { randomViolationFor(it) }

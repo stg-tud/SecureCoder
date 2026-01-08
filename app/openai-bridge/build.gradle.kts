@@ -15,20 +15,5 @@ dependencies {
 }
 
 application {
-    mainClass.set("de.tuda.stg.securecoder.openapibridge.MainKt")
-}
-
-tasks.named<JavaExec>("run") {
-    val keys = listOf(
-        "OPENROUTER_KEY",
-        "MODEL",
-        "OLLAMA_BASE_URL",
-        "OLLAMA_KEEP_ALIVE",
-        "PORT"
-    )
-    keys.forEach { key ->
-        System.getProperty(key)?.let { value ->
-            systemProperty(key, value)
-        }
-    }
+    mainClass.set("de.tuda.stg.securecoder.openaibridge.MainKt")
 }

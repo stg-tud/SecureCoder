@@ -2,7 +2,7 @@
     <id>de.tuda.securecoder</id>
     <name>SecureCoder</name>
     <vendor email="sekretariat@st.informatik.tu-darmstadt.de" url="https://www.stg.tu-darmstadt.de/">Software Technology Group at TU Darmstadt</vendor>
-    <version>0.0.2</version>
+    <version>0.0.3</version>
     <description><![CDATA[
         SecureCoder brings security to your IDE by AI suggestions, and running quick critics before code lands.
     ]]></description>
@@ -13,7 +13,7 @@
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow id="securecoder"
                     anchor="right"
-                    factoryClass="de.tuda.stg.securecoder.plugin.SecureCoderAiToolWindowFactory"/>
+                    factoryClass="de.tuda.stg.securecoder.plugin.toolwindow.SecureCoderAiToolWindowFactory"/>
         <applicationConfigurable id="de.tuda.securecoder.settings"
                                  parentId="tools"
                                  key="settings.configurable.display.name"

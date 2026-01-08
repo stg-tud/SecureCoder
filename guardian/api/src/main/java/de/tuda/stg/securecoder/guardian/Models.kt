@@ -24,6 +24,7 @@ data class Violation(
     val location: Location,
     val hardReject: Boolean,
     val confidence: String? = null,
+    val raw: String? = null,
 )
 
 @Serializable

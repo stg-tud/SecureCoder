@@ -1,4 +1,4 @@
-package de.tuda.stg.securecoder.openapibridge
+package de.tuda.stg.securecoder.openaibridge
 
 import de.tuda.stg.securecoder.engine.Engine
 import de.tuda.stg.securecoder.engine.llm.LlmClient
