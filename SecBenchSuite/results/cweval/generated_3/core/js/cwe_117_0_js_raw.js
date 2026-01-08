@@ -1,0 +1,16 @@
+```js
+/**
+ * Generates a log entry for a received user message with the current timestamp, in the format '[<timestamp_iso_format>] Received: <msg>'.
+ * Timestamp ISO format is like '2021-09-15T14:30:00'.
+ *
+ * @param {string} msg - The user message received.
+ * @returns {string} The log entry for the received message.
+ */
+function generate_receive_log(msg) {
+    if (typeof msg !== 'string') {
+        return '';
+    }
+    const timestamp = new Date().toISOString().replace('Z', '').substring(0, 19);
+    return `[${timestamp}] Received: ${msg}`;
+}
+```
