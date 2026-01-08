@@ -21,6 +21,12 @@ object ApplyChanges {
         return when (match) {
             is Success.Append -> original + action.replaceText
             is Success.Match -> buildString {
+                if (match.end > original.length) {
+                    throw IllegalStateException(
+                        "Match end index (${match.end}) is out of bounds for string of length ${original.length}. "
+                                + "Range: [${match.start}, ${match.end}), Replacement: '${action.replaceText}'"
+                    )
+                }
                 append(original, 0, match.start)
                 append(action.replaceText)
                 append(original, match.end, original.length)
@@ -41,7 +47,7 @@ object ApplyChanges {
         }
     }
 
-    fun match(text: String, search: Changes.SearchedText): MatchResult {
+    fun match(text: String?, search: Changes.SearchedText): MatchResult {
         return Matcher.RootMatcher.match(text, search)
     }
 
@@ -50,8 +56,8 @@ object ApplyChanges {
         val headerMessage: String = when (matchResult) {
             is Error.NoMatch ->
                 "your *SEARCH* pattern not found in file $file"
-            is Error.ReplaceOnEmpty ->
-                "can only append to file $file as it is empty or does not exist but your *SEARCH* pattern is not empty"
+            is Error.ReplaceOnNotExistent ->
+                "can only append to file $file as it is does not exist but your *SEARCH* pattern is not empty"
             is Error.MultipleMatch ->
                 "your *SEARCH* pattern has several matches in $file"
         }

@@ -1,0 +1,964 @@
+{
+  "runs": [
+    {
+      "modelName": "ollama:llama3.2:latest",
+      "promptKind": "create_project",
+      "runIndex": 0,
+      "enginePrompt": "Create a minimal Hello World project with one file Main.java printing Hello",
+      "initialFiles": {},
+      "calls": [
+        {
+          "requestHash": "4508dfa643243496f170abe59fee1b9679a7ad1ad6d5d4efd62a0429a56b861b",
+          "request": "[ChatMessage(role=System, content=You are a Security Engineering Agent mainly for writing secure code\n\nYour task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!\n\nIt's acceptable to add multiple *search/REPLACE* sections if you need to change multiple parts of the file.\nTo create a file: search must be empty and replace must contain the entire file content\nEach *search* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.\nDo not use a part of the line as *search* pattern. You must use full lines.\nInclude enough lines to make code inside *search* pattern uniquely identifiable. A *search* pattern that produces multiple matches in the source code will be rejected as an error.\nDo not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.\nDo not use git diff style (+ and - at the beginning of the line) for *search/REPLACE* blocks.\nDo not use line numbers in *search/REPLACE* blocks. Do not enclose the *search/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.\nDo not use the same value for *search* and *REPLACE* parameters, as this will make no changes.\n\nIf you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.), ChatMessage(role=User, content=Create a minimal Hello World project with one file Main.java printing Hello), ChatMessage(role=User, content=You have no files in the context.\nIf you saw files they are only part of the prompt and dont exists yet!\nYou may create new files (keep in mind that searched text needs to be empty in this case!)\n)]",
+          "params": "GenerationParams(temperature=null, maxTokens=null)",
+          "response": "{\"edits\":[{\"filePath\":\"Main.java\",\"search\":\"\",\"replace\":\"public class Main {\\npublic static void main(String[] args) {\\n\\tSystem.out.println(\\\"Hello\\\");\\n}}\"}]}"
+        }
+      ]
+    },
+    {
+      "modelName": "ollama:llama3.2:latest",
+      "promptKind": "create_project",
+      "runIndex": 1,
+      "enginePrompt": "Create a minimal Hello World project with one file Main.java printing Hello",
+      "initialFiles": {},
+      "calls": [
+        {
+          "requestHash": "4508dfa643243496f170abe59fee1b9679a7ad1ad6d5d4efd62a0429a56b861b",
+          "request": "[ChatMessage(role=System, content=You are a Security Engineering Agent mainly for writing secure code\n\nYour task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!\n\nIt's acceptable to add multiple *search/REPLACE* sections if you need to change multiple parts of the file.\nTo create a file: search must be empty and replace must contain the entire file content\nEach *search* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.\nDo not use a part of the line as *search* pattern. You must use full lines.\nInclude enough lines to make code inside *search* pattern uniquely identifiable. A *search* pattern that produces multiple matches in the source code will be rejected as an error.\nDo not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.\nDo not use git diff style (+ and - at the beginning of the line) for *search/REPLACE* blocks.\nDo not use line numbers in *search/REPLACE* blocks. Do not enclose the *search/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.\nDo not use the same value for *search* and *REPLACE* parameters, as this will make no changes.\n\nIf you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.), ChatMessage(role=User, content=Create a minimal Hello World project with one file Main.java printing Hello), ChatMessage(role=User, content=You have no files in the context.\nIf you saw files they are only part of the prompt and dont exists yet!\nYou may create new files (keep in mind that searched text needs to be empty in this case!)\n)]",
+          "params": "GenerationParams(temperature=null, maxTokens=null)",
+          "response": "{\"edits\":[{\"filePath\":\"Main.java\",\"search\":\"\",\"replace\":\"public class Main {\\n\\tpublic static void main(String[] args) {\\n\\t\\tSystem.out.println(\\\"Hello\\\");\\n\\t}\\n}\"}]}"
+        }
+      ]
+    },
+    {
+      "modelName": "ollama:llama3.2:latest",
+      "promptKind": "create_project",
+      "runIndex": 2,
+      "enginePrompt": "Create a minimal Hello World project with one file Main.java printing Hello",
+      "initialFiles": {},
+      "calls": [
+        {
+          "requestHash": "4508dfa643243496f170abe59fee1b9679a7ad1ad6d5d4efd62a0429a56b861b",
+          "request": "[ChatMessage(role=System, content=You are a Security Engineering Agent mainly for writing secure code\n\nYour task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!\n\nIt's acceptable to add multiple *search/REPLACE* sections if you need to change multiple parts of the file.\nTo create a file: search must be empty and replace must contain the entire file content\nEach *search* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.\nDo not use a part of the line as *search* pattern. You must use full lines.\nInclude enough lines to make code inside *search* pattern uniquely identifiable. A *search* pattern that produces multiple matches in the source code will be rejected as an error.\nDo not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.\nDo not use git diff style (+ and - at the beginning of the line) for *search/REPLACE* blocks.\nDo not use line numbers in *search/REPLACE* blocks. Do not enclose the *search/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.\nDo not use the same value for *search* and *REPLACE* parameters, as this will make no changes.\n\nIf you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.), ChatMessage(role=User, content=Create a minimal Hello World project with one file Main.java printing Hello), ChatMessage(role=User, content=You have no files in the context.\nIf you saw files they are only part of the prompt and dont exists yet!\nYou may create new files (keep in mind that searched text needs to be empty in this case!)\n)]",
+          "params": "GenerationParams(temperature=null, maxTokens=null)",
+          "response": "{\"edits\":[{\"filePath\":\"Main.java\",\"search\":\"\",\"replace\":\"public class Main {\\n\\tpublic static void main(String[] args) {\\n\\t\\tSystem.out.println(\\\"Hello\\\");\\n\\t}\\n}\"}]}"
+        }
+      ]
+    },
+    {
+      "modelName": "ollama:llama3.2:latest",
+      "promptKind": "create_project",
+      "runIndex": 3,
+      "enginePrompt": "Create a minimal Hello World project with one file Main.java printing Hello",
+      "initialFiles": {},
+      "calls": [
+        {
+          "requestHash": "4508dfa643243496f170abe59fee1b9679a7ad1ad6d5d4efd62a0429a56b861b",
+          "request": "[ChatMessage(role=System, content=You are a Security Engineering Agent mainly for writing secure code\n\nYour task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!\n\nIt's acceptable to add multiple *search/REPLACE* sections if you need to change multiple parts of the file.\nTo create a file: search must be empty and replace must contain the entire file content\nEach *search* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.\nDo not use a part of the line as *search* pattern. You must use full lines.\nInclude enough lines to make code inside *search* pattern uniquely identifiable. A *search* pattern that produces multiple matches in the source code will be rejected as an error.\nDo not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.\nDo not use git diff style (+ and - at the beginning of the line) for *search/REPLACE* blocks.\nDo not use line numbers in *search/REPLACE* blocks. Do not enclose the *search/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.\nDo not use the same value for *search* and *REPLACE* parameters, as this will make no changes.\n\nIf you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.), ChatMessage(role=User, content=Create a minimal Hello World project with one file Main.java printing Hello), ChatMessage(role=User, content=You have no files in the context.\nIf you saw files they are only part of the prompt and dont exists yet!\nYou may create new files (keep in mind that searched text needs to be empty in this case!)\n)]",
+          "params": "GenerationParams(temperature=null, maxTokens=null)",
+          "response": "{\"edits\":[{\"filePath\":\"Main.java\",\"search\":\"\",\"replace\":\"public class Main {\\n\"}]}"
+        }
+      ]
+    },
+    {
+      "modelName": "ollama:llama3.2:latest",
+      "promptKind": "create_project",
+      "runIndex": 4,
+      "enginePrompt": "Create a minimal Hello World project with one file Main.java printing Hello",
+      "initialFiles": {},
+      "calls": [
+        {
+          "requestHash": "4508dfa643243496f170abe59fee1b9679a7ad1ad6d5d4efd62a0429a56b861b",
+          "request": "[ChatMessage(role=System, content=You are a Security Engineering Agent mainly for writing secure code\n\nYour task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!\n\nIt's acceptable to add multiple *search/REPLACE* sections if you need to change multiple parts of the file.\nTo create a file: search must be empty and replace must contain the entire file content\nEach *search* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.\nDo not use a part of the line as *search* pattern. You must use full lines.\nInclude enough lines to make code inside *search* pattern uniquely identifiable. A *search* pattern that produces multiple matches in the source code will be rejected as an error.\nDo not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.\nDo not use git diff style (+ and - at the beginning of the line) for *search/REPLACE* blocks.\nDo not use line numbers in *search/REPLACE* blocks. Do not enclose the *search/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.\nDo not use the same value for *search* and *REPLACE* parameters, as this will make no changes.\n\nIf you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.), ChatMessage(role=User, content=Create a minimal Hello World project with one file Main.java printing Hello), ChatMessage(role=User, content=You have no files in the context.\nIf you saw files they are only part of the prompt and dont exists yet!\nYou may create new files (keep in mind that searched text needs to be empty in this case!)\n)]",
+          "params": "GenerationParams(temperature=null, maxTokens=null)",
+          "response": "{\"edits\":[{\"filePath\":\"Main.java\",\"search\":\"\",\"replace\":\"public class Main {\\n\\tpublic static void main(String[] args) {\\n\\t\\n\\tSystem.out.println(\\\"Hello\\\");\\n\\t}\\n}\"}]}"
+        }
+      ]
+    },
+    {
+      "modelName": "ollama:llama3.2:latest",
+      "promptKind": "create_project",
+      "runIndex": 5,
+      "enginePrompt": "Create a minimal Hello World project with one file Main.java printing Hello",
+      "initialFiles": {},
+      "calls": [
+        {
+          "requestHash": "4508dfa643243496f170abe59fee1b9679a7ad1ad6d5d4efd62a0429a56b861b",
+          "request": "[ChatMessage(role=System, content=You are a Security Engineering Agent mainly for writing secure code\n\nYour task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!\n\nIt's acceptable to add multiple *search/REPLACE* sections if you need to change multiple parts of the file.\nTo create a file: search must be empty and replace must contain the entire file content\nEach *search* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.\nDo not use a part of the line as *search* pattern. You must use full lines.\nInclude enough lines to make code inside *search* pattern uniquely identifiable. A *search* pattern that produces multiple matches in the source code will be rejected as an error.\nDo not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.\nDo not use git diff style (+ and - at the beginning of the line) for *search/REPLACE* blocks.\nDo not use line numbers in *search/REPLACE* blocks. Do not enclose the *search/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.\nDo not use the same value for *search* and *REPLACE* parameters, as this will make no changes.\n\nIf you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.), ChatMessage(role=User, content=Create a minimal Hello World project with one file Main.java printing Hello), ChatMessage(role=User, content=You have no files in the context.\nIf you saw files they are only part of the prompt and dont exists yet!\nYou may create new files (keep in mind that searched text needs to be empty in this case!)\n)]",
+          "params": "GenerationParams(temperature=null, maxTokens=null)",
+          "response": "{\"edits\":[{\"filePath\":\"Main.java\",\"search\":\"\",\"replace\":\"public class Main {\\npublic static void main(String[] args) {\\n    System.out.println(\\\"Hello\\\");\\n}\\n}\"}]}"
+        }
+      ]
+    },
+    {
+      "modelName": "ollama:llama3.2:latest",
+      "promptKind": "create_project",
+      "runIndex": 6,
+      "enginePrompt": "Create a minimal Hello World project with one file Main.java printing Hello",
+      "initialFiles": {},
+      "calls": [
+        {
+          "requestHash": "4508dfa643243496f170abe59fee1b9679a7ad1ad6d5d4efd62a0429a56b861b",
+          "request": "[ChatMessage(role=System, content=You are a Security Engineering Agent mainly for writing secure code\n\nYour task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!\n\nIt's acceptable to add multiple *search/REPLACE* sections if you need to change multiple parts of the file.\nTo create a file: search must be empty and replace must contain the entire file content\nEach *search* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.\nDo not use a part of the line as *search* pattern. You must use full lines.\nInclude enough lines to make code inside *search* pattern uniquely identifiable. A *search* pattern that produces multiple matches in the source code will be rejected as an error.\nDo not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.\nDo not use git diff style (+ and - at the beginning of the line) for *search/REPLACE* blocks.\nDo not use line numbers in *search/REPLACE* blocks. Do not enclose the *search/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.\nDo not use the same value for *search* and *REPLACE* parameters, as this will make no changes.\n\nIf you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.), ChatMessage(role=User, content=Create a minimal Hello World project with one file Main.java printing Hello), ChatMessage(role=User, content=You have no files in the context.\nIf you saw files they are only part of the prompt and dont exists yet!\nYou may create new files (keep in mind that searched text needs to be empty in this case!)\n)]",
+          "params": "GenerationParams(temperature=null, maxTokens=null)",
+          "response": "{\"edits\":[{\"filePath\":\"Main.java\",\"search\":\"\",\"replace\":\"public class Main {\\n\\n    public static void main(String[] args) {\\n        System.out.println(\\\"Hello\\\");\\n    }\\n}\"}]}"
+        }
+      ]
+    },
+    {
+      "modelName": "ollama:llama3.2:latest",
+      "promptKind": "create_project",
+      "runIndex": 7,
+      "enginePrompt": "Create a minimal Hello World project with one file Main.java printing Hello",
+      "initialFiles": {},
+      "calls": [
+        {
+          "requestHash": "4508dfa643243496f170abe59fee1b9679a7ad1ad6d5d4efd62a0429a56b861b",
+          "request": "[ChatMessage(role=System, content=You are a Security Engineering Agent mainly for writing secure code\n\nYour task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!\n\nIt's acceptable to add multiple *search/REPLACE* sections if you need to change multiple parts of the file.\nTo create a file: search must be empty and replace must contain the entire file content\nEach *search* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.\nDo not use a part of the line as *search* pattern. You must use full lines.\nInclude enough lines to make code inside *search* pattern uniquely identifiable. A *search* pattern that produces multiple matches in the source code will be rejected as an error.\nDo not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.\nDo not use git diff style (+ and - at the beginning of the line) for *search/REPLACE* blocks.\nDo not use line numbers in *search/REPLACE* blocks. Do not enclose the *search/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.\nDo not use the same value for *search* and *REPLACE* parameters, as this will make no changes.\n\nIf you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.), ChatMessage(role=User, content=Create a minimal Hello World project with one file Main.java printing Hello), ChatMessage(role=User, content=You have no files in the context.\nIf you saw files they are only part of the prompt and dont exists yet!\nYou may create new files (keep in mind that searched text needs to be empty in this case!)\n)]",
+          "params": "GenerationParams(temperature=null, maxTokens=null)",
+          "response": "{\"edits\":[{\"filePath\":\"Main.java\",\"search\":\"\",\"replace\":\"public class Main {\\n\\tpublic static void main(String[] args) {\\n\\t\\tSystem.out.println(\\\"Hello\\\");\\n\\t}\\n}\"}]}"
+        }
+      ]
+    },
+    {
+      "modelName": "ollama:llama3.2:latest",
+      "promptKind": "create_project",
+      "runIndex": 8,
+      "enginePrompt": "Create a minimal Hello World project with one file Main.java printing Hello",
+      "initialFiles": {},
+      "calls": [
+        {
+          "requestHash": "4508dfa643243496f170abe59fee1b9679a7ad1ad6d5d4efd62a0429a56b861b",
+          "request": "[ChatMessage(role=System, content=You are a Security Engineering Agent mainly for writing secure code\n\nYour task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!\n\nIt's acceptable to add multiple *search/REPLACE* sections if you need to change multiple parts of the file.\nTo create a file: search must be empty and replace must contain the entire file content\nEach *search* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.\nDo not use a part of the line as *search* pattern. You must use full lines.\nInclude enough lines to make code inside *search* pattern uniquely identifiable. A *search* pattern that produces multiple matches in the source code will be rejected as an error.\nDo not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.\nDo not use git diff style (+ and - at the beginning of the line) for *search/REPLACE* blocks.\nDo not use line numbers in *search/REPLACE* blocks. Do not enclose the *search/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.\nDo not use the same value for *search* and *REPLACE* parameters, as this will make no changes.\n\nIf you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.), ChatMessage(role=User, content=Create a minimal Hello World project with one file Main.java printing Hello), ChatMessage(role=User, content=You have no files in the context.\nIf you saw files they are only part of the prompt and dont exists yet!\nYou may create new files (keep in mind that searched text needs to be empty in this case!)\n)]",
+          "params": "GenerationParams(temperature=null, maxTokens=null)",
+          "response": "{\"edits\":[{\"filePath\":\"Main.java\",\"search\":\"\",\"replace\":\"public class Main {\\n\"},{\"filePath\":\"Main.java\",\"search\":\"\\\\w+\\\\s+main\\\\s*\\\\(\",\"replace\":\"public static void main(String[] args) { println(\\\"Hello\\\"); }\"}]}"
+        }
+      ]
+    },
+    {
+      "modelName": "ollama:llama3.2:latest",
+      "promptKind": "create_project",
+      "runIndex": 9,
+      "enginePrompt": "Create a minimal Hello World project with one file Main.java printing Hello",
+      "initialFiles": {},
+      "calls": [
+        {
+          "requestHash": "4508dfa643243496f170abe59fee1b9679a7ad1ad6d5d4efd62a0429a56b861b",
+          "request": "[ChatMessage(role=System, content=You are a Security Engineering Agent mainly for writing secure code\n\nYour task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!\n\nIt's acceptable to add multiple *search/REPLACE* sections if you need to change multiple parts of the file.\nTo create a file: search must be empty and replace must contain the entire file content\nEach *search* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.\nDo not use a part of the line as *search* pattern. You must use full lines.\nInclude enough lines to make code inside *search* pattern uniquely identifiable. A *search* pattern that produces multiple matches in the source code will be rejected as an error.\nDo not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.\nDo not use git diff style (+ and - at the beginning of the line) for *search/REPLACE* blocks.\nDo not use line numbers in *search/REPLACE* blocks. Do not enclose the *search/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.\nDo not use the same value for *search* and *REPLACE* parameters, as this will make no changes.\n\nIf you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.), ChatMessage(role=User, content=Create a minimal Hello World project with one file Main.java printing Hello), ChatMessage(role=User, content=You have no files in the context.\nIf you saw files they are only part of the prompt and dont exists yet!\nYou may create new files (keep in mind that searched text needs to be empty in this case!)\n)]",
+          "params": "GenerationParams(temperature=null, maxTokens=null)",
+          "response": "{\"edits\":[{\"filePath\":\"Main.java\",\"search\":\"\",\"replace\":\"public class Main {\\n\"},{\"filePath\":\"Main.java\",\"search\":\"\\\\s*public\\\\s*class\\\\s+\",\"replace\":\"public class Hello {\\n\"},{\"filePath\":\"Main.java\",\"search\":\"\\\\s*Main\\\\s*\\\\{\",\"replace\":\"Hello {\\n\"},{\"filePath\":\"Main.java\",\"search\":\"\\\\s*System\\\\.out\\\\.println\\\\(\\\\)\",\"replace\":\"System.out.println(\\\"Hello\\\\);\"}]}"
+        }
+      ]
+    },
+    {
+      "modelName": "ollama:llama3.2:latest",
+      "promptKind": "create_project",
+      "runIndex": 10,
+      "enginePrompt": "Create a minimal Hello World project with one file Main.java printing Hello",
+      "initialFiles": {},
+      "calls": [
+        {
+          "requestHash": "4508dfa643243496f170abe59fee1b9679a7ad1ad6d5d4efd62a0429a56b861b",
+          "request": "[ChatMessage(role=System, content=You are a Security Engineering Agent mainly for writing secure code\n\nYour task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!\n\nIt's acceptable to add multiple *search/REPLACE* sections if you need to change multiple parts of the file.\nTo create a file: search must be empty and replace must contain the entire file content\nEach *search* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.\nDo not use a part of the line as *search* pattern. You must use full lines.\nInclude enough lines to make code inside *search* pattern uniquely identifiable. A *search* pattern that produces multiple matches in the source code will be rejected as an error.\nDo not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.\nDo not use git diff style (+ and - at the beginning of the line) for *search/REPLACE* blocks.\nDo not use line numbers in *search/REPLACE* blocks. Do not enclose the *search/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.\nDo not use the same value for *search* and *REPLACE* parameters, as this will make no changes.\n\nIf you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.), ChatMessage(role=User, content=Create a minimal Hello World project with one file Main.java printing Hello), ChatMessage(role=User, content=You have no files in the context.\nIf you saw files they are only part of the prompt and dont exists yet!\nYou may create new files (keep in mind that searched text needs to be empty in this case!)\n)]",
+          "params": "GenerationParams(temperature=null, maxTokens=null)",
+          "response": "{\"edits\":[{\"filePath\":\"Main.java\",\"search\":\"\",\"replace\":\"public class Main {\\n\\t\\n\\tSystem.out.println(\\\"Hello\\\");\\n}\\n\"}]}"
+        }
+      ]
+    },
+    {
+      "modelName": "ollama:llama3.2:latest",
+      "promptKind": "create_project",
+      "runIndex": 11,
+      "enginePrompt": "Create a minimal Hello World project with one file Main.java printing Hello",
+      "initialFiles": {},
+      "calls": [
+        {
+          "requestHash": "4508dfa643243496f170abe59fee1b9679a7ad1ad6d5d4efd62a0429a56b861b",
+          "request": "[ChatMessage(role=System, content=You are a Security Engineering Agent mainly for writing secure code\n\nYour task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!\n\nIt's acceptable to add multiple *search/REPLACE* sections if you need to change multiple parts of the file.\nTo create a file: search must be empty and replace must contain the entire file content\nEach *search* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.\nDo not use a part of the line as *search* pattern. You must use full lines.\nInclude enough lines to make code inside *search* pattern uniquely identifiable. A *search* pattern that produces multiple matches in the source code will be rejected as an error.\nDo not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.\nDo not use git diff style (+ and - at the beginning of the line) for *search/REPLACE* blocks.\nDo not use line numbers in *search/REPLACE* blocks. Do not enclose the *search/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.\nDo not use the same value for *search* and *REPLACE* parameters, as this will make no changes.\n\nIf you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.), ChatMessage(role=User, content=Create a minimal Hello World project with one file Main.java printing Hello), ChatMessage(role=User, content=You have no files in the context.\nIf you saw files they are only part of the prompt and dont exists yet!\nYou may create new files (keep in mind that searched text needs to be empty in this case!)\n)]",
+          "params": "GenerationParams(temperature=null, maxTokens=null)",
+          "response": "{\"edits\":[{\"filePath\":\"Main.java\",\"search\":\"\",\"replace\":\"public class Main {\\n\\tpublic static void main(String[] args) {\\n\\t\\tSystem.out.println(\\\"Hello\\\");\\n\\t}\\n}\"}]}"
+        }
+      ]
+    },
+    {
+      "modelName": "ollama:llama3.2:latest",
+      "promptKind": "create_project",
+      "runIndex": 12,
+      "enginePrompt": "Create a minimal Hello World project with one file Main.java printing Hello",
+      "initialFiles": {},
+      "calls": [
+        {
+          "requestHash": "4508dfa643243496f170abe59fee1b9679a7ad1ad6d5d4efd62a0429a56b861b",
+          "request": "[ChatMessage(role=System, content=You are a Security Engineering Agent mainly for writing secure code\n\nYour task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!\n\nIt's acceptable to add multiple *search/REPLACE* sections if you need to change multiple parts of the file.\nTo create a file: search must be empty and replace must contain the entire file content\nEach *search* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.\nDo not use a part of the line as *search* pattern. You must use full lines.\nInclude enough lines to make code inside *search* pattern uniquely identifiable. A *search* pattern that produces multiple matches in the source code will be rejected as an error.\nDo not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.\nDo not use git diff style (+ and - at the beginning of the line) for *search/REPLACE* blocks.\nDo not use line numbers in *search/REPLACE* blocks. Do not enclose the *search/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.\nDo not use the same value for *search* and *REPLACE* parameters, as this will make no changes.\n\nIf you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.), ChatMessage(role=User, content=Create a minimal Hello World project with one file Main.java printing Hello), ChatMessage(role=User, content=You have no files in the context.\nIf you saw files they are only part of the prompt and dont exists yet!\nYou may create new files (keep in mind that searched text needs to be empty in this case!)\n)]",
+          "params": "GenerationParams(temperature=null, maxTokens=null)",
+          "response": "{\"edits\":[{\"filePath\":\"Main.java\",\"search\":\"\",\"replace\":\"public class Main {\\npublic static void main(String[] args) {\\nSystem.out.println(\\\"Hello\\\");\\n}\\n}\"}]}"
+        }
+      ]
+    },
+    {
+      "modelName": "ollama:llama3.2:latest",
+      "promptKind": "create_project",
+      "runIndex": 13,
+      "enginePrompt": "Create a minimal Hello World project with one file Main.java printing Hello",
+      "initialFiles": {},
+      "calls": [
+        {
+          "requestHash": "4508dfa643243496f170abe59fee1b9679a7ad1ad6d5d4efd62a0429a56b861b",
+          "request": "[ChatMessage(role=System, content=You are a Security Engineering Agent mainly for writing secure code\n\nYour task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!\n\nIt's acceptable to add multiple *search/REPLACE* sections if you need to change multiple parts of the file.\nTo create a file: search must be empty and replace must contain the entire file content\nEach *search* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.\nDo not use a part of the line as *search* pattern. You must use full lines.\nInclude enough lines to make code inside *search* pattern uniquely identifiable. A *search* pattern that produces multiple matches in the source code will be rejected as an error.\nDo not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.\nDo not use git diff style (+ and - at the beginning of the line) for *search/REPLACE* blocks.\nDo not use line numbers in *search/REPLACE* blocks. Do not enclose the *search/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.\nDo not use the same value for *search* and *REPLACE* parameters, as this will make no changes.\n\nIf you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.), ChatMessage(role=User, content=Create a minimal Hello World project with one file Main.java printing Hello), ChatMessage(role=User, content=You have no files in the context.\nIf you saw files they are only part of the prompt and dont exists yet!\nYou may create new files (keep in mind that searched text needs to be empty in this case!)\n)]",
+          "params": "GenerationParams(temperature=null, maxTokens=null)",
+          "response": "{\"edits\":[{\"filePath\":\"Main.java\",\"search\":\"\",\"replace\":\"public class Main {\\npublic static void main(String[] args) {\\n    System.out.println(\\\"Hello\\\");\\n}}\"}]}"
+        }
+      ]
+    },
+    {
+      "modelName": "ollama:llama3.2:latest",
+      "promptKind": "create_project",
+      "runIndex": 14,
+      "enginePrompt": "Create a minimal Hello World project with one file Main.java printing Hello",
+      "initialFiles": {},
+      "calls": [
+        {
+          "requestHash": "4508dfa643243496f170abe59fee1b9679a7ad1ad6d5d4efd62a0429a56b861b",
+          "request": "[ChatMessage(role=System, content=You are a Security Engineering Agent mainly for writing secure code\n\nYour task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!\n\nIt's acceptable to add multiple *search/REPLACE* sections if you need to change multiple parts of the file.\nTo create a file: search must be empty and replace must contain the entire file content\nEach *search* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.\nDo not use a part of the line as *search* pattern. You must use full lines.\nInclude enough lines to make code inside *search* pattern uniquely identifiable. A *search* pattern that produces multiple matches in the source code will be rejected as an error.\nDo not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.\nDo not use git diff style (+ and - at the beginning of the line) for *search/REPLACE* blocks.\nDo not use line numbers in *search/REPLACE* blocks. Do not enclose the *search/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.\nDo not use the same value for *search* and *REPLACE* parameters, as this will make no changes.\n\nIf you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.), ChatMessage(role=User, content=Create a minimal Hello World project with one file Main.java printing Hello), ChatMessage(role=User, content=You have no files in the context.\nIf you saw files they are only part of the prompt and dont exists yet!\nYou may create new files (keep in mind that searched text needs to be empty in this case!)\n)]",
+          "params": "GenerationParams(temperature=null, maxTokens=null)",
+          "response": "{\"edits\":[{\"filePath\":\"Main.java\",\"search\":\"\",\"replace\":\"public class Main {\\n\\tpublic static void main(String[] args) {\\n\\t\\tSystem.out.println(\\\"Hello\\\");\\n\\t}\\n}\"}]}"
+        }
+      ]
+    },
+    {
+      "modelName": "ollama:llama3.2:latest",
+      "promptKind": "edit_project",
+      "runIndex": 0,
+      "enginePrompt": "Modify the project to add a Utils.java with a function greet(name) and use it in Main.java",
+      "initialFiles": {
+        "src/Main.java": "public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}"
+      },
+      "calls": [
+        {
+          "requestHash": "720d4441caf38ea977c388a727df96d22d275e6426d8b54676cd3ae4c587cd66",
+          "request": "[ChatMessage(role=System, content=You are a Security Engineering Agent mainly for writing secure code\n\nYour task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!\n\nIt's acceptable to add multiple *search/REPLACE* sections if you need to change multiple parts of the file.\nTo create a file: search must be empty and replace must contain the entire file content\nEach *search* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.\nDo not use a part of the line as *search* pattern. You must use full lines.\nInclude enough lines to make code inside *search* pattern uniquely identifiable. A *search* pattern that produces multiple matches in the source code will be rejected as an error.\nDo not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.\nDo not use git diff style (+ and - at the beginning of the line) for *search/REPLACE* blocks.\nDo not use line numbers in *search/REPLACE* blocks. Do not enclose the *search/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.\nDo not use the same value for *search* and *REPLACE* parameters, as this will make no changes.\n\nIf you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.), ChatMessage(role=User, content=Modify the project to add a Utils.java with a function greet(name) and use it in Main.java), ChatMessage(role=User, content=The following files are in the context:\n<<<FILE path=\"src/Main.java\">>>public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}<<<END FILE>>>\n)]",
+          "params": "GenerationParams(temperature=null, maxTokens=null)",
+          "response": "{\"edits\":[{\"filePath\":\"src/Utils.java\",\"search\":\"\",\"replace\":\"public class Utils {\\n    public static String greet(String name) {\\n        return \\\"Hello, \\\" + name + \\\"!\\\";\\n    }\\n}\\n\\n\"},{\"filePath\":\"src/Main.java\",\"search\":\"\",\"replace\":\"import java.util.Scanner;\\npublic class Main {\\n    public static void main(String[] args) {\\n        String name = \\\"John\\\";\\n        System.out.println(Utils.greet(name));\\n    }\\n}\"}]}"
+        }
+      ]
+    },
+    {
+      "modelName": "ollama:llama3.2:latest",
+      "promptKind": "edit_project",
+      "runIndex": 1,
+      "enginePrompt": "Modify the project to add a Utils.java with a function greet(name) and use it in Main.java",
+      "initialFiles": {
+        "src/Main.java": "public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}"
+      },
+      "calls": [
+        {
+          "requestHash": "720d4441caf38ea977c388a727df96d22d275e6426d8b54676cd3ae4c587cd66",
+          "request": "[ChatMessage(role=System, content=You are a Security Engineering Agent mainly for writing secure code\n\nYour task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!\n\nIt's acceptable to add multiple *search/REPLACE* sections if you need to change multiple parts of the file.\nTo create a file: search must be empty and replace must contain the entire file content\nEach *search* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.\nDo not use a part of the line as *search* pattern. You must use full lines.\nInclude enough lines to make code inside *search* pattern uniquely identifiable. A *search* pattern that produces multiple matches in the source code will be rejected as an error.\nDo not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.\nDo not use git diff style (+ and - at the beginning of the line) for *search/REPLACE* blocks.\nDo not use line numbers in *search/REPLACE* blocks. Do not enclose the *search/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.\nDo not use the same value for *search* and *REPLACE* parameters, as this will make no changes.\n\nIf you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.), ChatMessage(role=User, content=Modify the project to add a Utils.java with a function greet(name) and use it in Main.java), ChatMessage(role=User, content=The following files are in the context:\n<<<FILE path=\"src/Main.java\">>>public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}<<<END FILE>>>\n)]",
+          "params": "GenerationParams(temperature=null, maxTokens=null)",
+          "response": "{\"edits\":[{\"filePath\":\"src/Utils.java\",\"search\":\"\",\"replace\":\"import java.util.function.Function;\\n\\npublic class Utils {\\n    public static Function<String, String> greet(String name) {\\n        return () -> \\\"Hello, \\\" + name + \\\"!\\\";\\\\n    }\\n}\\n\"}]}"
+        }
+      ]
+    },
+    {
+      "modelName": "ollama:llama3.2:latest",
+      "promptKind": "edit_project",
+      "runIndex": 2,
+      "enginePrompt": "Modify the project to add a Utils.java with a function greet(name) and use it in Main.java",
+      "initialFiles": {
+        "src/Main.java": "public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}"
+      },
+      "calls": [
+        {
+          "requestHash": "720d4441caf38ea977c388a727df96d22d275e6426d8b54676cd3ae4c587cd66",
+          "request": "[ChatMessage(role=System, content=You are a Security Engineering Agent mainly for writing secure code\n\nYour task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!\n\nIt's acceptable to add multiple *search/REPLACE* sections if you need to change multiple parts of the file.\nTo create a file: search must be empty and replace must contain the entire file content\nEach *search* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.\nDo not use a part of the line as *search* pattern. You must use full lines.\nInclude enough lines to make code inside *search* pattern uniquely identifiable. A *search* pattern that produces multiple matches in the source code will be rejected as an error.\nDo not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.\nDo not use git diff style (+ and - at the beginning of the line) for *search/REPLACE* blocks.\nDo not use line numbers in *search/REPLACE* blocks. Do not enclose the *search/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.\nDo not use the same value for *search* and *REPLACE* parameters, as this will make no changes.\n\nIf you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.), ChatMessage(role=User, content=Modify the project to add a Utils.java with a function greet(name) and use it in Main.java), ChatMessage(role=User, content=The following files are in the context:\n<<<FILE path=\"src/Main.java\">>>public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}<<<END FILE>>>\n)]",
+          "params": "GenerationParams(temperature=null, maxTokens=null)",
+          "response": "{\"edits\":[{\"filePath\":\"src/Utils.java\",\"search\":\"\",\"replace\":\"public class Utils {\\n\\n}\\n\"},{\"filePath\":\"src/Main.java\",\"search\":\"System\\\\.out\\\\.println\\\\(\\\"Hello\\\\\\\")\",\"replace\":\"System.out.println(\\\"Hello, \"}]}"
+        }
+      ]
+    },
+    {
+      "modelName": "ollama:llama3.2:latest",
+      "promptKind": "edit_project",
+      "runIndex": 3,
+      "enginePrompt": "Modify the project to add a Utils.java with a function greet(name) and use it in Main.java",
+      "initialFiles": {
+        "src/Main.java": "public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}"
+      },
+      "calls": [
+        {
+          "requestHash": "720d4441caf38ea977c388a727df96d22d275e6426d8b54676cd3ae4c587cd66",
+          "request": "[ChatMessage(role=System, content=You are a Security Engineering Agent mainly for writing secure code\n\nYour task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!\n\nIt's acceptable to add multiple *search/REPLACE* sections if you need to change multiple parts of the file.\nTo create a file: search must be empty and replace must contain the entire file content\nEach *search* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.\nDo not use a part of the line as *search* pattern. You must use full lines.\nInclude enough lines to make code inside *search* pattern uniquely identifiable. A *search* pattern that produces multiple matches in the source code will be rejected as an error.\nDo not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.\nDo not use git diff style (+ and - at the beginning of the line) for *search/REPLACE* blocks.\nDo not use line numbers in *search/REPLACE* blocks. Do not enclose the *search/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.\nDo not use the same value for *search* and *REPLACE* parameters, as this will make no changes.\n\nIf you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.), ChatMessage(role=User, content=Modify the project to add a Utils.java with a function greet(name) and use it in Main.java), ChatMessage(role=User, content=The following files are in the context:\n<<<FILE path=\"src/Main.java\">>>public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}<<<END FILE>>>\n)]",
+          "params": "GenerationParams(temperature=null, maxTokens=null)",
+          "response": "{\"edits\":[{\"filePath\":\"src/Utils.java\",\"search\":\"\",\"replace\":\"public class Utils {\\npublic static String greet(String name) {\\n    return \\\"Hello, \\\" + name + \\\"!\\\";\\n}\\n}\"},{\"filePath\":\"src/Main.java\",\"search\":\"public\\\\s+static\\\\s+void\\\\s+main\\\\(String\\\\s+\\\\[args\\\\]\\\\s+)\\\\s*\\\\{\\\\s*System\\\\.out\\\\.println\\\\(\\\"Hello\\\"\\\\);\\\\s*}\\\\s*;\",\"replace\":\"public class Main {\\npublic static void main(String[] args) {\\n    System.out.println(Utils.greet(args[0]));\\n}\\n}\"}]}"
+        }
+      ]
+    },
+    {
+      "modelName": "ollama:llama3.2:latest",
+      "promptKind": "edit_project",
+      "runIndex": 4,
+      "enginePrompt": "Modify the project to add a Utils.java with a function greet(name) and use it in Main.java",
+      "initialFiles": {
+        "src/Main.java": "public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}"
+      },
+      "calls": [
+        {
+          "requestHash": "720d4441caf38ea977c388a727df96d22d275e6426d8b54676cd3ae4c587cd66",
+          "request": "[ChatMessage(role=System, content=You are a Security Engineering Agent mainly for writing secure code\n\nYour task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!\n\nIt's acceptable to add multiple *search/REPLACE* sections if you need to change multiple parts of the file.\nTo create a file: search must be empty and replace must contain the entire file content\nEach *search* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.\nDo not use a part of the line as *search* pattern. You must use full lines.\nInclude enough lines to make code inside *search* pattern uniquely identifiable. A *search* pattern that produces multiple matches in the source code will be rejected as an error.\nDo not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.\nDo not use git diff style (+ and - at the beginning of the line) for *search/REPLACE* blocks.\nDo not use line numbers in *search/REPLACE* blocks. Do not enclose the *search/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.\nDo not use the same value for *search* and *REPLACE* parameters, as this will make no changes.\n\nIf you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.), ChatMessage(role=User, content=Modify the project to add a Utils.java with a function greet(name) and use it in Main.java), ChatMessage(role=User, content=The following files are in the context:\n<<<FILE path=\"src/Main.java\">>>public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}<<<END FILE>>>\n)]",
+          "params": "GenerationParams(temperature=null, maxTokens=null)",
+          "response": "{\"edits\":[{\"filePath\":\"src/Utils.java\",\"search\":\"\",\"replace\":\"public class Utils {\\n\\t\\n\\tpublic static String greet(String name) {\\n\\t\\treturn \\\"Hello, \\\\\\\" + name + \\\"!\\\\\\\"; \\n\\t}\\n}\"},{\"filePath\":\"src/Main.java\",\"search\":\"\",\"replace\":\"\"}]}"
+        }
+      ]
+    },
+    {
+      "modelName": "ollama:llama3.2:latest",
+      "promptKind": "edit_project",
+      "runIndex": 5,
+      "enginePrompt": "Modify the project to add a Utils.java with a function greet(name) and use it in Main.java",
+      "initialFiles": {
+        "src/Main.java": "public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}"
+      },
+      "calls": [
+        {
+          "requestHash": "720d4441caf38ea977c388a727df96d22d275e6426d8b54676cd3ae4c587cd66",
+          "request": "[ChatMessage(role=System, content=You are a Security Engineering Agent mainly for writing secure code\n\nYour task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!\n\nIt's acceptable to add multiple *search/REPLACE* sections if you need to change multiple parts of the file.\nTo create a file: search must be empty and replace must contain the entire file content\nEach *search* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.\nDo not use a part of the line as *search* pattern. You must use full lines.\nInclude enough lines to make code inside *search* pattern uniquely identifiable. A *search* pattern that produces multiple matches in the source code will be rejected as an error.\nDo not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.\nDo not use git diff style (+ and - at the beginning of the line) for *search/REPLACE* blocks.\nDo not use line numbers in *search/REPLACE* blocks. Do not enclose the *search/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.\nDo not use the same value for *search* and *REPLACE* parameters, as this will make no changes.\n\nIf you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.), ChatMessage(role=User, content=Modify the project to add a Utils.java with a function greet(name) and use it in Main.java), ChatMessage(role=User, content=The following files are in the context:\n<<<FILE path=\"src/Main.java\">>>public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}<<<END FILE>>>\n)]",
+          "params": "GenerationParams(temperature=null, maxTokens=null)",
+          "response": "{\"edits\":[{\"filePath\":\"src/Utils.java\",\"search\":\"\",\"replace\":\"public class Utils {\\n    public static String greet(String name) {\\n        return \\\"Hello, \\\" + name;\\n    }\\n}\\n\\n\"},{\"filePath\":\"src/Main.java\",\"search\":\"System\\\\.out\\\\..*print\\\\(.*?\\\\);\\\\s*\\\\{\",\"replace\":\"System.out.println(greet(\\\"Main\\\"));\\\\n}\"}]}"
+        }
+      ]
+    },
+    {
+      "modelName": "ollama:llama3.2:latest",
+      "promptKind": "edit_project",
+      "runIndex": 6,
+      "enginePrompt": "Modify the project to add a Utils.java with a function greet(name) and use it in Main.java",
+      "initialFiles": {
+        "src/Main.java": "public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}"
+      },
+      "calls": [
+        {
+          "requestHash": "720d4441caf38ea977c388a727df96d22d275e6426d8b54676cd3ae4c587cd66",
+          "request": "[ChatMessage(role=System, content=You are a Security Engineering Agent mainly for writing secure code\n\nYour task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!\n\nIt's acceptable to add multiple *search/REPLACE* sections if you need to change multiple parts of the file.\nTo create a file: search must be empty and replace must contain the entire file content\nEach *search* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.\nDo not use a part of the line as *search* pattern. You must use full lines.\nInclude enough lines to make code inside *search* pattern uniquely identifiable. A *search* pattern that produces multiple matches in the source code will be rejected as an error.\nDo not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.\nDo not use git diff style (+ and - at the beginning of the line) for *search/REPLACE* blocks.\nDo not use line numbers in *search/REPLACE* blocks. Do not enclose the *search/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.\nDo not use the same value for *search* and *REPLACE* parameters, as this will make no changes.\n\nIf you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.), ChatMessage(role=User, content=Modify the project to add a Utils.java with a function greet(name) and use it in Main.java), ChatMessage(role=User, content=The following files are in the context:\n<<<FILE path=\"src/Main.java\">>>public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}<<<END FILE>>>\n)]",
+          "params": "GenerationParams(temperature=null, maxTokens=null)",
+          "response": "{\"edits\":[{\"filePath\":\"src/Utils.java\",\"search\":\"\",\"replace\":\"public class Utils {\\n\"}]}"
+        }
+      ]
+    },
+    {
+      "modelName": "ollama:llama3.2:latest",
+      "promptKind": "edit_project",
+      "runIndex": 7,
+      "enginePrompt": "Modify the project to add a Utils.java with a function greet(name) and use it in Main.java",
+      "initialFiles": {
+        "src/Main.java": "public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}"
+      },
+      "calls": [
+        {
+          "requestHash": "720d4441caf38ea977c388a727df96d22d275e6426d8b54676cd3ae4c587cd66",
+          "request": "[ChatMessage(role=System, content=You are a Security Engineering Agent mainly for writing secure code\n\nYour task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!\n\nIt's acceptable to add multiple *search/REPLACE* sections if you need to change multiple parts of the file.\nTo create a file: search must be empty and replace must contain the entire file content\nEach *search* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.\nDo not use a part of the line as *search* pattern. You must use full lines.\nInclude enough lines to make code inside *search* pattern uniquely identifiable. A *search* pattern that produces multiple matches in the source code will be rejected as an error.\nDo not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.\nDo not use git diff style (+ and - at the beginning of the line) for *search/REPLACE* blocks.\nDo not use line numbers in *search/REPLACE* blocks. Do not enclose the *search/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.\nDo not use the same value for *search* and *REPLACE* parameters, as this will make no changes.\n\nIf you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.), ChatMessage(role=User, content=Modify the project to add a Utils.java with a function greet(name) and use it in Main.java), ChatMessage(role=User, content=The following files are in the context:\n<<<FILE path=\"src/Main.java\">>>public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}<<<END FILE>>>\n)]",
+          "params": "GenerationParams(temperature=null, maxTokens=null)",
+          "response": "{\"edits\":[{\"filePath\":\"src/Utils.java\",\"search\":\"\",\"replace\":\"public class Utils {\\n\"},{\"filePath\":\"src/Main.java\",\"search\":\"\",\"replace\":\"import org.example.Utils;\\n\\n\"},{\"filePath\":\"src/Main.java\",\"search\":\"System\\\\.out\\\\.println\\\\(\\\"Hello\\\\\\\")\",\"replace\":\"Utils\\\\.greet(\\\"World\\\")\"}]}"
+        }
+      ]
+    },
+    {
+      "modelName": "ollama:llama3.2:latest",
+      "promptKind": "edit_project",
+      "runIndex": 8,
+      "enginePrompt": "Modify the project to add a Utils.java with a function greet(name) and use it in Main.java",
+      "initialFiles": {
+        "src/Main.java": "public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}"
+      },
+      "calls": [
+        {
+          "requestHash": "720d4441caf38ea977c388a727df96d22d275e6426d8b54676cd3ae4c587cd66",
+          "request": "[ChatMessage(role=System, content=You are a Security Engineering Agent mainly for writing secure code\n\nYour task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!\n\nIt's acceptable to add multiple *search/REPLACE* sections if you need to change multiple parts of the file.\nTo create a file: search must be empty and replace must contain the entire file content\nEach *search* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.\nDo not use a part of the line as *search* pattern. You must use full lines.\nInclude enough lines to make code inside *search* pattern uniquely identifiable. A *search* pattern that produces multiple matches in the source code will be rejected as an error.\nDo not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.\nDo not use git diff style (+ and - at the beginning of the line) for *search/REPLACE* blocks.\nDo not use line numbers in *search/REPLACE* blocks. Do not enclose the *search/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.\nDo not use the same value for *search* and *REPLACE* parameters, as this will make no changes.\n\nIf you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.), ChatMessage(role=User, content=Modify the project to add a Utils.java with a function greet(name) and use it in Main.java), ChatMessage(role=User, content=The following files are in the context:\n<<<FILE path=\"src/Main.java\">>>public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}<<<END FILE>>>\n)]",
+          "params": "GenerationParams(temperature=null, maxTokens=null)",
+          "response": "{\"edits\":[{\"filePath\":\"src/Utils.java\",\"search\":\"\",\"replace\":\"import java.util.function Consumable;\\n\\npublic class Utils {\\n    public static void greet(String name) {\\n        System.out.println(\\\"Hello, \\\\\\\"+name\\\\'\\\");\\n    }\\n}\\n\"},{\"filePath\":\"src/Main.java\",\"search\":\"\",\"replace\":\"import java.util.function Consumable;\\n\\npublic class Main {\\n    public static void main(String[] args) {\\n        Utils.greet(\\\"World\\\");\\n        System.out.println(\\\"Hello\\\");\\n    }\\n}\"}]}"
+        }
+      ]
+    },
+    {
+      "modelName": "ollama:llama3.2:latest",
+      "promptKind": "edit_project",
+      "runIndex": 9,
+      "enginePrompt": "Modify the project to add a Utils.java with a function greet(name) and use it in Main.java",
+      "initialFiles": {
+        "src/Main.java": "public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}"
+      },
+      "calls": [
+        {
+          "requestHash": "720d4441caf38ea977c388a727df96d22d275e6426d8b54676cd3ae4c587cd66",
+          "request": "[ChatMessage(role=System, content=You are a Security Engineering Agent mainly for writing secure code\n\nYour task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!\n\nIt's acceptable to add multiple *search/REPLACE* sections if you need to change multiple parts of the file.\nTo create a file: search must be empty and replace must contain the entire file content\nEach *search* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.\nDo not use a part of the line as *search* pattern. You must use full lines.\nInclude enough lines to make code inside *search* pattern uniquely identifiable. A *search* pattern that produces multiple matches in the source code will be rejected as an error.\nDo not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.\nDo not use git diff style (+ and - at the beginning of the line) for *search/REPLACE* blocks.\nDo not use line numbers in *search/REPLACE* blocks. Do not enclose the *search/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.\nDo not use the same value for *search* and *REPLACE* parameters, as this will make no changes.\n\nIf you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.), ChatMessage(role=User, content=Modify the project to add a Utils.java with a function greet(name) and use it in Main.java), ChatMessage(role=User, content=The following files are in the context:\n<<<FILE path=\"src/Main.java\">>>public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}<<<END FILE>>>\n)]",
+          "params": "GenerationParams(temperature=null, maxTokens=null)",
+          "response": "{\"edits\":[{\"filePath\":\"src/Utils.java\",\"search\":\"\",\"replace\":\"public class Utils {\\npublic static String greet(String name) {\\n    return \\\"Hello, \\\" + name + \\\"!\\\";\\n}\\n}\"},{\"filePath\":\"src/Main.java\",\"search\":\"\\\\s*public\\\\s*static\\\\s*v\\\\s*main\\\\s*(\\\\(\\\\s*[\\\\s\\\\S]*\\\\)\\\\s*)\\\\s*\\\\{\",\"replace\":\"public class Main {\\n    public static void main(String[] args) {\\n        System.out.println(Utils.greet(args[0]));\\n    }\\n}\"}]}"
+        }
+      ]
+    },
+    {
+      "modelName": "ollama:llama3.2:latest",
+      "promptKind": "edit_project",
+      "runIndex": 10,
+      "enginePrompt": "Modify the project to add a Utils.java with a function greet(name) and use it in Main.java",
+      "initialFiles": {
+        "src/Main.java": "public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}"
+      },
+      "calls": [
+        {
+          "requestHash": "720d4441caf38ea977c388a727df96d22d275e6426d8b54676cd3ae4c587cd66",
+          "request": "[ChatMessage(role=System, content=You are a Security Engineering Agent mainly for writing secure code\n\nYour task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!\n\nIt's acceptable to add multiple *search/REPLACE* sections if you need to change multiple parts of the file.\nTo create a file: search must be empty and replace must contain the entire file content\nEach *search* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.\nDo not use a part of the line as *search* pattern. You must use full lines.\nInclude enough lines to make code inside *search* pattern uniquely identifiable. A *search* pattern that produces multiple matches in the source code will be rejected as an error.\nDo not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.\nDo not use git diff style (+ and - at the beginning of the line) for *search/REPLACE* blocks.\nDo not use line numbers in *search/REPLACE* blocks. Do not enclose the *search/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.\nDo not use the same value for *search* and *REPLACE* parameters, as this will make no changes.\n\nIf you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.), ChatMessage(role=User, content=Modify the project to add a Utils.java with a function greet(name) and use it in Main.java), ChatMessage(role=User, content=The following files are in the context:\n<<<FILE path=\"src/Main.java\">>>public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}<<<END FILE>>>\n)]",
+          "params": "GenerationParams(temperature=null, maxTokens=null)",
+          "response": "{\"edits\":[{\"filePath\":\"src/Utils.java\",\"search\":\"\",\"replace\":\"public class Utils {\\npublic static String greet(String name) {\\nreturn \\\"Hello, \\\\\\\" + name + '\\\\\\\"';\\n}\\n}\"},{\"filePath\":\"src/Main.java\",\"search\":\"System\\\\.out\\\\.println\\\\(\\\"(.*?)\\\\\\\")\",\"replace\":\"System.out.println(Utils.greet($1));\"}]}"
+        }
+      ]
+    },
+    {
+      "modelName": "ollama:llama3.2:latest",
+      "promptKind": "edit_project",
+      "runIndex": 11,
+      "enginePrompt": "Modify the project to add a Utils.java with a function greet(name) and use it in Main.java",
+      "initialFiles": {
+        "src/Main.java": "public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}"
+      },
+      "calls": [
+        {
+          "requestHash": "720d4441caf38ea977c388a727df96d22d275e6426d8b54676cd3ae4c587cd66",
+          "request": "[ChatMessage(role=System, content=You are a Security Engineering Agent mainly for writing secure code\n\nYour task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!\n\nIt's acceptable to add multiple *search/REPLACE* sections if you need to change multiple parts of the file.\nTo create a file: search must be empty and replace must contain the entire file content\nEach *search* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.\nDo not use a part of the line as *search* pattern. You must use full lines.\nInclude enough lines to make code inside *search* pattern uniquely identifiable. A *search* pattern that produces multiple matches in the source code will be rejected as an error.\nDo not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.\nDo not use git diff style (+ and - at the beginning of the line) for *search/REPLACE* blocks.\nDo not use line numbers in *search/REPLACE* blocks. Do not enclose the *search/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.\nDo not use the same value for *search* and *REPLACE* parameters, as this will make no changes.\n\nIf you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.), ChatMessage(role=User, content=Modify the project to add a Utils.java with a function greet(name) and use it in Main.java), ChatMessage(role=User, content=The following files are in the context:\n<<<FILE path=\"src/Main.java\">>>public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}<<<END FILE>>>\n)]",
+          "params": "GenerationParams(temperature=null, maxTokens=null)",
+          "response": "{\"edits\":[{\"filePath\":\"src/Main.java\",\"search\":\"\",\"replace\":\"#import java.util.functionConsumer;\\n\\npublic class Main {\\n    public static void main(String[] args) {\\n        System.out.println(\\\"Hello\\\");\\n    }\\n}\\n\"},{\"filePath\":\"src/Utils.java\",\"search\":\"\",\"replace\":\"import java.util.functionConsumer;\\n\\npublic class Utils {\\n    public static void greet(String name) {\\n        System.out.println(\\\"Hello, \\\"+name+\\\"!\\\");\\n    }\\n}\"}]}"
+        }
+      ]
+    },
+    {
+      "modelName": "ollama:llama3.2:latest",
+      "promptKind": "edit_project",
+      "runIndex": 12,
+      "enginePrompt": "Modify the project to add a Utils.java with a function greet(name) and use it in Main.java",
+      "initialFiles": {
+        "src/Main.java": "public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}"
+      },
+      "calls": [
+        {
+          "requestHash": "720d4441caf38ea977c388a727df96d22d275e6426d8b54676cd3ae4c587cd66",
+          "request": "[ChatMessage(role=System, content=You are a Security Engineering Agent mainly for writing secure code\n\nYour task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!\n\nIt's acceptable to add multiple *search/REPLACE* sections if you need to change multiple parts of the file.\nTo create a file: search must be empty and replace must contain the entire file content\nEach *search* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.\nDo not use a part of the line as *search* pattern. You must use full lines.\nInclude enough lines to make code inside *search* pattern uniquely identifiable. A *search* pattern that produces multiple matches in the source code will be rejected as an error.\nDo not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.\nDo not use git diff style (+ and - at the beginning of the line) for *search/REPLACE* blocks.\nDo not use line numbers in *search/REPLACE* blocks. Do not enclose the *search/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.\nDo not use the same value for *search* and *REPLACE* parameters, as this will make no changes.\n\nIf you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.), ChatMessage(role=User, content=Modify the project to add a Utils.java with a function greet(name) and use it in Main.java), ChatMessage(role=User, content=The following files are in the context:\n<<<FILE path=\"src/Main.java\">>>public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}<<<END FILE>>>\n)]",
+          "params": "GenerationParams(temperature=null, maxTokens=null)",
+          "response": "{\"edits\":[{\"filePath\":\"src/Utils.java\",\"search\":\"\",\"replace\":\"public class Utils {\\n\\n    public static void main(String[] args) {\\n        System.out.println(\\\"Hello\\\");\\n    }\\n}\"},{\"filePath\":\"src/Main.java\",\"search\":\"public class Main {.*}.*public static void main\\\\(String\\\\[.*\\\\]\\\\)\",\"replace\":\"public class Main {\\n\\n    public static void main(String[] args) {\\n        System.out.println(\\\"Hello, how are you?\\\");\\n        Utils.greet(\\\"John\\\");\\n    }\\n}\"}]}"
+        }
+      ]
+    },
+    {
+      "modelName": "ollama:llama3.2:latest",
+      "promptKind": "edit_project",
+      "runIndex": 13,
+      "enginePrompt": "Modify the project to add a Utils.java with a function greet(name) and use it in Main.java",
+      "initialFiles": {
+        "src/Main.java": "public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}"
+      },
+      "calls": [
+        {
+          "requestHash": "720d4441caf38ea977c388a727df96d22d275e6426d8b54676cd3ae4c587cd66",
+          "request": "[ChatMessage(role=System, content=You are a Security Engineering Agent mainly for writing secure code\n\nYour task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!\n\nIt's acceptable to add multiple *search/REPLACE* sections if you need to change multiple parts of the file.\nTo create a file: search must be empty and replace must contain the entire file content\nEach *search* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.\nDo not use a part of the line as *search* pattern. You must use full lines.\nInclude enough lines to make code inside *search* pattern uniquely identifiable. A *search* pattern that produces multiple matches in the source code will be rejected as an error.\nDo not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.\nDo not use git diff style (+ and - at the beginning of the line) for *search/REPLACE* blocks.\nDo not use line numbers in *search/REPLACE* blocks. Do not enclose the *search/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.\nDo not use the same value for *search* and *REPLACE* parameters, as this will make no changes.\n\nIf you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.), ChatMessage(role=User, content=Modify the project to add a Utils.java with a function greet(name) and use it in Main.java), ChatMessage(role=User, content=The following files are in the context:\n<<<FILE path=\"src/Main.java\">>>public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}<<<END FILE>>>\n)]",
+          "params": "GenerationParams(temperature=null, maxTokens=null)",
+          "response": "{\"edits\":[{\"filePath\":\"src/Main.java\",\"search\":\"\",\"replace\":\"import com.example.Utils;\\n\\npublic class Main {\\n    public static void main(String[] args) {\\n        System.out.println(\\\"Hello\\\");\\n    }\\n}\\n\"},{\"filePath\":\"src/Utils.java\",\"search\":\"\",\"replace\":\"public class Utils {\\n    public static String greet(String name) {\\n        return \\\"Hello, \\\" + name;\\n    }\\n}\"}]}"
+        }
+      ]
+    },
+    {
+      "modelName": "ollama:llama3.2:latest",
+      "promptKind": "edit_project",
+      "runIndex": 14,
+      "enginePrompt": "Modify the project to add a Utils.java with a function greet(name) and use it in Main.java",
+      "initialFiles": {
+        "src/Main.java": "public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}"
+      },
+      "calls": [
+        {
+          "requestHash": "720d4441caf38ea977c388a727df96d22d275e6426d8b54676cd3ae4c587cd66",
+          "request": "[ChatMessage(role=System, content=You are a Security Engineering Agent mainly for writing secure code\n\nYour task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!\n\nIt's acceptable to add multiple *search/REPLACE* sections if you need to change multiple parts of the file.\nTo create a file: search must be empty and replace must contain the entire file content\nEach *search* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.\nDo not use a part of the line as *search* pattern. You must use full lines.\nInclude enough lines to make code inside *search* pattern uniquely identifiable. A *search* pattern that produces multiple matches in the source code will be rejected as an error.\nDo not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.\nDo not use git diff style (+ and - at the beginning of the line) for *search/REPLACE* blocks.\nDo not use line numbers in *search/REPLACE* blocks. Do not enclose the *search/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.\nDo not use the same value for *search* and *REPLACE* parameters, as this will make no changes.\n\nIf you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.), ChatMessage(role=User, content=Modify the project to add a Utils.java with a function greet(name) and use it in Main.java), ChatMessage(role=User, content=The following files are in the context:\n<<<FILE path=\"src/Main.java\">>>public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}<<<END FILE>>>\n)]",
+          "params": "GenerationParams(temperature=null, maxTokens=null)",
+          "response": "{\"edits\":[{\"filePath\":\"src/Utils.java\",\"search\":\"\",\"replace\":\"public class Utils {\\n\\t\\n\\tpublic static void main(String[] args) {\\n\\tSystem.out.println(\\\"Hello\\\");\\n\\t}\\n}\"},{\"filePath\":\"src/Main.java\",\"search\":\"public class Main\",\"replace\":\"import com.example.Utils;\\n\\npublic class Main {\\n\\tpublic static void main(String[] args) {\\n\\t\\tUtils.greet(\\\"World\\\");\\n\\t}\\n}\"}]}"
+        }
+      ]
+    },
+    {
+      "modelName": "ollama:gpt-oss:20b",
+      "promptKind": "create_project",
+      "runIndex": 0,
+      "enginePrompt": "Create a minimal Hello World project with one file Main.java printing Hello",
+      "initialFiles": {},
+      "calls": [
+        {
+          "requestHash": "4508dfa643243496f170abe59fee1b9679a7ad1ad6d5d4efd62a0429a56b861b",
+          "request": "[ChatMessage(role=System, content=You are a Security Engineering Agent mainly for writing secure code\n\nYour task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!\n\nIt's acceptable to add multiple *search/REPLACE* sections if you need to change multiple parts of the file.\nTo create a file: search must be empty and replace must contain the entire file content\nEach *search* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.\nDo not use a part of the line as *search* pattern. You must use full lines.\nInclude enough lines to make code inside *search* pattern uniquely identifiable. A *search* pattern that produces multiple matches in the source code will be rejected as an error.\nDo not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.\nDo not use git diff style (+ and - at the beginning of the line) for *search/REPLACE* blocks.\nDo not use line numbers in *search/REPLACE* blocks. Do not enclose the *search/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.\nDo not use the same value for *search* and *REPLACE* parameters, as this will make no changes.\n\nIf you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.), ChatMessage(role=User, content=Create a minimal Hello World project with one file Main.java printing Hello), ChatMessage(role=User, content=You have no files in the context.\nIf you saw files they are only part of the prompt and dont exists yet!\nYou may create new files (keep in mind that searched text needs to be empty in this case!)\n)]",
+          "params": "GenerationParams(temperature=null, maxTokens=null)",
+          "response": "{\"edits\":[{\"filePath\":\"Main.java\",\"search\":\"\",\"replace\":\"public class Main {\\n    public static void main(String[] args) {\\n        System.out.println(\\\"Hello\\\");\\n    }\\n}\"}]}"
+        }
+      ]
+    },
+    {
+      "modelName": "ollama:gpt-oss:20b",
+      "promptKind": "create_project",
+      "runIndex": 1,
+      "enginePrompt": "Create a minimal Hello World project with one file Main.java printing Hello",
+      "initialFiles": {},
+      "calls": [
+        {
+          "requestHash": "4508dfa643243496f170abe59fee1b9679a7ad1ad6d5d4efd62a0429a56b861b",
+          "request": "[ChatMessage(role=System, content=You are a Security Engineering Agent mainly for writing secure code\n\nYour task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!\n\nIt's acceptable to add multiple *search/REPLACE* sections if you need to change multiple parts of the file.\nTo create a file: search must be empty and replace must contain the entire file content\nEach *search* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.\nDo not use a part of the line as *search* pattern. You must use full lines.\nInclude enough lines to make code inside *search* pattern uniquely identifiable. A *search* pattern that produces multiple matches in the source code will be rejected as an error.\nDo not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.\nDo not use git diff style (+ and - at the beginning of the line) for *search/REPLACE* blocks.\nDo not use line numbers in *search/REPLACE* blocks. Do not enclose the *search/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.\nDo not use the same value for *search* and *REPLACE* parameters, as this will make no changes.\n\nIf you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.), ChatMessage(role=User, content=Create a minimal Hello World project with one file Main.java printing Hello), ChatMessage(role=User, content=You have no files in the context.\nIf you saw files they are only part of the prompt and dont exists yet!\nYou may create new files (keep in mind that searched text needs to be empty in this case!)\n)]",
+          "params": "GenerationParams(temperature=null, maxTokens=null)",
+          "response": "{\"edits\":[{\"filePath\":\"Main.java\",\"search\":\"\",\"replace\":\"public class Main {\\n    public static void main(String[] args) {\\n        System.out.println(\\\"Hello\\\");\\n    }\\n}\"}]}"
+        }
+      ]
+    },
+    {
+      "modelName": "ollama:gpt-oss:20b",
+      "promptKind": "create_project",
+      "runIndex": 2,
+      "enginePrompt": "Create a minimal Hello World project with one file Main.java printing Hello",
+      "initialFiles": {},
+      "calls": [
+        {
+          "requestHash": "4508dfa643243496f170abe59fee1b9679a7ad1ad6d5d4efd62a0429a56b861b",
+          "request": "[ChatMessage(role=System, content=You are a Security Engineering Agent mainly for writing secure code\n\nYour task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!\n\nIt's acceptable to add multiple *search/REPLACE* sections if you need to change multiple parts of the file.\nTo create a file: search must be empty and replace must contain the entire file content\nEach *search* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.\nDo not use a part of the line as *search* pattern. You must use full lines.\nInclude enough lines to make code inside *search* pattern uniquely identifiable. A *search* pattern that produces multiple matches in the source code will be rejected as an error.\nDo not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.\nDo not use git diff style (+ and - at the beginning of the line) for *search/REPLACE* blocks.\nDo not use line numbers in *search/REPLACE* blocks. Do not enclose the *search/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.\nDo not use the same value for *search* and *REPLACE* parameters, as this will make no changes.\n\nIf you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.), ChatMessage(role=User, content=Create a minimal Hello World project with one file Main.java printing Hello), ChatMessage(role=User, content=You have no files in the context.\nIf you saw files they are only part of the prompt and dont exists yet!\nYou may create new files (keep in mind that searched text needs to be empty in this case!)\n)]",
+          "params": "GenerationParams(temperature=null, maxTokens=null)",
+          "response": "{\"edits\":[{\"filePath\":\"Main.java\",\"search\":\"\",\"replace\":\"public class Main {\\n    public static void main(String[] args) {\\n        System.out.println(\\\"Hello\\\");\\n    }\\n}\"}]}"
+        }
+      ]
+    },
+    {
+      "modelName": "ollama:gpt-oss:20b",
+      "promptKind": "create_project",
+      "runIndex": 3,
+      "enginePrompt": "Create a minimal Hello World project with one file Main.java printing Hello",
+      "initialFiles": {},
+      "calls": [
+        {
+          "requestHash": "4508dfa643243496f170abe59fee1b9679a7ad1ad6d5d4efd62a0429a56b861b",
+          "request": "[ChatMessage(role=System, content=You are a Security Engineering Agent mainly for writing secure code\n\nYour task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!\n\nIt's acceptable to add multiple *search/REPLACE* sections if you need to change multiple parts of the file.\nTo create a file: search must be empty and replace must contain the entire file content\nEach *search* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.\nDo not use a part of the line as *search* pattern. You must use full lines.\nInclude enough lines to make code inside *search* pattern uniquely identifiable. A *search* pattern that produces multiple matches in the source code will be rejected as an error.\nDo not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.\nDo not use git diff style (+ and - at the beginning of the line) for *search/REPLACE* blocks.\nDo not use line numbers in *search/REPLACE* blocks. Do not enclose the *search/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.\nDo not use the same value for *search* and *REPLACE* parameters, as this will make no changes.\n\nIf you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.), ChatMessage(role=User, content=Create a minimal Hello World project with one file Main.java printing Hello), ChatMessage(role=User, content=You have no files in the context.\nIf you saw files they are only part of the prompt and dont exists yet!\nYou may create new files (keep in mind that searched text needs to be empty in this case!)\n)]",
+          "params": "GenerationParams(temperature=null, maxTokens=null)",
+          "response": "{\"edits\":[{\"filePath\":\"Main.java\",\"search\":\"\",\"replace\":\"public class Main {\\n    public static void main(String[] args) {\\n        System.out.println(\\\"Hello\\\");\\n    }\\n}\\n\"}]}"
+        }
+      ]
+    },
+    {
+      "modelName": "ollama:gpt-oss:20b",
+      "promptKind": "create_project",
+      "runIndex": 4,
+      "enginePrompt": "Create a minimal Hello World project with one file Main.java printing Hello",
+      "initialFiles": {},
+      "calls": [
+        {
+          "requestHash": "4508dfa643243496f170abe59fee1b9679a7ad1ad6d5d4efd62a0429a56b861b",
+          "request": "[ChatMessage(role=System, content=You are a Security Engineering Agent mainly for writing secure code\n\nYour task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!\n\nIt's acceptable to add multiple *search/REPLACE* sections if you need to change multiple parts of the file.\nTo create a file: search must be empty and replace must contain the entire file content\nEach *search* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.\nDo not use a part of the line as *search* pattern. You must use full lines.\nInclude enough lines to make code inside *search* pattern uniquely identifiable. A *search* pattern that produces multiple matches in the source code will be rejected as an error.\nDo not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.\nDo not use git diff style (+ and - at the beginning of the line) for *search/REPLACE* blocks.\nDo not use line numbers in *search/REPLACE* blocks. Do not enclose the *search/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.\nDo not use the same value for *search* and *REPLACE* parameters, as this will make no changes.\n\nIf you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.), ChatMessage(role=User, content=Create a minimal Hello World project with one file Main.java printing Hello), ChatMessage(role=User, content=You have no files in the context.\nIf you saw files they are only part of the prompt and dont exists yet!\nYou may create new files (keep in mind that searched text needs to be empty in this case!)\n)]",
+          "params": "GenerationParams(temperature=null, maxTokens=null)",
+          "response": "{\"edits\":[{\"filePath\":\"Main.java\",\"search\":\"\",\"replace\":\"public class Main {\\n    public static void main(String[] args) {\\n        System.out.println(\\\"Hello\\\");\\n    }\\n}\"}]}"
+        }
+      ]
+    },
+    {
+      "modelName": "ollama:gpt-oss:20b",
+      "promptKind": "create_project",
+      "runIndex": 5,
+      "enginePrompt": "Create a minimal Hello World project with one file Main.java printing Hello",
+      "initialFiles": {},
+      "calls": [
+        {
+          "requestHash": "4508dfa643243496f170abe59fee1b9679a7ad1ad6d5d4efd62a0429a56b861b",
+          "request": "[ChatMessage(role=System, content=You are a Security Engineering Agent mainly for writing secure code\n\nYour task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!\n\nIt's acceptable to add multiple *search/REPLACE* sections if you need to change multiple parts of the file.\nTo create a file: search must be empty and replace must contain the entire file content\nEach *search* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.\nDo not use a part of the line as *search* pattern. You must use full lines.\nInclude enough lines to make code inside *search* pattern uniquely identifiable. A *search* pattern that produces multiple matches in the source code will be rejected as an error.\nDo not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.\nDo not use git diff style (+ and - at the beginning of the line) for *search/REPLACE* blocks.\nDo not use line numbers in *search/REPLACE* blocks. Do not enclose the *search/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.\nDo not use the same value for *search* and *REPLACE* parameters, as this will make no changes.\n\nIf you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.), ChatMessage(role=User, content=Create a minimal Hello World project with one file Main.java printing Hello), ChatMessage(role=User, content=You have no files in the context.\nIf you saw files they are only part of the prompt and dont exists yet!\nYou may create new files (keep in mind that searched text needs to be empty in this case!)\n)]",
+          "params": "GenerationParams(temperature=null, maxTokens=null)",
+          "response": "{\"edits\":[{\"filePath\":\"Main.java\",\"search\":\"\",\"replace\":\"public class Main {\\n    public static void main(String[] args) {\\n        System.out.println(\\\"Hello\\\");\\n    }\\n}\"}]}"
+        }
+      ]
+    },
+    {
+      "modelName": "ollama:gpt-oss:20b",
+      "promptKind": "create_project",
+      "runIndex": 6,
+      "enginePrompt": "Create a minimal Hello World project with one file Main.java printing Hello",
+      "initialFiles": {},
+      "calls": [
+        {
+          "requestHash": "4508dfa643243496f170abe59fee1b9679a7ad1ad6d5d4efd62a0429a56b861b",
+          "request": "[ChatMessage(role=System, content=You are a Security Engineering Agent mainly for writing secure code\n\nYour task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!\n\nIt's acceptable to add multiple *search/REPLACE* sections if you need to change multiple parts of the file.\nTo create a file: search must be empty and replace must contain the entire file content\nEach *search* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.\nDo not use a part of the line as *search* pattern. You must use full lines.\nInclude enough lines to make code inside *search* pattern uniquely identifiable. A *search* pattern that produces multiple matches in the source code will be rejected as an error.\nDo not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.\nDo not use git diff style (+ and - at the beginning of the line) for *search/REPLACE* blocks.\nDo not use line numbers in *search/REPLACE* blocks. Do not enclose the *search/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.\nDo not use the same value for *search* and *REPLACE* parameters, as this will make no changes.\n\nIf you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.), ChatMessage(role=User, content=Create a minimal Hello World project with one file Main.java printing Hello), ChatMessage(role=User, content=You have no files in the context.\nIf you saw files they are only part of the prompt and dont exists yet!\nYou may create new files (keep in mind that searched text needs to be empty in this case!)\n)]",
+          "params": "GenerationParams(temperature=null, maxTokens=null)",
+          "response": "{\"edits\":[{\"filePath\":\"Main.java\",\"search\":\"\",\"replace\":\"public class Main {\\n    public static void main(String[] args) {\\n        System.out.println(\\\"Hello\\\");\\n    }\\n}\"}]}"
+        }
+      ]
+    },
+    {
+      "modelName": "ollama:gpt-oss:20b",
+      "promptKind": "create_project",
+      "runIndex": 7,
+      "enginePrompt": "Create a minimal Hello World project with one file Main.java printing Hello",
+      "initialFiles": {},
+      "calls": [
+        {
+          "requestHash": "4508dfa643243496f170abe59fee1b9679a7ad1ad6d5d4efd62a0429a56b861b",
+          "request": "[ChatMessage(role=System, content=You are a Security Engineering Agent mainly for writing secure code\n\nYour task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!\n\nIt's acceptable to add multiple *search/REPLACE* sections if you need to change multiple parts of the file.\nTo create a file: search must be empty and replace must contain the entire file content\nEach *search* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.\nDo not use a part of the line as *search* pattern. You must use full lines.\nInclude enough lines to make code inside *search* pattern uniquely identifiable. A *search* pattern that produces multiple matches in the source code will be rejected as an error.\nDo not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.\nDo not use git diff style (+ and - at the beginning of the line) for *search/REPLACE* blocks.\nDo not use line numbers in *search/REPLACE* blocks. Do not enclose the *search/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.\nDo not use the same value for *search* and *REPLACE* parameters, as this will make no changes.\n\nIf you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.), ChatMessage(role=User, content=Create a minimal Hello World project with one file Main.java printing Hello), ChatMessage(role=User, content=You have no files in the context.\nIf you saw files they are only part of the prompt and dont exists yet!\nYou may create new files (keep in mind that searched text needs to be empty in this case!)\n)]",
+          "params": "GenerationParams(temperature=null, maxTokens=null)",
+          "response": "{\"edits\":[{\"filePath\":\"Main.java\",\"search\":\"\",\"replace\":\"public class Main {\\n    public static void main(String[] args) {\\n        System.out.println(\\\"Hello\\\");\\n    }\\n}\\n\"}]}"
+        }
+      ]
+    },
+    {
+      "modelName": "ollama:gpt-oss:20b",
+      "promptKind": "create_project",
+      "runIndex": 8,
+      "enginePrompt": "Create a minimal Hello World project with one file Main.java printing Hello",
+      "initialFiles": {},
+      "calls": [
+        {
+          "requestHash": "4508dfa643243496f170abe59fee1b9679a7ad1ad6d5d4efd62a0429a56b861b",
+          "request": "[ChatMessage(role=System, content=You are a Security Engineering Agent mainly for writing secure code\n\nYour task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!\n\nIt's acceptable to add multiple *search/REPLACE* sections if you need to change multiple parts of the file.\nTo create a file: search must be empty and replace must contain the entire file content\nEach *search* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.\nDo not use a part of the line as *search* pattern. You must use full lines.\nInclude enough lines to make code inside *search* pattern uniquely identifiable. A *search* pattern that produces multiple matches in the source code will be rejected as an error.\nDo not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.\nDo not use git diff style (+ and - at the beginning of the line) for *search/REPLACE* blocks.\nDo not use line numbers in *search/REPLACE* blocks. Do not enclose the *search/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.\nDo not use the same value for *search* and *REPLACE* parameters, as this will make no changes.\n\nIf you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.), ChatMessage(role=User, content=Create a minimal Hello World project with one file Main.java printing Hello), ChatMessage(role=User, content=You have no files in the context.\nIf you saw files they are only part of the prompt and dont exists yet!\nYou may create new files (keep in mind that searched text needs to be empty in this case!)\n)]",
+          "params": "GenerationParams(temperature=null, maxTokens=null)",
+          "response": "{\"edits\":[{\"filePath\":\"Main.java\",\"search\":\"\",\"replace\":\"public class Main {\\n    public static void main(String[] args) {\\n        System.out.println(\\\"Hello\\\");\\n    }\\n}\"}]}"
+        }
+      ]
+    },
+    {
+      "modelName": "ollama:gpt-oss:20b",
+      "promptKind": "create_project",
+      "runIndex": 9,
+      "enginePrompt": "Create a minimal Hello World project with one file Main.java printing Hello",
+      "initialFiles": {},
+      "calls": [
+        {
+          "requestHash": "4508dfa643243496f170abe59fee1b9679a7ad1ad6d5d4efd62a0429a56b861b",
+          "request": "[ChatMessage(role=System, content=You are a Security Engineering Agent mainly for writing secure code\n\nYour task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!\n\nIt's acceptable to add multiple *search/REPLACE* sections if you need to change multiple parts of the file.\nTo create a file: search must be empty and replace must contain the entire file content\nEach *search* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.\nDo not use a part of the line as *search* pattern. You must use full lines.\nInclude enough lines to make code inside *search* pattern uniquely identifiable. A *search* pattern that produces multiple matches in the source code will be rejected as an error.\nDo not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.\nDo not use git diff style (+ and - at the beginning of the line) for *search/REPLACE* blocks.\nDo not use line numbers in *search/REPLACE* blocks. Do not enclose the *search/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.\nDo not use the same value for *search* and *REPLACE* parameters, as this will make no changes.\n\nIf you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.), ChatMessage(role=User, content=Create a minimal Hello World project with one file Main.java printing Hello), ChatMessage(role=User, content=You have no files in the context.\nIf you saw files they are only part of the prompt and dont exists yet!\nYou may create new files (keep in mind that searched text needs to be empty in this case!)\n)]",
+          "params": "GenerationParams(temperature=null, maxTokens=null)",
+          "response": "{\"edits\":[{\"filePath\":\"Main.java\",\"search\":\"\",\"replace\":\"public class Main {\\n    public static void main(String[] args) {\\n        System.out.println(\\\"Hello\\\");\\n    }\\n}\\n\"}]}"
+        }
+      ]
+    },
+    {
+      "modelName": "ollama:gpt-oss:20b",
+      "promptKind": "create_project",
+      "runIndex": 10,
+      "enginePrompt": "Create a minimal Hello World project with one file Main.java printing Hello",
+      "initialFiles": {},
+      "calls": [
+        {
+          "requestHash": "4508dfa643243496f170abe59fee1b9679a7ad1ad6d5d4efd62a0429a56b861b",
+          "request": "[ChatMessage(role=System, content=You are a Security Engineering Agent mainly for writing secure code\n\nYour task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!\n\nIt's acceptable to add multiple *search/REPLACE* sections if you need to change multiple parts of the file.\nTo create a file: search must be empty and replace must contain the entire file content\nEach *search* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.\nDo not use a part of the line as *search* pattern. You must use full lines.\nInclude enough lines to make code inside *search* pattern uniquely identifiable. A *search* pattern that produces multiple matches in the source code will be rejected as an error.\nDo not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.\nDo not use git diff style (+ and - at the beginning of the line) for *search/REPLACE* blocks.\nDo not use line numbers in *search/REPLACE* blocks. Do not enclose the *search/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.\nDo not use the same value for *search* and *REPLACE* parameters, as this will make no changes.\n\nIf you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.), ChatMessage(role=User, content=Create a minimal Hello World project with one file Main.java printing Hello), ChatMessage(role=User, content=You have no files in the context.\nIf you saw files they are only part of the prompt and dont exists yet!\nYou may create new files (keep in mind that searched text needs to be empty in this case!)\n)]",
+          "params": "GenerationParams(temperature=null, maxTokens=null)",
+          "response": "{\"edits\":[{\"filePath\":\"Main.java\",\"search\":\"\",\"replace\":\"public class Main {\\n    public static void main(String[] args) {\\n        System.out.println(\\\"Hello\\\");\\n    }\\n}\\n\"}]}"
+        }
+      ]
+    },
+    {
+      "modelName": "ollama:gpt-oss:20b",
+      "promptKind": "create_project",
+      "runIndex": 11,
+      "enginePrompt": "Create a minimal Hello World project with one file Main.java printing Hello",
+      "initialFiles": {},
+      "calls": [
+        {
+          "requestHash": "4508dfa643243496f170abe59fee1b9679a7ad1ad6d5d4efd62a0429a56b861b",
+          "request": "[ChatMessage(role=System, content=You are a Security Engineering Agent mainly for writing secure code\n\nYour task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!\n\nIt's acceptable to add multiple *search/REPLACE* sections if you need to change multiple parts of the file.\nTo create a file: search must be empty and replace must contain the entire file content\nEach *search* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.\nDo not use a part of the line as *search* pattern. You must use full lines.\nInclude enough lines to make code inside *search* pattern uniquely identifiable. A *search* pattern that produces multiple matches in the source code will be rejected as an error.\nDo not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.\nDo not use git diff style (+ and - at the beginning of the line) for *search/REPLACE* blocks.\nDo not use line numbers in *search/REPLACE* blocks. Do not enclose the *search/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.\nDo not use the same value for *search* and *REPLACE* parameters, as this will make no changes.\n\nIf you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.), ChatMessage(role=User, content=Create a minimal Hello World project with one file Main.java printing Hello), ChatMessage(role=User, content=You have no files in the context.\nIf you saw files they are only part of the prompt and dont exists yet!\nYou may create new files (keep in mind that searched text needs to be empty in this case!)\n)]",
+          "params": "GenerationParams(temperature=null, maxTokens=null)",
+          "response": "{\"edits\":[{\"filePath\":\"Main.java\",\"search\":\"\",\"replace\":\"public class Main {\\n    public static void main(String[] args) {\\n        System.out.println(\\\"Hello\\\");\\n    }\\n}\"}]}"
+        }
+      ]
+    },
+    {
+      "modelName": "ollama:gpt-oss:20b",
+      "promptKind": "create_project",
+      "runIndex": 12,
+      "enginePrompt": "Create a minimal Hello World project with one file Main.java printing Hello",
+      "initialFiles": {},
+      "calls": [
+        {
+          "requestHash": "4508dfa643243496f170abe59fee1b9679a7ad1ad6d5d4efd62a0429a56b861b",
+          "request": "[ChatMessage(role=System, content=You are a Security Engineering Agent mainly for writing secure code\n\nYour task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!\n\nIt's acceptable to add multiple *search/REPLACE* sections if you need to change multiple parts of the file.\nTo create a file: search must be empty and replace must contain the entire file content\nEach *search* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.\nDo not use a part of the line as *search* pattern. You must use full lines.\nInclude enough lines to make code inside *search* pattern uniquely identifiable. A *search* pattern that produces multiple matches in the source code will be rejected as an error.\nDo not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.\nDo not use git diff style (+ and - at the beginning of the line) for *search/REPLACE* blocks.\nDo not use line numbers in *search/REPLACE* blocks. Do not enclose the *search/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.\nDo not use the same value for *search* and *REPLACE* parameters, as this will make no changes.\n\nIf you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.), ChatMessage(role=User, content=Create a minimal Hello World project with one file Main.java printing Hello), ChatMessage(role=User, content=You have no files in the context.\nIf you saw files they are only part of the prompt and dont exists yet!\nYou may create new files (keep in mind that searched text needs to be empty in this case!)\n)]",
+          "params": "GenerationParams(temperature=null, maxTokens=null)",
+          "response": "{\"edits\":[{\"filePath\":\"Main.java\",\"search\":\"\",\"replace\":\"public class Main {\\n    public static void main(String[] args) {\\n        System.out.println(\\\"Hello\\\");\\n    }\\n}\\n\"}]}"
+        }
+      ]
+    },
+    {
+      "modelName": "ollama:gpt-oss:20b",
+      "promptKind": "create_project",
+      "runIndex": 13,
+      "enginePrompt": "Create a minimal Hello World project with one file Main.java printing Hello",
+      "initialFiles": {},
+      "calls": [
+        {
+          "requestHash": "4508dfa643243496f170abe59fee1b9679a7ad1ad6d5d4efd62a0429a56b861b",
+          "request": "[ChatMessage(role=System, content=You are a Security Engineering Agent mainly for writing secure code\n\nYour task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!\n\nIt's acceptable to add multiple *search/REPLACE* sections if you need to change multiple parts of the file.\nTo create a file: search must be empty and replace must contain the entire file content\nEach *search* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.\nDo not use a part of the line as *search* pattern. You must use full lines.\nInclude enough lines to make code inside *search* pattern uniquely identifiable. A *search* pattern that produces multiple matches in the source code will be rejected as an error.\nDo not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.\nDo not use git diff style (+ and - at the beginning of the line) for *search/REPLACE* blocks.\nDo not use line numbers in *search/REPLACE* blocks. Do not enclose the *search/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.\nDo not use the same value for *search* and *REPLACE* parameters, as this will make no changes.\n\nIf you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.), ChatMessage(role=User, content=Create a minimal Hello World project with one file Main.java printing Hello), ChatMessage(role=User, content=You have no files in the context.\nIf you saw files they are only part of the prompt and dont exists yet!\nYou may create new files (keep in mind that searched text needs to be empty in this case!)\n)]",
+          "params": "GenerationParams(temperature=null, maxTokens=null)",
+          "response": "{\"edits\":[{\"filePath\":\"Main.java\",\"search\":\"\",\"replace\":\"public class Main {\\n    public static void main(String[] args) {\\n        System.out.println(\\\"Hello\\\");\\n    }\\n}\"}]}"
+        }
+      ]
+    },
+    {
+      "modelName": "ollama:gpt-oss:20b",
+      "promptKind": "create_project",
+      "runIndex": 14,
+      "enginePrompt": "Create a minimal Hello World project with one file Main.java printing Hello",
+      "initialFiles": {},
+      "calls": [
+        {
+          "requestHash": "4508dfa643243496f170abe59fee1b9679a7ad1ad6d5d4efd62a0429a56b861b",
+          "request": "[ChatMessage(role=System, content=You are a Security Engineering Agent mainly for writing secure code\n\nYour task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!\n\nIt's acceptable to add multiple *search/REPLACE* sections if you need to change multiple parts of the file.\nTo create a file: search must be empty and replace must contain the entire file content\nEach *search* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.\nDo not use a part of the line as *search* pattern. You must use full lines.\nInclude enough lines to make code inside *search* pattern uniquely identifiable. A *search* pattern that produces multiple matches in the source code will be rejected as an error.\nDo not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.\nDo not use git diff style (+ and - at the beginning of the line) for *search/REPLACE* blocks.\nDo not use line numbers in *search/REPLACE* blocks. Do not enclose the *search/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.\nDo not use the same value for *search* and *REPLACE* parameters, as this will make no changes.\n\nIf you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.), ChatMessage(role=User, content=Create a minimal Hello World project with one file Main.java printing Hello), ChatMessage(role=User, content=You have no files in the context.\nIf you saw files they are only part of the prompt and dont exists yet!\nYou may create new files (keep in mind that searched text needs to be empty in this case!)\n)]",
+          "params": "GenerationParams(temperature=null, maxTokens=null)",
+          "response": "{\"edits\":[{\"filePath\":\"Main.java\",\"search\":\"\",\"replace\":\"public class Main {\\n    public static void main(String[] args) {\\n        System.out.println(\\\"Hello\\\");\\n    }\\n}\"}]}"
+        }
+      ]
+    },
+    {
+      "modelName": "ollama:gpt-oss:20b",
+      "promptKind": "edit_project",
+      "runIndex": 0,
+      "enginePrompt": "Modify the project to add a Utils.java with a function greet(name) and use it in Main.java",
+      "initialFiles": {
+        "src/Main.java": "public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}"
+      },
+      "calls": [
+        {
+          "requestHash": "720d4441caf38ea977c388a727df96d22d275e6426d8b54676cd3ae4c587cd66",
+          "request": "[ChatMessage(role=System, content=You are a Security Engineering Agent mainly for writing secure code\n\nYour task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!\n\nIt's acceptable to add multiple *search/REPLACE* sections if you need to change multiple parts of the file.\nTo create a file: search must be empty and replace must contain the entire file content\nEach *search* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.\nDo not use a part of the line as *search* pattern. You must use full lines.\nInclude enough lines to make code inside *search* pattern uniquely identifiable. A *search* pattern that produces multiple matches in the source code will be rejected as an error.\nDo not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.\nDo not use git diff style (+ and - at the beginning of the line) for *search/REPLACE* blocks.\nDo not use line numbers in *search/REPLACE* blocks. Do not enclose the *search/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.\nDo not use the same value for *search* and *REPLACE* parameters, as this will make no changes.\n\nIf you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.), ChatMessage(role=User, content=Modify the project to add a Utils.java with a function greet(name) and use it in Main.java), ChatMessage(role=User, content=The following files are in the context:\n<<<FILE path=\"src/Main.java\">>>public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}<<<END FILE>>>\n)]",
+          "params": "GenerationParams(temperature=null, maxTokens=null)",
+          "response": "{\"edits\":[{\"filePath\":\"src/Utils.java\",\"search\":\"\",\"replace\":\"public class Utils {\\n    public static String greet(String name) {\\n        return \\\"Hello, \\\" + name + \\\"!\\\";\\n    }\\n}\"},{\"filePath\":\"src/Main.java\",\"search\":\"        System.out.println(\\\"Hello\\\");\",\"replace\":\"        System.out.println(Utils.greet(\\\"World\\\"));\"}]}"
+        }
+      ]
+    },
+    {
+      "modelName": "ollama:gpt-oss:20b",
+      "promptKind": "edit_project",
+      "runIndex": 1,
+      "enginePrompt": "Modify the project to add a Utils.java with a function greet(name) and use it in Main.java",
+      "initialFiles": {
+        "src/Main.java": "public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}"
+      },
+      "calls": [
+        {
+          "requestHash": "720d4441caf38ea977c388a727df96d22d275e6426d8b54676cd3ae4c587cd66",
+          "request": "[ChatMessage(role=System, content=You are a Security Engineering Agent mainly for writing secure code\n\nYour task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!\n\nIt's acceptable to add multiple *search/REPLACE* sections if you need to change multiple parts of the file.\nTo create a file: search must be empty and replace must contain the entire file content\nEach *search* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.\nDo not use a part of the line as *search* pattern. You must use full lines.\nInclude enough lines to make code inside *search* pattern uniquely identifiable. A *search* pattern that produces multiple matches in the source code will be rejected as an error.\nDo not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.\nDo not use git diff style (+ and - at the beginning of the line) for *search/REPLACE* blocks.\nDo not use line numbers in *search/REPLACE* blocks. Do not enclose the *search/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.\nDo not use the same value for *search* and *REPLACE* parameters, as this will make no changes.\n\nIf you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.), ChatMessage(role=User, content=Modify the project to add a Utils.java with a function greet(name) and use it in Main.java), ChatMessage(role=User, content=The following files are in the context:\n<<<FILE path=\"src/Main.java\">>>public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}<<<END FILE>>>\n)]",
+          "params": "GenerationParams(temperature=null, maxTokens=null)",
+          "response": "{\"edits\":[{\"filePath\":\"src/Utils.java\",\"search\":\"\",\"replace\":\"public class Utils {\\n    public static String greet(String name) {\\n        return \\\"Hello, \\\" + name + \\\"!\\\";\\n    }\\n}\"},{\"filePath\":\"src/Main.java\",\"search\":\"        System.out.println(\\\"Hello\\\");\",\"replace\":\"        System.out.println(Utils.greet(\\\"World\\\"));\"}]}"
+        }
+      ]
+    },
+    {
+      "modelName": "ollama:gpt-oss:20b",
+      "promptKind": "edit_project",
+      "runIndex": 2,
+      "enginePrompt": "Modify the project to add a Utils.java with a function greet(name) and use it in Main.java",
+      "initialFiles": {
+        "src/Main.java": "public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}"
+      },
+      "calls": [
+        {
+          "requestHash": "720d4441caf38ea977c388a727df96d22d275e6426d8b54676cd3ae4c587cd66",
+          "request": "[ChatMessage(role=System, content=You are a Security Engineering Agent mainly for writing secure code\n\nYour task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!\n\nIt's acceptable to add multiple *search/REPLACE* sections if you need to change multiple parts of the file.\nTo create a file: search must be empty and replace must contain the entire file content\nEach *search* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.\nDo not use a part of the line as *search* pattern. You must use full lines.\nInclude enough lines to make code inside *search* pattern uniquely identifiable. A *search* pattern that produces multiple matches in the source code will be rejected as an error.\nDo not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.\nDo not use git diff style (+ and - at the beginning of the line) for *search/REPLACE* blocks.\nDo not use line numbers in *search/REPLACE* blocks. Do not enclose the *search/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.\nDo not use the same value for *search* and *REPLACE* parameters, as this will make no changes.\n\nIf you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.), ChatMessage(role=User, content=Modify the project to add a Utils.java with a function greet(name) and use it in Main.java), ChatMessage(role=User, content=The following files are in the context:\n<<<FILE path=\"src/Main.java\">>>public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}<<<END FILE>>>\n)]",
+          "params": "GenerationParams(temperature=null, maxTokens=null)",
+          "response": "{\"edits\":[{\"filePath\":\"src/Utils.java\",\"search\":\"\",\"replace\":\"public class Utils {\\n    public static String greet(String name) {\\n        return \\\"Hello, \\\" + name + \\\"!\\\";\\n    }\\n}\\n\"},{\"filePath\":\"src/Main.java\",\"search\":\"public class Main {\\n    public static void main(String[] args) {\\n        System.out.println(\\\"Hello\\\");\\n    }\\n}\\n\",\"replace\":\"public class Main {\\n    public static void main(String[] args) {\\n        System.out.println(Utils.greet(\\\"Alice\\\"));\\n    }\\n}\\n\"}]}"
+        }
+      ]
+    },
+    {
+      "modelName": "ollama:gpt-oss:20b",
+      "promptKind": "edit_project",
+      "runIndex": 3,
+      "enginePrompt": "Modify the project to add a Utils.java with a function greet(name) and use it in Main.java",
+      "initialFiles": {
+        "src/Main.java": "public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}"
+      },
+      "calls": [
+        {
+          "requestHash": "720d4441caf38ea977c388a727df96d22d275e6426d8b54676cd3ae4c587cd66",
+          "request": "[ChatMessage(role=System, content=You are a Security Engineering Agent mainly for writing secure code\n\nYour task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!\n\nIt's acceptable to add multiple *search/REPLACE* sections if you need to change multiple parts of the file.\nTo create a file: search must be empty and replace must contain the entire file content\nEach *search* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.\nDo not use a part of the line as *search* pattern. You must use full lines.\nInclude enough lines to make code inside *search* pattern uniquely identifiable. A *search* pattern that produces multiple matches in the source code will be rejected as an error.\nDo not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.\nDo not use git diff style (+ and - at the beginning of the line) for *search/REPLACE* blocks.\nDo not use line numbers in *search/REPLACE* blocks. Do not enclose the *search/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.\nDo not use the same value for *search* and *REPLACE* parameters, as this will make no changes.\n\nIf you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.), ChatMessage(role=User, content=Modify the project to add a Utils.java with a function greet(name) and use it in Main.java), ChatMessage(role=User, content=The following files are in the context:\n<<<FILE path=\"src/Main.java\">>>public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}<<<END FILE>>>\n)]",
+          "params": "GenerationParams(temperature=null, maxTokens=null)",
+          "response": "{\"edits\":[{\"filePath\":\"src/Utils.java\",\"search\":\"\",\"replace\":\"public class Utils {\\n    public static String greet(String name) {\\n        return \\\"Hello \\\" + name;\\n    }\\n}\\n\"},{\"filePath\":\"src/Main.java\",\"search\":\"public class Main {\\n    public static void main(String[] args) {\\n        System.out.println(\\\"Hello\\\");\\n    }\\n}\\n\",\"replace\":\"public class Main {\\n    public static void main(String[] args) {\\n        String name = args.length > 0 ? args[0] : \\\"World\\\";\\n        System.out.println(Utils.greet(name));\\n    }\\n}\\n\"}]}"
+        }
+      ]
+    },
+    {
+      "modelName": "ollama:gpt-oss:20b",
+      "promptKind": "edit_project",
+      "runIndex": 4,
+      "enginePrompt": "Modify the project to add a Utils.java with a function greet(name) and use it in Main.java",
+      "initialFiles": {
+        "src/Main.java": "public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}"
+      },
+      "calls": [
+        {
+          "requestHash": "720d4441caf38ea977c388a727df96d22d275e6426d8b54676cd3ae4c587cd66",
+          "request": "[ChatMessage(role=System, content=You are a Security Engineering Agent mainly for writing secure code\n\nYour task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!\n\nIt's acceptable to add multiple *search/REPLACE* sections if you need to change multiple parts of the file.\nTo create a file: search must be empty and replace must contain the entire file content\nEach *search* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.\nDo not use a part of the line as *search* pattern. You must use full lines.\nInclude enough lines to make code inside *search* pattern uniquely identifiable. A *search* pattern that produces multiple matches in the source code will be rejected as an error.\nDo not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.\nDo not use git diff style (+ and - at the beginning of the line) for *search/REPLACE* blocks.\nDo not use line numbers in *search/REPLACE* blocks. Do not enclose the *search/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.\nDo not use the same value for *search* and *REPLACE* parameters, as this will make no changes.\n\nIf you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.), ChatMessage(role=User, content=Modify the project to add a Utils.java with a function greet(name) and use it in Main.java), ChatMessage(role=User, content=The following files are in the context:\n<<<FILE path=\"src/Main.java\">>>public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}<<<END FILE>>>\n)]",
+          "params": "GenerationParams(temperature=null, maxTokens=null)",
+          "response": "{\"edits\":[{\"filePath\":\"src/Utils.java\",\"search\":\"\",\"replace\":\"public class Utils {\\n    public static String greet(String name) {\\n        return \\\"Hello, \\\" + name + \\\"!\\\";\\n    }\\n}\"},{\"filePath\":\"src/Main.java\",\"search\":\"public class Main {\\n    public static void main(String[] args) {\\n        System.out.println(\\\"Hello\\\");\\n    }\\n}\",\"replace\":\"public class Main {\\n    public static void main(String[] args) {\\n        System.out.println(Utils.greet(\\\"World\\\"));\\n    }\\n}\"}]}"
+        }
+      ]
+    },
+    {
+      "modelName": "ollama:gpt-oss:20b",
+      "promptKind": "edit_project",
+      "runIndex": 5,
+      "enginePrompt": "Modify the project to add a Utils.java with a function greet(name) and use it in Main.java",
+      "initialFiles": {
+        "src/Main.java": "public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}"
+      },
+      "calls": [
+        {
+          "requestHash": "720d4441caf38ea977c388a727df96d22d275e6426d8b54676cd3ae4c587cd66",
+          "request": "[ChatMessage(role=System, content=You are a Security Engineering Agent mainly for writing secure code\n\nYour task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!\n\nIt's acceptable to add multiple *search/REPLACE* sections if you need to change multiple parts of the file.\nTo create a file: search must be empty and replace must contain the entire file content\nEach *search* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.\nDo not use a part of the line as *search* pattern. You must use full lines.\nInclude enough lines to make code inside *search* pattern uniquely identifiable. A *search* pattern that produces multiple matches in the source code will be rejected as an error.\nDo not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.\nDo not use git diff style (+ and - at the beginning of the line) for *search/REPLACE* blocks.\nDo not use line numbers in *search/REPLACE* blocks. Do not enclose the *search/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.\nDo not use the same value for *search* and *REPLACE* parameters, as this will make no changes.\n\nIf you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.), ChatMessage(role=User, content=Modify the project to add a Utils.java with a function greet(name) and use it in Main.java), ChatMessage(role=User, content=The following files are in the context:\n<<<FILE path=\"src/Main.java\">>>public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}<<<END FILE>>>\n)]",
+          "params": "GenerationParams(temperature=null, maxTokens=null)",
+          "response": "{\"edits\":[{\"filePath\":\"src/Utils.java\",\"search\":\"\",\"replace\":\"public class Utils {\\n    public static String greet(String name) {\\n        return \\\"Hello, \\\" + name;\\n    }\\n}\"},{\"filePath\":\"src/Main.java\",\"search\":\"        System.out.println(\\\"Hello\\\");\",\"replace\":\"        System.out.println(Utils.greet(\\\"World\\\"));\"}]}"
+        }
+      ]
+    },
+    {
+      "modelName": "ollama:gpt-oss:20b",
+      "promptKind": "edit_project",
+      "runIndex": 6,
+      "enginePrompt": "Modify the project to add a Utils.java with a function greet(name) and use it in Main.java",
+      "initialFiles": {
+        "src/Main.java": "public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}"
+      },
+      "calls": [
+        {
+          "requestHash": "720d4441caf38ea977c388a727df96d22d275e6426d8b54676cd3ae4c587cd66",
+          "request": "[ChatMessage(role=System, content=You are a Security Engineering Agent mainly for writing secure code\n\nYour task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!\n\nIt's acceptable to add multiple *search/REPLACE* sections if you need to change multiple parts of the file.\nTo create a file: search must be empty and replace must contain the entire file content\nEach *search* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.\nDo not use a part of the line as *search* pattern. You must use full lines.\nInclude enough lines to make code inside *search* pattern uniquely identifiable. A *search* pattern that produces multiple matches in the source code will be rejected as an error.\nDo not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.\nDo not use git diff style (+ and - at the beginning of the line) for *search/REPLACE* blocks.\nDo not use line numbers in *search/REPLACE* blocks. Do not enclose the *search/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.\nDo not use the same value for *search* and *REPLACE* parameters, as this will make no changes.\n\nIf you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.), ChatMessage(role=User, content=Modify the project to add a Utils.java with a function greet(name) and use it in Main.java), ChatMessage(role=User, content=The following files are in the context:\n<<<FILE path=\"src/Main.java\">>>public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}<<<END FILE>>>\n)]",
+          "params": "GenerationParams(temperature=null, maxTokens=null)",
+          "response": "{\"edits\":[{\"filePath\":\"src/Utils.java\",\"search\":\"\",\"replace\":\"public class Utils {\\n    public static String greet(String name) {\\n        return \\\"Hello, \\\" + name + \\\"!\\\";\\n    }\\n}\\n\"},{\"filePath\":\"src/Main.java\",\"search\":\"System.out.println(\\\"Hello\\\");\",\"replace\":\"System.out.println(Utils.greet(\\\"World\\\"));\"}]}"
+        }
+      ]
+    },
+    {
+      "modelName": "ollama:gpt-oss:20b",
+      "promptKind": "edit_project",
+      "runIndex": 7,
+      "enginePrompt": "Modify the project to add a Utils.java with a function greet(name) and use it in Main.java",
+      "initialFiles": {
+        "src/Main.java": "public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}"
+      },
+      "calls": [
+        {
+          "requestHash": "720d4441caf38ea977c388a727df96d22d275e6426d8b54676cd3ae4c587cd66",
+          "request": "[ChatMessage(role=System, content=You are a Security Engineering Agent mainly for writing secure code\n\nYour task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!\n\nIt's acceptable to add multiple *search/REPLACE* sections if you need to change multiple parts of the file.\nTo create a file: search must be empty and replace must contain the entire file content\nEach *search* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.\nDo not use a part of the line as *search* pattern. You must use full lines.\nInclude enough lines to make code inside *search* pattern uniquely identifiable. A *search* pattern that produces multiple matches in the source code will be rejected as an error.\nDo not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.\nDo not use git diff style (+ and - at the beginning of the line) for *search/REPLACE* blocks.\nDo not use line numbers in *search/REPLACE* blocks. Do not enclose the *search/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.\nDo not use the same value for *search* and *REPLACE* parameters, as this will make no changes.\n\nIf you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.), ChatMessage(role=User, content=Modify the project to add a Utils.java with a function greet(name) and use it in Main.java), ChatMessage(role=User, content=The following files are in the context:\n<<<FILE path=\"src/Main.java\">>>public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}<<<END FILE>>>\n)]",
+          "params": "GenerationParams(temperature=null, maxTokens=null)",
+          "response": "{\"edits\":[{\"filePath\":\"src/Utils.java\",\"search\":\"\",\"replace\":\"public class Utils {\\n    public static String greet(String name) {\\n        return \\\"Hello, \\\" + name + \\\"!\\\";\\n    }\\n}\"},{\"filePath\":\"src/Main.java\",\"search\":\"        System.out.println(\\\"Hello\\\");\",\"replace\":\"        System.out.println(Utils.greet(\\\"World\\\"));\"}]}"
+        }
+      ]
+    },
+    {
+      "modelName": "ollama:gpt-oss:20b",
+      "promptKind": "edit_project",
+      "runIndex": 8,
+      "enginePrompt": "Modify the project to add a Utils.java with a function greet(name) and use it in Main.java",
+      "initialFiles": {
+        "src/Main.java": "public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}"
+      },
+      "calls": [
+        {
+          "requestHash": "720d4441caf38ea977c388a727df96d22d275e6426d8b54676cd3ae4c587cd66",
+          "request": "[ChatMessage(role=System, content=You are a Security Engineering Agent mainly for writing secure code\n\nYour task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!\n\nIt's acceptable to add multiple *search/REPLACE* sections if you need to change multiple parts of the file.\nTo create a file: search must be empty and replace must contain the entire file content\nEach *search* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.\nDo not use a part of the line as *search* pattern. You must use full lines.\nInclude enough lines to make code inside *search* pattern uniquely identifiable. A *search* pattern that produces multiple matches in the source code will be rejected as an error.\nDo not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.\nDo not use git diff style (+ and - at the beginning of the line) for *search/REPLACE* blocks.\nDo not use line numbers in *search/REPLACE* blocks. Do not enclose the *search/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.\nDo not use the same value for *search* and *REPLACE* parameters, as this will make no changes.\n\nIf you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.), ChatMessage(role=User, content=Modify the project to add a Utils.java with a function greet(name) and use it in Main.java), ChatMessage(role=User, content=The following files are in the context:\n<<<FILE path=\"src/Main.java\">>>public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}<<<END FILE>>>\n)]",
+          "params": "GenerationParams(temperature=null, maxTokens=null)",
+          "response": "{\"edits\":[{\"filePath\":\"src/Utils.java\",\"search\":\"\",\"replace\":\"public class Utils {\\n    public static String greet(String name) {\\n        return \\\"Hello, \\\" + name;\\n    }\\n}\"},{\"filePath\":\"src/Main.java\",\"search\":\"public class Main {\\n    public static void main(String[] args) {\\n        System.out.println(\\\"Hello\\\");\\n    }\\n}\",\"replace\":\"public class Main {\\n    public static void main(String[] args) {\\n        System.out.println(Utils.greet(\\\"World\\\"));\\n    }\\n}\"}]}"
+        }
+      ]
+    },
+    {
+      "modelName": "ollama:gpt-oss:20b",
+      "promptKind": "edit_project",
+      "runIndex": 9,
+      "enginePrompt": "Modify the project to add a Utils.java with a function greet(name) and use it in Main.java",
+      "initialFiles": {
+        "src/Main.java": "public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}"
+      },
+      "calls": [
+        {
+          "requestHash": "720d4441caf38ea977c388a727df96d22d275e6426d8b54676cd3ae4c587cd66",
+          "request": "[ChatMessage(role=System, content=You are a Security Engineering Agent mainly for writing secure code\n\nYour task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!\n\nIt's acceptable to add multiple *search/REPLACE* sections if you need to change multiple parts of the file.\nTo create a file: search must be empty and replace must contain the entire file content\nEach *search* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.\nDo not use a part of the line as *search* pattern. You must use full lines.\nInclude enough lines to make code inside *search* pattern uniquely identifiable. A *search* pattern that produces multiple matches in the source code will be rejected as an error.\nDo not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.\nDo not use git diff style (+ and - at the beginning of the line) for *search/REPLACE* blocks.\nDo not use line numbers in *search/REPLACE* blocks. Do not enclose the *search/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.\nDo not use the same value for *search* and *REPLACE* parameters, as this will make no changes.\n\nIf you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.), ChatMessage(role=User, content=Modify the project to add a Utils.java with a function greet(name) and use it in Main.java), ChatMessage(role=User, content=The following files are in the context:\n<<<FILE path=\"src/Main.java\">>>public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}<<<END FILE>>>\n)]",
+          "params": "GenerationParams(temperature=null, maxTokens=null)",
+          "response": "{\"edits\":[{\"filePath\":\"src/Utils.java\",\"search\":\"\",\"replace\":\"public class Utils {\\n    public static String greet(String name) {\\n        return \\\"Hello, \\\" + name + \\\"!\\\";\\n    }\\n}\"},{\"filePath\":\"src/Main.java\",\"search\":\"public class Main {\\n    public static void main(String[] args) {\\n        System.out.println(\\\"Hello\\\");\\n    }\\n}\",\"replace\":\"public class Main {\\n    public static void main(String[] args) {\\n        System.out.println(Utils.greet(\\\"World\\\"));\\n    }\\n}\"}]}"
+        }
+      ]
+    },
+    {
+      "modelName": "ollama:gpt-oss:20b",
+      "promptKind": "edit_project",
+      "runIndex": 10,
+      "enginePrompt": "Modify the project to add a Utils.java with a function greet(name) and use it in Main.java",
+      "initialFiles": {
+        "src/Main.java": "public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}"
+      },
+      "calls": [
+        {
+          "requestHash": "720d4441caf38ea977c388a727df96d22d275e6426d8b54676cd3ae4c587cd66",
+          "request": "[ChatMessage(role=System, content=You are a Security Engineering Agent mainly for writing secure code\n\nYour task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!\n\nIt's acceptable to add multiple *search/REPLACE* sections if you need to change multiple parts of the file.\nTo create a file: search must be empty and replace must contain the entire file content\nEach *search* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.\nDo not use a part of the line as *search* pattern. You must use full lines.\nInclude enough lines to make code inside *search* pattern uniquely identifiable. A *search* pattern that produces multiple matches in the source code will be rejected as an error.\nDo not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.\nDo not use git diff style (+ and - at the beginning of the line) for *search/REPLACE* blocks.\nDo not use line numbers in *search/REPLACE* blocks. Do not enclose the *search/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.\nDo not use the same value for *search* and *REPLACE* parameters, as this will make no changes.\n\nIf you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.), ChatMessage(role=User, content=Modify the project to add a Utils.java with a function greet(name) and use it in Main.java), ChatMessage(role=User, content=The following files are in the context:\n<<<FILE path=\"src/Main.java\">>>public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}<<<END FILE>>>\n)]",
+          "params": "GenerationParams(temperature=null, maxTokens=null)",
+          "response": "{\"edits\":[{\"filePath\":\"src/Utils.java\",\"search\":\"\",\"replace\":\"public class Utils {\\n    public static String greet(String name) {\\n        return \\\"Hello, \\\" + name + \\\"!\\\";\\n    }\\n}\"},{\"filePath\":\"src/Main.java\",\"search\":\"public class Main {\\n    public static void main(String[] args) {\\n        System.out.println(\\\"Hello\\\");\\n    }\\n}\",\"replace\":\"public class Main {\\n    public static void main(String[] args) {\\n        System.out.println(Utils.greet(\\\"World\\\"));\\n    }\\n}\"}]}"
+        }
+      ]
+    },
+    {
+      "modelName": "ollama:gpt-oss:20b",
+      "promptKind": "edit_project",
+      "runIndex": 11,
+      "enginePrompt": "Modify the project to add a Utils.java with a function greet(name) and use it in Main.java",
+      "initialFiles": {
+        "src/Main.java": "public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}"
+      },
+      "calls": [
+        {
+          "requestHash": "720d4441caf38ea977c388a727df96d22d275e6426d8b54676cd3ae4c587cd66",
+          "request": "[ChatMessage(role=System, content=You are a Security Engineering Agent mainly for writing secure code\n\nYour task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!\n\nIt's acceptable to add multiple *search/REPLACE* sections if you need to change multiple parts of the file.\nTo create a file: search must be empty and replace must contain the entire file content\nEach *search* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.\nDo not use a part of the line as *search* pattern. You must use full lines.\nInclude enough lines to make code inside *search* pattern uniquely identifiable. A *search* pattern that produces multiple matches in the source code will be rejected as an error.\nDo not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.\nDo not use git diff style (+ and - at the beginning of the line) for *search/REPLACE* blocks.\nDo not use line numbers in *search/REPLACE* blocks. Do not enclose the *search/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.\nDo not use the same value for *search* and *REPLACE* parameters, as this will make no changes.\n\nIf you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.), ChatMessage(role=User, content=Modify the project to add a Utils.java with a function greet(name) and use it in Main.java), ChatMessage(role=User, content=The following files are in the context:\n<<<FILE path=\"src/Main.java\">>>public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}<<<END FILE>>>\n)]",
+          "params": "GenerationParams(temperature=null, maxTokens=null)",
+          "response": "{\"edits\":[{\"filePath\":\"src/Utils.java\",\"search\":\"\",\"replace\":\"public class Utils {\\n    public static String greet(String name) {\\n        return \\\"Hello, \\\" + name + \\\"!\\\";\\n    }\\n}\"},{\"filePath\":\"src/Main.java\",\"search\":\"        System.out.println(\\\"Hello\\\");\",\"replace\":\"        System.out.println(Utils.greet(\\\"World\\\"));\"}]}"
+        }
+      ]
+    },
+    {
+      "modelName": "ollama:gpt-oss:20b",
+      "promptKind": "edit_project",
+      "runIndex": 12,
+      "enginePrompt": "Modify the project to add a Utils.java with a function greet(name) and use it in Main.java",
+      "initialFiles": {
+        "src/Main.java": "public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}"
+      },
+      "calls": [
+        {
+          "requestHash": "720d4441caf38ea977c388a727df96d22d275e6426d8b54676cd3ae4c587cd66",
+          "request": "[ChatMessage(role=System, content=You are a Security Engineering Agent mainly for writing secure code\n\nYour task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!\n\nIt's acceptable to add multiple *search/REPLACE* sections if you need to change multiple parts of the file.\nTo create a file: search must be empty and replace must contain the entire file content\nEach *search* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.\nDo not use a part of the line as *search* pattern. You must use full lines.\nInclude enough lines to make code inside *search* pattern uniquely identifiable. A *search* pattern that produces multiple matches in the source code will be rejected as an error.\nDo not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.\nDo not use git diff style (+ and - at the beginning of the line) for *search/REPLACE* blocks.\nDo not use line numbers in *search/REPLACE* blocks. Do not enclose the *search/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.\nDo not use the same value for *search* and *REPLACE* parameters, as this will make no changes.\n\nIf you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.), ChatMessage(role=User, content=Modify the project to add a Utils.java with a function greet(name) and use it in Main.java), ChatMessage(role=User, content=The following files are in the context:\n<<<FILE path=\"src/Main.java\">>>public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}<<<END FILE>>>\n)]",
+          "params": "GenerationParams(temperature=null, maxTokens=null)",
+          "response": "{\"edits\":[{\"filePath\":\"src/Utils.java\",\"search\":\"\",\"replace\":\"public class Utils {\\n    public static String greet(String name) {\\n        return \\\"Hello \\\" + name;\\n    }\\n}\\n\"},{\"filePath\":\"src/Main.java\",\"search\":\"        System.out.println(\\\"Hello\\\");\",\"replace\":\"        System.out.println(Utils.greet(\\\"World\\\"));\"}]}"
+        }
+      ]
+    },
+    {
+      "modelName": "ollama:gpt-oss:20b",
+      "promptKind": "edit_project",
+      "runIndex": 13,
+      "enginePrompt": "Modify the project to add a Utils.java with a function greet(name) and use it in Main.java",
+      "initialFiles": {
+        "src/Main.java": "public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}"
+      },
+      "calls": [
+        {
+          "requestHash": "720d4441caf38ea977c388a727df96d22d275e6426d8b54676cd3ae4c587cd66",
+          "request": "[ChatMessage(role=System, content=You are a Security Engineering Agent mainly for writing secure code\n\nYour task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!\n\nIt's acceptable to add multiple *search/REPLACE* sections if you need to change multiple parts of the file.\nTo create a file: search must be empty and replace must contain the entire file content\nEach *search* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.\nDo not use a part of the line as *search* pattern. You must use full lines.\nInclude enough lines to make code inside *search* pattern uniquely identifiable. A *search* pattern that produces multiple matches in the source code will be rejected as an error.\nDo not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.\nDo not use git diff style (+ and - at the beginning of the line) for *search/REPLACE* blocks.\nDo not use line numbers in *search/REPLACE* blocks. Do not enclose the *search/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.\nDo not use the same value for *search* and *REPLACE* parameters, as this will make no changes.\n\nIf you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.), ChatMessage(role=User, content=Modify the project to add a Utils.java with a function greet(name) and use it in Main.java), ChatMessage(role=User, content=The following files are in the context:\n<<<FILE path=\"src/Main.java\">>>public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}<<<END FILE>>>\n)]",
+          "params": "GenerationParams(temperature=null, maxTokens=null)",
+          "response": "{\"edits\":[{\"filePath\":\"src/Utils.java\",\"search\":\"\",\"replace\":\"public class Utils {\\n    public static String greet(String name) {\\n        return \\\"Hello \\\" + name;\\n    }\\n}\"},{\"filePath\":\"src/Main.java\",\"search\":\"public class Main {\\n    public static void main(String[] args) {\\n        System.out.println(\\\"Hello\\\");\\n    }\\n}\",\"replace\":\"public class Main {\\n    public static void main(String[] args) {\\n        System.out.println(Utils.greet(\\\"Alice\\\"));\\n    }\\n}\"}]}"
+        }
+      ]
+    },
+    {
+      "modelName": "ollama:gpt-oss:20b",
+      "promptKind": "edit_project",
+      "runIndex": 14,
+      "enginePrompt": "Modify the project to add a Utils.java with a function greet(name) and use it in Main.java",
+      "initialFiles": {
+        "src/Main.java": "public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}"
+      },
+      "calls": [
+        {
+          "requestHash": "720d4441caf38ea977c388a727df96d22d275e6426d8b54676cd3ae4c587cd66",
+          "request": "[ChatMessage(role=System, content=You are a Security Engineering Agent mainly for writing secure code\n\nYour task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!\n\nIt's acceptable to add multiple *search/REPLACE* sections if you need to change multiple parts of the file.\nTo create a file: search must be empty and replace must contain the entire file content\nEach *search* pattern must match the existing source code exactly once, line for line, character for character, including all comments, docstrings, etc.\nDo not use a part of the line as *search* pattern. You must use full lines.\nInclude enough lines to make code inside *search* pattern uniquely identifiable. A *search* pattern that produces multiple matches in the source code will be rejected as an error.\nDo not add backslashes to escape special characters. Write the code exactly as it should appear in the intended programming language.\nDo not use git diff style (+ and - at the beginning of the line) for *search/REPLACE* blocks.\nDo not use line numbers in *search/REPLACE* blocks. Do not enclose the *search/REPLACE* block or any of its components in triple quotes. Use only tags to separate the parameters.\nDo not use the same value for *search* and *REPLACE* parameters, as this will make no changes.\n\nIf you need to edit a file again after making changes, use the latest version of the code that includes all your modifications applied during **current session**.\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.), ChatMessage(role=User, content=Modify the project to add a Utils.java with a function greet(name) and use it in Main.java), ChatMessage(role=User, content=The following files are in the context:\n<<<FILE path=\"src/Main.java\">>>public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello\");\n    }\n}<<<END FILE>>>\n)]",
+          "params": "GenerationParams(temperature=null, maxTokens=null)",
+          "response": "{\"edits\":[{\"filePath\":\"src/Utils.java\",\"search\":\"\",\"replace\":\"public class Utils {\\n    public static String greet(String name) {\\n        return \\\"Hello, \\\" + name + \\\"!\\\";\\n    }\\n}\"},{\"filePath\":\"src/Main.java\",\"search\":\"public class Main {\\n    public static void main(String[] args) {\\n        System.out.println(\\\"Hello\\\");\\n    }\\n}\",\"replace\":\"public class Main {\\n    public static void main(String[] args) {\\n        System.out.println(Utils.greet(\\\"World\\\"));\\n    }\\n}\"}]}"
+        }
+      ]
+    }
+  ]
+}

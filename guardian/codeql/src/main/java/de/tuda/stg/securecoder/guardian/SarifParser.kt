@@ -54,6 +54,7 @@ private fun mapResultToViolation(res: JsonElement): Violation {
         ),
         hardReject = false,
         confidence = confidence,
+        raw = res.toString(),
     )
 }
 

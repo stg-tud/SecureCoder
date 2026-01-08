@@ -47,10 +47,12 @@ suspend fun runSecurityEval(
         val fs = InMemoryFileSystem()
         val onEvent: suspend (StreamEvent) -> Unit = { ev ->
             when (ev) {
-                is StreamEvent.EditFiles -> {
+                is StreamEvent.ProposedEdits -> {
                     println(ev)
                     fs.applyEdits(ev.changes.searchReplaces)
                 }
+                is StreamEvent.ValidationStarted -> {}
+                is StreamEvent.ValidationSucceeded -> {}
                 is StreamEvent.SendDebugMessage -> {
                     if (ev.icon != EventIcon.Info) {
                         println("ENGINE: $ev")
@@ -67,7 +69,12 @@ suspend fun runSecurityEval(
                 }
             }
         }
-        engine.run(item.prompt, fs, onEvent)
+        val result = engine.run(item.prompt, fs, onEvent)
+        if (result !is Engine.EngineResult.Success) {
+            println("Failed to generate edits for item $item: $result")
+            continue
+        }
+        fs.applyEdits(result.changes.searchReplaces)
         val files = fs.allFiles().toList()
         if (files.size != 1) {
             println("Expected 1 file, but got ${files.size}")

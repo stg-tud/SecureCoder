@@ -1,12 +1,32 @@
 package de.tuda.stg.securecoder.plugin.engine.event
 
 import com.intellij.icons.AllIcons
+import de.tuda.stg.securecoder.engine.stream.ProposalId
 import de.tuda.stg.securecoder.engine.stream.StreamEvent
 import de.tuda.stg.securecoder.plugin.SecureCoderBundle
+import de.tuda.stg.securecoder.plugin.engine.event.UiStreamEvent.EditFilesValidation
 
-object StreamEventMapper {
+class StreamEventMapper {
+    private val proposals = mutableMapOf<ProposalId, UiStreamEvent.EditFiles>()
+
     fun map(event: StreamEvent): UiStreamEvent = when (event) {
-        is StreamEvent.EditFiles -> UiStreamEvent.EditFiles(event.changes)
+        is StreamEvent.ProposedEdits -> {
+            val pid = event.id
+            val current = proposals[pid]
+            val merged = (current ?: UiStreamEvent.EditFiles(
+                changes = event.changes,
+                proposalId = pid,
+                validation = EditFilesValidation.NotAvailable,
+            )).copy(changes = event.changes)
+            proposals[pid] = merged
+            merged
+        }
+        is StreamEvent.ValidationStarted -> {
+            updateProposalValidation(event.id, EditFilesValidation.Running)
+        }
+        is StreamEvent.ValidationSucceeded -> {
+            updateProposalValidation(event.id, EditFilesValidation.Succeeded)
+        }
 
         is StreamEvent.SendDebugMessage -> {
             UiStreamEvent.Message(
@@ -25,20 +45,95 @@ object StreamEventMapper {
         }
 
         is StreamEvent.GuardianWarning -> {
-            UiStreamEvent.Message(
-                title = SecureCoderBundle.message("warning.guardian.title"),
-                description = SecureCoderBundle.message("warning.guardian.description", event.violations),
-                icon = AllIcons.General.Warning
-            )
+            val messages = mutableListOf<String>()
+            val ruleNames = event.result.violations.map { v ->
+                val n = v.rule.name
+                if (n.isNullOrBlank()) v.rule.id else n
+            }.distinct()
+            if (ruleNames.isNotEmpty()) {
+                messages += SecureCoderBundle.message(
+                    "warning.guardian.short.violation",
+                    ruleNames.joinToString { "\"$it\"" },
+                )
+            }
+            if (event.result.failures.isNotEmpty()) {
+                messages += SecureCoderBundle.message(
+                    "warning.guardian.short.failure",
+                    event.result.failures.joinToString { f -> f.guardian }
+                )
+            }
+
+            val summary = messages.joinToString(" ")
+            val details = buildGuardianDetailsText(event)
+            updateProposalValidation(event.id, EditFilesValidation.Failed(summary, details))
         }
 
         is StreamEvent.InvalidLlmOutputWarning -> {
             UiStreamEvent.Message(
                 title = SecureCoderBundle.message("warning.llm.title"),
-                description = SecureCoderBundle.message("warning.llm.description", event.parseErrors.joinToString("\n")),
-                icon = AllIcons.General.Warning
+                description = SecureCoderBundle.message("warning.llm.description"),
+                icon = AllIcons.General.Warning,
+                debugText = buildExchangeText(event)
             )
         }
+    }
+
+    private fun updateProposalValidation(pid: ProposalId, newValidation: EditFilesValidation): UiStreamEvent.EditFiles {
+        val current = proposals[pid] ?: throw IllegalStateException("Unknown proposal $pid")
+        val merged = current.copy(validation = newValidation)
+        proposals[pid] = merged
+        return merged
+    }
+
+    private fun buildGuardianDetailsText(event: StreamEvent.GuardianWarning): String {
+        val result = event.result
+        val sb = StringBuilder()
+        if (result.violations.isNotEmpty()) {
+            sb.appendLine("Violations:")
+            result.violations.forEachIndexed { index, v ->
+                val ruleName = if (v.rule.name.isNullOrBlank()) v.rule.id else v.rule.name
+                sb.appendLine("#${index + 1} - Rule: $ruleName (id=${v.rule.id})")
+                sb.appendLine("Message: ${v.message}")
+                sb.appendLine("Location: ${v.location.file}:${v.location.startLine ?: "?"}-${v.location.endLine ?: "?"}")
+                v.confidence?.let { sb.appendLine("Confidence: $it") }
+                v.raw?.let { sb.appendLine("Raw: $it") }
+                sb.appendLine()
+            }
+        } else {
+            sb.appendLine("No violations reported.")
+        }
+
+        if (result.failures.isNotEmpty()) {
+            sb.appendLine("Guardian Failures:")
+            result.failures.forEachIndexed { index, f ->
+                sb.appendLine("#${index + 1} - ${f.guardian}: ${f.message}")
+            }
+            sb.appendLine()
+        }
+
+        if (result.files.isNotEmpty()) {
+            sb.appendLine("Analyzed files:")
+            result.files.forEach { f -> sb.appendLine("- ${f.name}") }
+        }
+        return sb.toString()
+    }
+
+    private fun buildExchangeText(event: StreamEvent.InvalidLlmOutputWarning): String {
+        val sb = StringBuilder()
+        sb.appendLine("Input messages:")
+        event.chatExchange.input.forEachIndexed { idx, msg ->
+            sb.appendLine("#${idx + 1} ${msg.role}:")
+            sb.appendLine(msg.content)
+            sb.appendLine()
+        }
+        sb.appendLine("Model output:")
+        sb.appendLine(event.chatExchange.output)
+        sb.appendLine()
+        sb.appendLine("Parse errors:")
+        event.parseErrors.forEachIndexed { index, error ->
+            sb.appendLine("#${index + 1}: $error")
+        }
+        return sb.toString()
     }
 
     fun mapException(exception: Exception): UiStreamEvent.Message {
@@ -46,7 +141,7 @@ object StreamEventMapper {
             title = SecureCoderBundle.message("error.uncaught.title"),
             description = SecureCoderBundle.message(
                 "error.uncaught.description",
-                exception.message ?: "N/A",
+                exception.message ?: SecureCoderBundle.message("common.notAvailable"),
                 exception.javaClass.simpleName
             ),
             icon = AllIcons.General.Error

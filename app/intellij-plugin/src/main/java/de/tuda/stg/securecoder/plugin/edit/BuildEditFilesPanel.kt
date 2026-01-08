@@ -36,6 +36,7 @@ import de.tuda.stg.securecoder.engine.file.edit.ApplyChanges
 import de.tuda.stg.securecoder.engine.file.edit.ApplyChanges.applyEdits
 import de.tuda.stg.securecoder.filesystem.FileSystem
 import de.tuda.stg.securecoder.plugin.SecureCoderBundle
+import com.intellij.openapi.diagnostic.Logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import javax.swing.BorderFactory
@@ -98,12 +99,13 @@ fun buildEditFilesPanel(
                                     project
                                 )
                             }
-                        } catch (t: Throwable) {
+                        } catch (throwable: Throwable) {
+                            LOG.error("Failed to apply edits", throwable)
                             SwingUtilities.invokeLater {
                                 Notifications.Bus.notify(
                                     notification(
                                         SecureCoderBundle.message("edit.apply.error.title"),
-                                        t.message ?: t.toString(),
+                                        throwable.message ?: throwable.toString(),
                                         NotificationType.ERROR
                                     ),
                                     project
@@ -166,6 +168,8 @@ fun buildEditFilesPanel(
 
     return panel
 }
+
+private val LOG: Logger = Logger.getInstance("BuildEditFilesPanel")
 
 private fun openDiffForFile(project: Project, fileUrl: String, edits: List<Changes.SearchReplace>) {
     val vfm = VirtualFileManager.getInstance()

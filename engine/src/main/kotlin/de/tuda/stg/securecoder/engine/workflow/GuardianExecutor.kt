@@ -21,9 +21,15 @@ class GuardianExecutor (
     data class GuardianResult(
         val violations: List<Violation>,
         val files: List<File>,
+        val failures: List<GuardianFailure> = emptyList(),
     ) {
         fun hasNoViolations() = violations.isEmpty()
     }
+
+    data class GuardianFailure(
+        val guardian: String,
+        val message: String,
+    )
 
     suspend fun analyze(fileSystem: FileSystem, changes: Changes): GuardianResult {
         val files = mutableListOf<File>()
@@ -32,16 +38,26 @@ class GuardianExecutor (
             { fileSystem.getFile(it)?.content() },
             { file, content -> files.add(File(file, content)) }
         )
-        val request = AnalyzeRequest(fileSystem, files)
-        val result = execute(request)
-        return result
+        return execute(AnalyzeRequest(fileSystem, files))
     }
 
     private suspend fun execute(request: AnalyzeRequest): GuardianResult = coroutineScope {
+        data class Outcome(val violations: List<Violation>, val failure: GuardianFailure?)
+
         val deferred = guardians.map { guardian ->
-            async(dispatcher) { guardian.run(request) }
+            async(dispatcher) {
+                try {
+                    val resp = guardian.run(request)
+                    Outcome(resp.violations, null)
+                } catch (throwable: Throwable) {
+                    val name = guardian.javaClass.simpleName
+                    Outcome(emptyList(), GuardianFailure(name, throwable.message ?: throwable.toString()))
+                }
+            }
         }
-        val violations = deferred.awaitAll().flatMap { it.violations }
-        GuardianResult(violations, request.files)
+        val outcomes = deferred.awaitAll()
+        val violations = outcomes.flatMap { it.violations }
+        val failures = outcomes.mapNotNull { it.failure }
+        GuardianResult(violations, request.files, failures)
     }
 }

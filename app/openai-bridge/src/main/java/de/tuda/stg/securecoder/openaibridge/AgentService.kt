@@ -1,4 +1,4 @@
-package de.tuda.stg.securecoder.openapibridge
+package de.tuda.stg.securecoder.openaibridge
 
 import de.tuda.stg.securecoder.engine.Engine
 import de.tuda.stg.securecoder.engine.file.edit.ApplyChanges.applyEdits
@@ -14,7 +14,7 @@ class AgentService(private val engine: Engine) {
         val fileSystem = InMemoryFileSystem()
         val userPrompt = messages.lastOrNull { it.role == "user" }?.content ?: ""
         val result = engine.run(
-            prompt = userPrompt,
+            prompt = "$userPrompt\nOnly create ONE file!",
             filesystem = fileSystem,
             onEvent = { event ->
                 println("Internal Agent Event: $event")
