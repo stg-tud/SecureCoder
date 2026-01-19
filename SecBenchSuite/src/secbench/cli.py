@@ -15,6 +15,7 @@ from rich.live import Live
 from secbench.config import Config
 from secbench.runners.generation import GenerationRunner
 from secbench.benchmarks.cweval import CWEvalBenchmark
+from secbench.benchmarks.seccodeplt import SecCodePLTBenchmark
 
 console = Console()
 
@@ -86,6 +87,44 @@ async def run_cweval(args, config: Config):
         live.update(generate_view())
 
 
+async def run_seccodeplt(args, config: Config):
+    # Assuming seccodeplt is located at ./Benchmarks/SecCodePLT relative to project root
+    bench_path = Path("Benchmarks/SecCodePLT")
+    if not bench_path.exists():
+        console.print(f"[red]Error: SecCodePLT benchmark not found at {bench_path}[/]")
+        return
+
+    try:
+        benchmark = SecCodePLTBenchmark(config, bench_path)
+    except FileNotFoundError as e:
+        console.print(f"[red]{e}[/]")
+        return
+
+    output_dir = Path(config.output_dir) / "seccodeplt"
+
+    output_lines = []
+
+    def generate_view():
+        return Panel(
+            Group(*[line for line in output_lines[-20:]]),
+            title=f"Running SecCodePLT with {args.model}",
+            border_style="cyan",
+        )
+
+    def update_output(msg: str):
+        output_lines.append(msg)
+
+    with Live(generate_view(), refresh_per_second=10) as live:
+        await benchmark.run_pipeline(
+            model=args.model,
+            output_dir=output_dir,
+            n=args.n,
+            temperature=args.temperature,
+            output_callback=update_output,
+        )
+        live.update(generate_view())
+
+
 def interactive_mode(config: Config):
     console.print(
         Panel.fit("[bold blue]SecBench Suite[/]\nInteractive Mode", border_style="blue")
@@ -128,7 +167,10 @@ def main():
     # Evaluate Command (Placeholder)
     eval_parser = subparsers.add_parser("evaluate", help="Evaluate samples")
     eval_parser.add_argument(
-        "--benchmark", choices=["cweval"], default="cweval", help="Benchmark to run"
+        "--benchmark",
+        choices=["cweval", "seccodeplt"],
+        default="cweval",
+        help="Benchmark to run",
     )
     eval_parser.add_argument(
         "--model", default="openai/gpt-3.5-turbo", help="Model to evaluate"
@@ -149,6 +191,8 @@ def main():
     elif args.command == "evaluate":
         if args.benchmark == "cweval":
             asyncio.run(run_cweval(args, config))
+        elif args.benchmark == "seccodeplt":
+            asyncio.run(run_seccodeplt(args, config))
         else:
             print("Evaluation not implemented yet.")
     else:

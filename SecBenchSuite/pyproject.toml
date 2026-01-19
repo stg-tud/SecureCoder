@@ -13,6 +13,30 @@ dependencies = [
     "pyyaml>=6.0",
 ]
 
+[project.optional-dependencies]
+cweval = [
+    "fire",
+    "natsort",
+    "pytest",
+    "pytest-xdist",
+    "wrapt_timeout_decorator",
+    "pytest-timeout",
+    "requests",
+    "lxml",
+    "pyyaml",
+    "PyJWT",
+    "argon2-cffi",
+    "pycryptodome",
+    "docker",
+    "numpy",
+    "p_tqdm",
+    "litellm",
+    "google-auth",
+    "google-generativeai",
+    "anthropic[vertex]",
+    "boto3",
+]
+
 [project.scripts]
 secbench = "secbench.cli:main"
 

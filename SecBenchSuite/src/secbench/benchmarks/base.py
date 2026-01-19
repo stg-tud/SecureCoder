@@ -31,7 +31,7 @@ class BaseBenchmark:
         """
         results = []
         total = len(prompts) * n
-        
+
         def log(msg):
             if output_callback:
                 output_callback(msg)
@@ -43,7 +43,7 @@ class BaseBenchmark:
         for i, item in enumerate(prompts):
             prompt_id = item.get("id", str(i))
             prompt_text = item.get("prompt")
-            
+
             if not prompt_text:
                 log(f"Skipping prompt {prompt_id}: No prompt text found.")
                 continue
@@ -55,24 +55,24 @@ class BaseBenchmark:
                         model=model,
                         prompt=prompt_text,
                         system_prompt=self.config.system_prompt,
-                        temperature=temperature
+                        temperature=temperature,
                     )
-                    results.append({
-                        "id": prompt_id,
-                        "prompt": prompt_text,
-                        "response": content,
-                        "sample_index": j,
-                        "model": model,
-                        "metadata": item
-                    })
+                    results.append(
+                        {
+                            "id": prompt_id,
+                            "prompt": prompt_text,
+                            "response": content,
+                            "sample_index": j,
+                            "model": model,
+                            "metadata": item.get("metadata", {}),
+                        }
+                    )
                 except Exception as e:
                     log(f"Error generating for prompt {prompt_id}: {e}")
-                    results.append({
-                        "id": prompt_id,
-                        "error": str(e),
-                        "sample_index": j
-                    })
-        
+                    results.append(
+                        {"id": prompt_id, "error": str(e), "sample_index": j}
+                    )
+
         return results
 
     def save_results(self, results: List[Dict[str, Any]], output_dir: Path):

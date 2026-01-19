@@ -32,6 +32,10 @@ class CWEvalBenchmark(BaseBenchmark):
         """
         Run the CWEval generation pipeline using the suite's generation runner.
         """
+        # Save current working directory and change to benchmark path
+        original_cwd = os.getcwd()
+        os.chdir(str(self.benchmark_path))
+        
         try:
             from cweval.commons import BENCHMARK_DIR, LANGS
             from cweval.ppt import DirectPrompt
@@ -41,6 +45,7 @@ class CWEvalBenchmark(BaseBenchmark):
             except ImportError:
                 natsorted = sorted
         except ImportError as e:
+            os.chdir(original_cwd)
             raise ImportError(
                 f"Could not import cweval modules: {e}. Make sure benchmark_path is correct."
             )
@@ -53,79 +58,83 @@ class CWEvalBenchmark(BaseBenchmark):
             else:
                 print(msg)
 
-        # Get cases
-        cases = {}
-        begin_prompt_anchor = "BEGIN PROMPT"
-        begin_solution_anchor = "BEGIN SOLUTION"
+        try:
+            # Get cases
+            cases = {}
+            begin_prompt_anchor = "BEGIN PROMPT"
+            begin_solution_anchor = "BEGIN SOLUTION"
 
-        log(f"Scanning for cases in {BENCHMARK_DIR}...")
+            log(f"Scanning for cases in {BENCHMARK_DIR}...")
 
-        for root, _, files in os.walk(BENCHMARK_DIR):
-            if "__pycache__" in root:
-                continue
-            for file in natsorted(files):
-                file_wo_ext, ext = os.path.splitext(file)
-                task_file_path = os.path.join(root, file)
-                lang = ext[1:]
-
-                if not (ext and file_wo_ext.endswith("_task")):
+            for root, _, files in os.walk(BENCHMARK_DIR):
+                if "__pycache__" in root:
                     continue
-                if lang not in LANGS:
-                    continue
+                for file in natsorted(files):
+                    file_wo_ext, ext = os.path.splitext(file)
+                    task_file_path = os.path.join(root, file)
+                    lang = ext[1:]
 
-                with open(task_file_path, "r") as f:
-                    task_code = f.read()
+                    if not (ext and file_wo_ext.endswith("_task")):
+                        continue
+                    if lang not in LANGS:
+                        continue
 
-                begin_solution_line_src = ""
-                for line in task_code.splitlines():
-                    if begin_solution_anchor in line:
-                        begin_solution_line_src = line
-                        break
+                    with open(task_file_path, "r") as f:
+                        task_code = f.read()
 
-                if not begin_solution_line_src:
-                    log(f"Warning: No solution anchor found in {task_file_path}")
-                    continue
+                    begin_solution_line_src = ""
+                    for line in task_code.splitlines():
+                        if begin_solution_anchor in line:
+                            begin_solution_line_src = line
+                            break
 
-                try:
-                    code_prompt = (
-                        task_code.split(begin_prompt_anchor)[-1]
-                        .split(begin_solution_line_src)[0]
-                        .strip()
-                    )
-                except IndexError:
-                    log(f"Warning: Could not parse prompt in {task_file_path}")
-                    continue
+                    if not begin_solution_line_src:
+                        log(f"Warning: No solution anchor found in {task_file_path}")
+                        continue
 
-                rel_path = os.path.relpath(task_file_path, BENCHMARK_DIR)
-                cases[rel_path] = {
-                    "code": code_prompt,
-                    "lang": lang,
-                    "path": task_file_path,
-                    "rel_path": rel_path,
-                }
+                    try:
+                        code_prompt = (
+                            task_code.split(begin_prompt_anchor)[-1]
+                            .split(begin_solution_line_src)[0]
+                            .strip()
+                        )
+                    except IndexError:
+                        log(f"Warning: Could not parse prompt in {task_file_path}")
+                        continue
 
-        log(f"Found {len(cases)} cases.")
+                    rel_path = os.path.relpath(task_file_path, BENCHMARK_DIR)
+                    cases[rel_path] = {
+                        "code": code_prompt,
+                        "lang": lang,
+                        "path": task_file_path,
+                        "rel_path": rel_path,
+                    }
 
-        prompts = []
-        for case_id, case_data in cases.items():
-            lang = case_data["lang"]
-            code_prompt = case_data["code"]
+            log(f"Found {len(cases)} cases.")
 
-            prompt_text = DirectPrompt.PPT.format(
-                lang=lang,
-                lang_instr=DirectPrompt.LANG_INSTR.get(lang, ""),
-                code_prompt=code_prompt,
+            prompts = []
+            for case_id, case_data in cases.items():
+                lang = case_data["lang"]
+                code_prompt = case_data["code"]
+
+                prompt_text = DirectPrompt.PPT.format(
+                    lang=lang,
+                    lang_instr=DirectPrompt.LANG_INSTR.get(lang, ""),
+                    code_prompt=code_prompt,
+                )
+
+                prompts.append(
+                    {"id": case_id, "prompt": prompt_text, "metadata": case_data}
+                )
+
+            results = await self.generate_samples(
+                model, prompts, n, temperature, output_callback
             )
 
-            prompts.append(
-                {"id": case_id, "prompt": prompt_text, "metadata": case_data}
-            )
-
-        results = await self.generate_samples(
-            model, prompts, n, temperature, output_callback
-        )
-
-        self.save_cweval_results(results, output_dir, n)
+            self.save_cweval_results(results, output_dir, n)
+        finally:
+            # Restore original working directory
+            os.chdir(original_cwd)
 
     def save_cweval_results(self, results, output_dir, n):
         """Save results in CWEval structure."""
