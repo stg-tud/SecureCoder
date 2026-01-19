@@ -1,0 +1,15 @@
+# Configuration for SecBench
+
+# API Keys (Leave empty if not used)
+openai_api_key: "YOUR_API_KEY"
+openrouter_api_key: "YOUR_API_KEY"
+
+# API Configuration
+api_base_url: "https://openrouter.ai/api/v1/" # "http://localhost:8080/v1"
+# default_model: "openai/gpt-4o-mini"
+
+# System Prompt
+# system_prompt: "You are a security-aware code assistant. Generate secure code."
+
+# Output Directory
+output_dir: "results"
