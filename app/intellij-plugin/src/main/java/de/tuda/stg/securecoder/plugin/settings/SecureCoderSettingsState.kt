@@ -21,18 +21,26 @@ class SecureCoderSettingsState : PersistentStateComponent<SecureCoderSettingsSta
         }
     }
 
-    data class StateData(
-        var enricherUrl: String = "http://localhost:7070",
-        var llmProvider: LlmProvider = LlmProvider.OPENROUTER,
+    data class LlmConfig(
+        var provider: LlmProvider = LlmProvider.OPENROUTER,
         var ollamaModel: String = "gpt-oss:20b",
         var openrouterApiKey: String = "",
         var openrouterModel: String = "openai/gpt-oss-20b",
+    ) {
+        fun isValid() = provider == LlmProvider.OLLAMA || openrouterApiKey.isNotBlank()
+    }
+
+    data class StateData(
+        var enricherUrl: String = "http://localhost:7070",
         var enablePromptEnriching: Boolean = true,
         var enableDummyGuardian: Boolean = true,
         var enableCodeQLGuardian: Boolean = false,
+        var enableLlmGuardian: Boolean = true,
         var codeqlBinary: String = "codeql",
+        var mainLlm: LlmConfig = LlmConfig(),
+        var guardianLlm: LlmConfig = LlmConfig(),
     ) {
-        fun hasLLMProviderConfigured() = llmProvider == LlmProvider.OLLAMA || openrouterApiKey.isNotBlank()
+        fun hasLLMProviderConfigured() = mainLlm.isValid()
     }
 
     fun interface SecureCoderSettingsListener {

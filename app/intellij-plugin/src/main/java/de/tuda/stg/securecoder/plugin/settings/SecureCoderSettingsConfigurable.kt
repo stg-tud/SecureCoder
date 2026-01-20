@@ -21,6 +21,7 @@ import com.intellij.ui.layout.selected
 import com.intellij.ui.layout.selectedValueMatches
 import de.tuda.stg.securecoder.guardian.CodeQLRunner
 import de.tuda.stg.securecoder.plugin.SecureCoderBundle
+import de.tuda.stg.securecoder.plugin.settings.SecureCoderSettingsState.LlmConfig
 import de.tuda.stg.securecoder.plugin.settings.SecureCoderSettingsState.LlmProvider
 import java.io.IOException
 import java.nio.file.Path
@@ -32,35 +33,10 @@ class SecureCoderSettingsConfigurable : BoundConfigurable(SecureCoderBundle.mess
     private val settings = service<SecureCoderSettingsState>()
 
     override fun createPanel() = panel {
-        group(SecureCoderBundle.message("settings.group.llmProvider")) {
-            val providerBox = ComboBox(EnumComboBoxModel(LlmProvider::class.java))
-            row(SecureCoderBundle.message("settings.provider")) {
-                val providerBinding: MutableProperty<LlmProvider?> = MutableProperty(
-                    { settings.state.llmProvider },
-                    { settings.state.llmProvider = it ?: LlmProvider.OLLAMA }
-                )
-                cell(providerBox).bindItem(providerBinding)
-            }
-            rowsRange {
-                row(SecureCoderBundle.message("settings.ollama.model")) {
-                    textField()
-                        .bindText(settings.state::ollamaModel)
-                        .columns(COLUMNS_MEDIUM)
-                }
-            }.visibleIf(providerBox.selectedValueMatches { it == LlmProvider.OLLAMA })
-            rowsRange {
-                row(SecureCoderBundle.message("settings.openrouter.api.key")) {
-                    passwordField()
-                        .bindText(settings.state::openrouterApiKey)
-                        .columns(COLUMNS_MEDIUM)
-                }
-                row(SecureCoderBundle.message("settings.openrouter.model")) {
-                    textField()
-                        .bindText(settings.state::openrouterModel)
-                        .columns(COLUMNS_MEDIUM)
-                }
-            }.visibleIf(providerBox.selectedValueMatches { it == LlmProvider.OPENROUTER })
-        }
+        createLlmConfigSection(
+            SecureCoderBundle.message("settings.group.llmProvider"),
+            settings.state.mainLlm
+        )
         group(SecureCoderBundle.message("settings.group.security")) {
             val enricher = JBCheckBox(SecureCoderBundle.message("settings.enricher.enabled"))
             row {
@@ -160,6 +136,15 @@ class SecureCoderSettingsConfigurable : BoundConfigurable(SecureCoderBundle.mess
                     })
                 }
             }.enabledIf(codeql.selected)
+            val llmGuardian = JBCheckBox(SecureCoderBundle.message("settings.guardian.llm.enable"))
+            row {
+                cell(llmGuardian).bindSelected(settings.state::enableLlmGuardian)
+            }
+
+            createLlmConfigSection(
+                SecureCoderBundle.message("settings.group.llmGuardian"),
+                settings.state.guardianLlm
+            ).enabledIf(llmGuardian.selected)
         }
     }
 
@@ -169,5 +154,40 @@ class SecureCoderSettingsConfigurable : BoundConfigurable(SecureCoderBundle.mess
             .messageBus
             .syncPublisher(SecureCoderSettingsState.topic)
             .settingsChanged(settings.state)
+    }
+
+    private fun Panel.createLlmConfigSection(
+        title: String,
+        config: LlmConfig,
+    ): Row {
+        return group(title) {
+            val providerBox = ComboBox(EnumComboBoxModel(LlmProvider::class.java))
+            row(SecureCoderBundle.message("settings.provider")) {
+                val providerBinding: MutableProperty<LlmProvider?> = MutableProperty(
+                    { config.provider },
+                    { config.provider = it ?: LlmProvider.OLLAMA }
+                )
+                cell(providerBox).bindItem(providerBinding)
+            }
+            rowsRange {
+                row(SecureCoderBundle.message("settings.ollama.model")) {
+                    textField()
+                        .bindText(config::ollamaModel)
+                        .columns(COLUMNS_MEDIUM)
+                }
+            }.visibleIf(providerBox.selectedValueMatches { it == LlmProvider.OLLAMA })
+            rowsRange {
+                row(SecureCoderBundle.message("settings.openrouter.api.key")) {
+                    passwordField()
+                        .bindText(config::openrouterApiKey)
+                        .columns(COLUMNS_MEDIUM)
+                }
+                row(SecureCoderBundle.message("settings.openrouter.model")) {
+                    textField()
+                        .bindText(config    ::openrouterModel)
+                        .columns(COLUMNS_MEDIUM)
+                }
+            }.visibleIf(providerBox.selectedValueMatches { it == LlmProvider.OPENROUTER })
+        }
     }
 }
