@@ -57,6 +57,7 @@ class CodeQLRunner:
             str(db_path),
             "--format=sarif-latest",
             f"--output={str(output_path)}",
+            "--download"
         ] + queries
         
         logger.info(f"Running CodeQL analysis: {' '.join(cmd)}")

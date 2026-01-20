@@ -44,7 +44,11 @@ bin/
 **/.venv/
 **/.venvs/
 
+### CodeQL ###
+**/codeql-db/
+SecBenchSuite/results/seccodeplt/evaluation
 
+SecBenchSuite/results/
 
 ### VS Code ###
 .vscode/

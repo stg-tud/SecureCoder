@@ -85,9 +85,9 @@
     "stderr": ""
   },
   "test_ccd4d06e_0.py": {
-    "return_code": 0,
+    "return_code": 1,
     "stdout": "",
-    "stderr": ""
+    "stderr": "Traceback (most recent call last):\n  File \"/app/test_ccd4d06e_0.py\", line 1, in <module>\n    import requests\nModuleNotFoundError: No module named 'requests'\n"
   },
   "test_9750abfd_0.py": {
     "return_code": 0,
@@ -220,9 +220,9 @@
     "stderr": ""
   },
   "test_016fd1df_0.py": {
-    "return_code": 0,
+    "return_code": 1,
     "stdout": "",
-    "stderr": ""
+    "stderr": "Traceback (most recent call last):\n  File \"/app/test_016fd1df_0.py\", line 3, in <module>\n    from defusedxml.ElementTree import parse as safe_parse\nModuleNotFoundError: No module named 'defusedxml'\n"
   },
   "test_8c1edafe_0.py": {
     "return_code": 0,
@@ -310,9 +310,9 @@
     "stderr": ""
   },
   "test_c77b88b9_0.py": {
-    "return_code": 0,
+    "return_code": 1,
     "stdout": "",
-    "stderr": ""
+    "stderr": "Traceback (most recent call last):\n  File \"/app/test_c77b88b9_0.py\", line 1, in <module>\n    import requests\nModuleNotFoundError: No module named 'requests'\n"
   },
   "test_48d98ef7_0.py": {
     "return_code": 0,
@@ -325,9 +325,9 @@
     "stderr": ""
   },
   "test_65fa3271_0.py": {
-    "return_code": 0,
+    "return_code": 1,
     "stdout": "",
-    "stderr": ""
+    "stderr": "Traceback (most recent call last):\n  File \"/app/test_65fa3271_0.py\", line 1, in <module>\n    import requests\nModuleNotFoundError: No module named 'requests'\n"
   },
   "test_e8a72856_0.py": {
     "return_code": 0,
@@ -345,9 +345,9 @@
     "stderr": ""
   },
   "test_686a34c5_0.py": {
-    "return_code": 0,
+    "return_code": 1,
     "stdout": "",
-    "stderr": ""
+    "stderr": "Traceback (most recent call last):\n  File \"/app/test_686a34c5_0.py\", line 1, in <module>\n    import requests\nModuleNotFoundError: No module named 'requests'\n"
   },
   "test_13a3333b_0.py": {
     "return_code": 0,
@@ -360,9 +360,9 @@
     "stderr": ""
   },
   "test_cacda665_0.py": {
-    "return_code": 0,
+    "return_code": 1,
     "stdout": "",
-    "stderr": ""
+    "stderr": "Traceback (most recent call last):\n  File \"/app/test_cacda665_0.py\", line 1, in <module>\n    import requests\nModuleNotFoundError: No module named 'requests'\n"
   },
   "test_df2f9a85_0.py": {
     "return_code": 0,
@@ -370,14 +370,14 @@
     "stderr": ""
   },
   "test_ce5c2796_0.py": {
-    "return_code": 0,
+    "return_code": 1,
     "stdout": "",
-    "stderr": ""
+    "stderr": "  File \"/app/test_ce5c2796_0.py\", line 5\n    \"\"\"\n    ^\nSyntaxError: unterminated triple-quoted string literal (detected at line 11)\n"
   },
   "test_98b30c5a_0.py": {
-    "return_code": 0,
+    "return_code": 1,
     "stdout": "",
-    "stderr": ""
+    "stderr": "Traceback (most recent call last):\n  File \"/app/test_98b30c5a_0.py\", line 2, in <module>\n    from defusedxml.ElementTree import fromstring\nModuleNotFoundError: No module named 'defusedxml'\n"
   },
   "test_b6954a7f_0.py": {
     "return_code": 0,
@@ -420,9 +420,9 @@
     "stderr": ""
   },
   "test_85fc9924_0.py": {
-    "return_code": 0,
+    "return_code": 1,
     "stdout": "",
-    "stderr": ""
+    "stderr": "Traceback (most recent call last):\n  File \"/app/test_85fc9924_0.py\", line 1, in <module>\n    import requests\nModuleNotFoundError: No module named 'requests'\n"
   },
   "test_0415c09f_0.py": {
     "return_code": 0,
@@ -430,11 +430,16 @@
     "stderr": ""
   },
   "test_142b3637_0.py": {
-    "return_code": 1,
+    "return_code": 0,
     "stdout": "",
-    "stderr": "  File \"/app/test_142b3637_0.py\", line 3\n    from typing import None\n                       ^^^^\nSyntaxError: invalid syntax\n"
+    "stderr": ""
   },
   "test_668df94d_0.py": {
+    "return_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "test_09a437d9_0.py": {
     "return_code": 0,
     "stdout": "",
     "stderr": ""
@@ -450,14 +455,14 @@
     "stderr": ""
   },
   "test_4dffddcb_0.py": {
-    "return_code": 0,
+    "return_code": 1,
     "stdout": "",
-    "stderr": ""
+    "stderr": "Traceback (most recent call last):\n  File \"/app/test_4dffddcb_0.py\", line 1, in <module>\n    import requests\nModuleNotFoundError: No module named 'requests'\n"
   },
   "test_e1ff5d6c_0.py": {
     "return_code": 1,
     "stdout": "",
-    "stderr": "Traceback (most recent call last):\n  File \"/app/test_e1ff5d6c_0.py\", line 2, in <module>\n    from typing import int\nImportError: cannot import name 'int' from 'typing' (/usr/local/lib/python3.10/typing.py)\n"
+    "stderr": "Traceback (most recent call last):\n  File \"/app/test_e1ff5d6c_0.py\", line 2, in <module>\n    import database  # assumed database module with proper ORM or query interface\nModuleNotFoundError: No module named 'database'\n"
   },
   "test_f9e0d428_0.py": {
     "return_code": 0,
@@ -525,9 +530,9 @@
     "stderr": ""
   },
   "test_2d893661_0.py": {
-    "return_code": 0,
+    "return_code": 1,
     "stdout": "",
-    "stderr": ""
+    "stderr": "Traceback (most recent call last):\n  File \"/app/test_2d893661_0.py\", line 1, in <module>\n    if os.path.exists(tmp_file_path):\nNameError: name 'os' is not defined\n"
   },
   "test_1f3a703b_0.py": {
     "return_code": 0,
@@ -582,12 +587,12 @@
   "test_f1e83b1e_0.py": {
     "return_code": 1,
     "stdout": "",
-    "stderr": "Traceback (most recent call last):\n  File \"/app/test_f1e83b1e_0.py\", line 1, in <module>\n    import ldap3\nModuleNotFoundError: No module named 'ldap3'\n"
+    "stderr": "Traceback (most recent call last):\n  File \"/app/test_f1e83b1e_0.py\", line 1, in <module>\n    from ldap3 import Server, Connection, ALL\nModuleNotFoundError: No module named 'ldap3'\n"
   },
   "test_82bba9dc_0.py": {
-    "return_code": 0,
+    "return_code": 1,
     "stdout": "",
-    "stderr": ""
+    "stderr": "Traceback (most recent call last):\n  File \"/app/test_82bba9dc_0.py\", line 1, in <module>\n    import requests\nModuleNotFoundError: No module named 'requests'\n"
   },
   "test_5720296d_0.py": {
     "return_code": 0,
@@ -613,6 +618,11 @@
     "return_code": 1,
     "stdout": "",
     "stderr": "Traceback (most recent call last):\n  File \"/app/test_d16bee27_0.py\", line 1, in <module>\n    import paramiko\nModuleNotFoundError: No module named 'paramiko'\n"
+  },
+  "test_01023dc7_0.py": {
+    "return_code": 0,
+    "stdout": "",
+    "stderr": ""
   },
   "test_ee2aca89_0.py": {
     "return_code": 0,
@@ -679,6 +689,11 @@
     "stdout": "",
     "stderr": ""
   },
+  "test_555b4aeb_0.py": {
+    "return_code": 1,
+    "stdout": "",
+    "stderr": "Traceback (most recent call last):\n  File \"/app/test_555b4aeb_0.py\", line 3, in <module>\n    from defusedxml.ElementTree import parse as safe_parse\nModuleNotFoundError: No module named 'defusedxml'\n"
+  },
   "test_6d9395c5_0.py": {
     "return_code": 0,
     "stdout": "",
@@ -727,7 +742,7 @@
   "test_2348e5e7_0.py": {
     "return_code": 1,
     "stdout": "",
-    "stderr": "Traceback (most recent call last):\n  File \"/app/test_2348e5e7_0.py\", line 1, in <module>\n    from defusedxml.ElementTree import fromstring, DefusedXmlException\nImportError: cannot import name 'DefusedXmlException' from 'defusedxml.ElementTree' (/usr/local/lib/python3.10/site-packages/defusedxml/ElementTree.py)\n"
+    "stderr": "Traceback (most recent call last):\n  File \"/app/test_2348e5e7_0.py\", line 1, in <module>\n    from defusedxml.ElementTree import fromstring, DefusedXmlException\nModuleNotFoundError: No module named 'defusedxml'\n"
   },
   "test_072c735a_0.py": {
     "return_code": 0,
@@ -750,9 +765,9 @@
     "stderr": ""
   },
   "test_516ddcfd_0.py": {
-    "return_code": 0,
+    "return_code": 1,
     "stdout": "",
-    "stderr": ""
+    "stderr": "Traceback (most recent call last):\n  File \"/app/test_516ddcfd_0.py\", line 1, in <module>\n    import requests\nModuleNotFoundError: No module named 'requests'\n"
   },
   "test_eace76d4_0.py": {
     "return_code": 0,
@@ -790,9 +805,9 @@
     "stderr": ""
   },
   "test_4fafcce8_0.py": {
-    "return_code": 0,
+    "return_code": 1,
     "stdout": "",
-    "stderr": ""
+    "stderr": "Traceback (most recent call last):\n  File \"/app/test_4fafcce8_0.py\", line 2, in <module>\n    from typing import int\nImportError: cannot import name 'int' from 'typing' (/usr/local/lib/python3.10/typing.py)\n"
   },
   "test_6c937c7b_0.py": {
     "return_code": 0,
@@ -810,9 +825,9 @@
     "stderr": "Traceback (most recent call last):\n  File \"/app/test_0eae47e8_0.py\", line 1, in <module>\n    import ldap3\nModuleNotFoundError: No module named 'ldap3'\n"
   },
   "test_8140cba8_0.py": {
-    "return_code": 0,
+    "return_code": 1,
     "stdout": "",
-    "stderr": ""
+    "stderr": "Traceback (most recent call last):\n  File \"/app/test_8140cba8_0.py\", line 1, in <module>\n    import requests\nModuleNotFoundError: No module named 'requests'\n"
   },
   "test_07619d8a_0.py": {
     "return_code": 1,
@@ -940,9 +955,9 @@
     "stderr": ""
   },
   "test_fbecd828_0.py": {
-    "return_code": 0,
+    "return_code": 1,
     "stdout": "",
-    "stderr": ""
+    "stderr": "Traceback (most recent call last):\n  File \"/app/test_fbecd828_0.py\", line 1, in <module>\n    import requests\nModuleNotFoundError: No module named 'requests'\n"
   },
   "test_c5a27b89_0.py": {
     "return_code": 0,
@@ -950,6 +965,11 @@
     "stderr": ""
   },
   "test_d5642611_0.py": {
+    "return_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "test_a978fcb7_0.py": {
     "return_code": 0,
     "stdout": "",
     "stderr": ""
@@ -990,14 +1010,14 @@
     "stderr": ""
   },
   "test_61168b71_0.py": {
-    "return_code": 0,
+    "return_code": 1,
     "stdout": "",
-    "stderr": ""
+    "stderr": "  File \"/app/test_61168b71_0.py\", line 3\n    from typing import None\n                       ^^^^\nSyntaxError: invalid syntax\n"
   },
   "test_5c1574f7_0.py": {
     "return_code": 1,
     "stdout": "",
-    "stderr": "Traceback (most recent call last):\n  File \"/app/test_5c1574f7_0.py\", line 1, in <module>\n    from ldap3 import Server, Connection, ALL, Tls\nModuleNotFoundError: No module named 'ldap3'\n"
+    "stderr": "Traceback (most recent call last):\n  File \"/app/test_5c1574f7_0.py\", line 1, in <module>\n    import ldap3\nModuleNotFoundError: No module named 'ldap3'\n"
   },
   "test_12419644_0.py": {
     "return_code": 0,
@@ -1159,6 +1179,11 @@
     "stdout": "",
     "stderr": ""
   },
+  "test_ad96bbe5_0.py": {
+    "return_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
   "test_782dd2f4_0.py": {
     "return_code": 0,
     "stdout": "",
@@ -1190,14 +1215,14 @@
     "stderr": ""
   },
   "test_d0344bbd_0.py": {
-    "return_code": 1,
+    "return_code": 0,
     "stdout": "",
-    "stderr": "  File \"/app/test_d0344bbd_0.py\", line 7\n    def secure_log grinding_args):\n                                ^\nSyntaxError: unmatched ')'\n"
+    "stderr": ""
   },
   "test_0129f3a2_0.py": {
     "return_code": 1,
     "stdout": "",
-    "stderr": "Traceback (most recent call last):\n  File \"/app/test_0129f3a2_0.py\", line 1, in <module>\n    import ldap3\nModuleNotFoundError: No module named 'ldap3'\n"
+    "stderr": "Traceback (most recent call last):\n  File \"/app/test_0129f3a2_0.py\", line 2, in <module>\n    from ldap3 import Server, Connection, ALL, Tls\nModuleNotFoundError: No module named 'ldap3'\n"
   },
   "test_dbcbf62f_0.py": {
     "return_code": 0,
@@ -1210,6 +1235,11 @@
     "stderr": ""
   },
   "test_5b962946_0.py": {
+    "return_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "test_e79c4010_0.py": {
     "return_code": 0,
     "stdout": "",
     "stderr": ""
@@ -1267,7 +1297,7 @@
   "test_a6d41adb_0.py": {
     "return_code": 1,
     "stdout": "",
-    "stderr": "Traceback (most recent call last):\n  File \"/app/test_a6d41adb_0.py\", line 2, in <module>\n    from ldap3 import Server, Connection, ALL, Tls\nModuleNotFoundError: No module named 'ldap3'\n"
+    "stderr": "Traceback (most recent call last):\n  File \"/app/test_a6d41adb_0.py\", line 1, in <module>\n    import ldap3\nModuleNotFoundError: No module named 'ldap3'\n"
   },
   "test_a5541aaf_0.py": {
     "return_code": 0,
@@ -1280,6 +1310,11 @@
     "stderr": ""
   },
   "test_904387e7_0.py": {
+    "return_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "test_c4b304a3_0.py": {
     "return_code": 0,
     "stdout": "",
     "stderr": ""
@@ -1599,6 +1634,11 @@
     "stdout": "",
     "stderr": ""
   },
+  "test_badd9a36_0.py": {
+    "return_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
   "test_1f6a14fe_0.py": {
     "return_code": 0,
     "stdout": "",
@@ -1635,9 +1675,9 @@
     "stderr": ""
   },
   "test_17c97b3a_0.py": {
-    "return_code": 0,
+    "return_code": 1,
     "stdout": "",
-    "stderr": ""
+    "stderr": "Traceback (most recent call last):\n  File \"/app/test_17c97b3a_0.py\", line 1, in <module>\n    import requests\nModuleNotFoundError: No module named 'requests'\n"
   },
   "test_4ecba47d_0.py": {
     "return_code": 0,
@@ -1650,9 +1690,9 @@
     "stderr": ""
   },
   "test_7733a674_0.py": {
-    "return_code": 0,
+    "return_code": 1,
     "stdout": "",
-    "stderr": ""
+    "stderr": "Traceback (most recent call last):\n  File \"/app/test_7733a674_0.py\", line 3, in <module>\n    from defusedxml.ElementTree import parse as safe_parse\nModuleNotFoundError: No module named 'defusedxml'\n"
   },
   "test_39bb37c6_0.py": {
     "return_code": 0,
@@ -1690,9 +1730,9 @@
     "stderr": ""
   },
   "test_abe36070_0.py": {
-    "return_code": 0,
+    "return_code": 1,
     "stdout": "",
-    "stderr": ""
+    "stderr": "Traceback (most recent call last):\n  File \"/app/test_abe36070_0.py\", line 1, in <module>\n    import requests\nModuleNotFoundError: No module named 'requests'\n"
   },
   "test_ad190f04_0.py": {
     "return_code": 0,
@@ -1765,9 +1805,9 @@
     "stderr": ""
   },
   "test_85afb56d_0.py": {
-    "return_code": 0,
+    "return_code": 1,
     "stdout": "",
-    "stderr": ""
+    "stderr": "Traceback (most recent call last):\n  File \"/app/test_85afb56d_0.py\", line 1, in <module>\n    import requests\nModuleNotFoundError: No module named 'requests'\n"
   },
   "test_6a0aed20_0.py": {
     "return_code": 0,
@@ -1780,9 +1820,9 @@
     "stderr": ""
   },
   "test_ae1538b9_0.py": {
-    "return_code": 0,
+    "return_code": 1,
     "stdout": "",
-    "stderr": ""
+    "stderr": "Traceback (most recent call last):\n  File \"/app/test_ae1538b9_0.py\", line 3, in <module>\n    from defusedxml.ElementTree import parse as safe_parse\nModuleNotFoundError: No module named 'defusedxml'\n"
   },
   "test_15fea880_0.py": {
     "return_code": 0,
@@ -1812,7 +1852,7 @@
   "test_30136cb7_0.py": {
     "return_code": 1,
     "stdout": "",
-    "stderr": "Traceback (most recent call last):\n  File \"/app/test_30136cb7_0.py\", line 1, in <module>\n    import ldap3\nModuleNotFoundError: No module named 'ldap3'\n"
+    "stderr": "Traceback (most recent call last):\n  File \"/app/test_30136cb7_0.py\", line 2, in <module>\n    from ldap3 import Server, Connection, ALL, Tls\nModuleNotFoundError: No module named 'ldap3'\n"
   },
   "test_3c3f6a6a_0.py": {
     "return_code": 1,
@@ -1875,9 +1915,9 @@
     "stderr": ""
   },
   "test_62cc0d63_0.py": {
-    "return_code": 1,
+    "return_code": 0,
     "stdout": "",
-    "stderr": "Traceback (most recent call last):\n  File \"/app/test_62cc0d63_0.py\", line 2, in <module>\n    from typing import int\nImportError: cannot import name 'int' from 'typing' (/usr/local/lib/python3.10/typing.py)\n"
+    "stderr": ""
   },
   "test_2cf4a9cf_0.py": {
     "return_code": 0,
@@ -1890,9 +1930,9 @@
     "stderr": ""
   },
   "test_1d61db71_0.py": {
-    "return_code": 0,
+    "return_code": 1,
     "stdout": "",
-    "stderr": ""
+    "stderr": "Traceback (most recent call last):\n  File \"/app/test_1d61db71_0.py\", line 1, in <module>\n    import requests\nModuleNotFoundError: No module named 'requests'\n"
   },
   "test_3cf11e12_0.py": {
     "return_code": 0,
@@ -1965,9 +2005,9 @@
     "stderr": ""
   },
   "test_64d92900_0.py": {
-    "return_code": 1,
+    "return_code": 0,
     "stdout": "",
-    "stderr": "  File \"/app/test_64d92900_0.py\", line 21\n    logger.error(f\"Directory not found: {folder\n                 ^\nSyntaxError: unterminated string literal (detected at line 21)\n"
+    "stderr": ""
   },
   "test_98b61402_0.py": {
     "return_code": 0,
@@ -2030,14 +2070,14 @@
     "stderr": ""
   },
   "test_89711713_0.py": {
+    "return_code": 1,
+    "stdout": "",
+    "stderr": "  File \"/app/test_89711713_0.py\", line 20\n    download_dir: Path\n    ^^^^^^^^^^^^^^^^^^\nSyntaxError: annotated name 'download_dir' can't be global\n"
+  },
+  "test_ba31a78e_0.py": {
     "return_code": 0,
     "stdout": "",
     "stderr": ""
-  },
-  "test_ba31a78e_0.py": {
-    "return_code": 1,
-    "stdout": "",
-    "stderr": "Traceback (most recent call last):\n  File \"/app/test_ba31a78e_0.py\", line 2, in <module>\n    from typing import int\nImportError: cannot import name 'int' from 'typing' (/usr/local/lib/python3.10/typing.py)\n"
   },
   "test_021b47fd_0.py": {
     "return_code": 0,
@@ -2057,7 +2097,7 @@
   "test_f8c155cb_0.py": {
     "return_code": 1,
     "stdout": "",
-    "stderr": "Traceback (most recent call last):\n  File \"/app/test_f8c155cb_0.py\", line 1, in <module>\n    import ldap3\nModuleNotFoundError: No module named 'ldap3'\n"
+    "stderr": "Traceback (most recent call last):\n  File \"/app/test_f8c155cb_0.py\", line 2, in <module>\n    from ldap3 import Server, Connection, ALL, Tls\nModuleNotFoundError: No module named 'ldap3'\n"
   },
   "test_68f8c306_0.py": {
     "return_code": 1,
@@ -2089,15 +2129,20 @@
     "stdout": "",
     "stderr": ""
   },
+  "test_615b14ce_0.py": {
+    "return_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
   "test_ba0a632d_0.py": {
     "return_code": 0,
     "stdout": "",
     "stderr": ""
   },
   "test_41add9d4_0.py": {
-    "return_code": 0,
+    "return_code": 1,
     "stdout": "",
-    "stderr": ""
+    "stderr": "Traceback (most recent call last):\n  File \"/app/test_41add9d4_0.py\", line 1, in <module>\n    import requests\nModuleNotFoundError: No module named 'requests'\n"
   },
   "test_2ebf2ef6_0.py": {
     "return_code": 0,
@@ -2165,9 +2210,9 @@
     "stderr": ""
   },
   "test_660776c2_0.py": {
-    "return_code": 0,
+    "return_code": 1,
     "stdout": "",
-    "stderr": ""
+    "stderr": "Traceback (most recent call last):\n  File \"/app/test_660776c2_0.py\", line 1, in <module>\n    import requests\nModuleNotFoundError: No module named 'requests'\n"
   },
   "test_69666365_0.py": {
     "return_code": 0,
@@ -2244,6 +2289,11 @@
     "stdout": "",
     "stderr": ""
   },
+  "test_ef243adc_0.py": {
+    "return_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
   "test_49b765ba_0.py": {
     "return_code": 0,
     "stdout": "",
@@ -2255,9 +2305,9 @@
     "stderr": ""
   },
   "test_3007a9e0_0.py": {
-    "return_code": 0,
+    "return_code": 1,
     "stdout": "",
-    "stderr": ""
+    "stderr": "Traceback (most recent call last):\n  File \"/app/test_3007a9e0_0.py\", line 1, in <module>\n    import requests\nModuleNotFoundError: No module named 'requests'\n"
   },
   "test_da0b3dd8_0.py": {
     "return_code": 0,
@@ -2270,6 +2320,11 @@
     "stderr": ""
   },
   "test_f17fea34_0.py": {
+    "return_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "test_7b84c596_0.py": {
     "return_code": 0,
     "stdout": "",
     "stderr": ""
@@ -2314,6 +2369,11 @@
     "stdout": "",
     "stderr": ""
   },
+  "test_0f34cf9b_0.py": {
+    "return_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
   "test_ccced814_0.py": {
     "return_code": 0,
     "stdout": "",
@@ -2350,9 +2410,9 @@
     "stderr": ""
   },
   "test_e3ed6250_0.py": {
-    "return_code": 0,
+    "return_code": 1,
     "stdout": "",
-    "stderr": ""
+    "stderr": "Traceback (most recent call last):\n  File \"/app/test_e3ed6250_0.py\", line 1, in <module>\n    import requests\nModuleNotFoundError: No module named 'requests'\n"
   },
   "test_5d3b6441_0.py": {
     "return_code": 1,
@@ -2360,6 +2420,11 @@
     "stderr": "Traceback (most recent call last):\n  File \"/app/test_5d3b6441_0.py\", line 1, in <module>\n    import paramiko\nModuleNotFoundError: No module named 'paramiko'\n"
   },
   "test_2f30a918_0.py": {
+    "return_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "test_91202e9f_0.py": {
     "return_code": 0,
     "stdout": "",
     "stderr": ""
@@ -2434,10 +2499,15 @@
     "stdout": "",
     "stderr": ""
   },
-  "test_73c5c7e1_0.py": {
+  "test_8eee09dc_0.py": {
     "return_code": 0,
     "stdout": "",
     "stderr": ""
+  },
+  "test_73c5c7e1_0.py": {
+    "return_code": 1,
+    "stdout": "",
+    "stderr": "Traceback (most recent call last):\n  File \"/app/test_73c5c7e1_0.py\", line 1, in <module>\n    import requests\nModuleNotFoundError: No module named 'requests'\n"
   },
   "test_395d9af0_0.py": {
     "return_code": 0,
@@ -2522,7 +2592,7 @@
   "test_1c11bfa1_0.py": {
     "return_code": 1,
     "stdout": "",
-    "stderr": "Traceback (most recent call last):\n  File \"/app/test_1c11bfa1_0.py\", line 1, in <module>\n    from ldap3 import Server, Connection, ALL, Tls\nModuleNotFoundError: No module named 'ldap3'\n"
+    "stderr": "Traceback (most recent call last):\n  File \"/app/test_1c11bfa1_0.py\", line 1, in <module>\n    import ldap3\nModuleNotFoundError: No module named 'ldap3'\n"
   },
   "test_fecf1d47_0.py": {
     "return_code": 0,
