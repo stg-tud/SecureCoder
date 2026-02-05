@@ -132,9 +132,88 @@ class CWEvalBenchmark(BaseBenchmark):
             )
 
             self.save_cweval_results(results, output_dir, n)
+
+            # Run evaluation in Docker
+            await self.evaluate_samples(output_dir, output_callback)
         finally:
             # Restore original working directory
             os.chdir(original_cwd)
+
+    async def evaluate_samples(
+        self,
+        output_dir: Path,
+        output_callback: Optional[Callable[[str], None]] = None,
+    ):
+        """
+        Run the evaluation script inside the official CWEval docker image.
+        """
+        container_name = "secbench_cweval_eval"
+        
+        # Ensure output_dir is absolute
+        output_dir = output_dir.resolve()
+
+        def log(msg):
+            if output_callback:
+                output_callback(msg)
+            else:
+                print(msg)
+
+        # Map host paths to container paths
+        # We mount the benchmark path code so we use the same version as local
+        # We mount the output_dir to evals_output so the container can see generated files
+        volumes = {
+            str(self.benchmark_path): self.CONTAINER_WORKDIR,
+            str(output_dir): f"{self.CONTAINER_WORKDIR}/evals_output",
+        }
+
+        # Env vars might be needed if evaluation uses API? 
+        env = {"PYTHONUNBUFFERED": "1"}
+        
+        log(f"Starting CWEval container ({container_name}) for evaluation...")
+
+        # Cleanup existing container if any
+        await self.docker_runner.remove(container_name)
+
+        try:
+            # Start container
+            await self.docker_runner.run_detached(
+                name=container_name,
+                volumes=volumes,
+                env=env,
+                workdir=self.CONTAINER_WORKDIR,
+            )
+
+            # Fix for missing tenacity in the docker image
+            install_cmd = f'zsh -c "source ~/miniforge3/bin/activate && source {self.CONTAINER_WORKDIR}/.env && pip install tenacity"'
+            await self.docker_runner.exec_command(
+                container_name, install_cmd, output_callback=None
+            )
+
+            # Run evaluation
+            # The generated files are in evals_output (mapped from output_dir)
+            eval_path_container = "evals_output"
+
+            eval_cmd_inner = (
+                f"python -u cweval/evaluate.py pipeline "
+                f"--eval_path {eval_path_container} "
+                f"--docker False "
+                f"--num_proc 4"
+            )
+            eval_cmd = f'zsh -c "source ~/miniforge3/bin/activate && source .env && {eval_cmd_inner}"'
+
+            log(f"Running Evaluation: {eval_cmd}")
+            exit_code = await self.docker_runner.exec_command(
+                container_name, eval_cmd, output_callback=output_callback
+            )
+
+            if exit_code != 0:
+                log("Evaluation failed.")
+            else:
+                log(f"Evaluation completed. Results updated in {output_dir}")
+
+        finally:
+            log("Stopping container...")
+            await self.docker_runner.stop(container_name)
 
     def save_cweval_results(self, results, output_dir, n):
         """Save results in CWEval structure."""

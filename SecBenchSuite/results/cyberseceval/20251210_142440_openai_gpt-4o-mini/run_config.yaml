@@ -1,7 +1,0 @@
-benchmark: cyberseceval
-benchmark_type: instruct
-model: openai/gpt-4o-mini
-n: 1
-runner: local
-temperature: 0.8
-timestamp: '20251210_142440'

@@ -76,13 +76,25 @@ async def run_cweval(args, config: Config):
         output_lines.append(msg)
 
     with Live(generate_view(), refresh_per_second=10) as live:
-        await benchmark.run_pipeline(
-            model=args.model,
-            output_dir=output_dir,
-            n=args.n,
-            temperature=args.temperature,
-            output_callback=update_output,
-        )
+        if args.samples_dir:
+            samples_dir = Path(args.samples_dir)
+            if not samples_dir.exists():
+                console.print(f"[red]Error: Samples directory not found at {samples_dir}[/]")
+                return
+            
+            output_lines.append(f"Evaluating samples from: {samples_dir}")
+            await benchmark.evaluate_samples(
+                output_dir=samples_dir,
+                output_callback=update_output,
+            )
+        else:
+            await benchmark.run_pipeline(
+                model=args.model,
+                output_dir=output_dir,
+                n=args.n,
+                temperature=args.temperature,
+                output_callback=update_output,
+            )
         # Keep the final view for a moment or just exit
         live.update(generate_view())
 
@@ -180,6 +192,10 @@ def main():
     )
     eval_parser.add_argument(
         "--temperature", type=float, default=0.8, help="Temperature"
+    )
+    eval_parser.add_argument(
+        "--samples-dir",
+        help="Directory containing generated samples for evaluation (skips generation)",
     )
 
     args = parser.parse_args()

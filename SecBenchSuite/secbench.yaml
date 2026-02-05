@@ -1,11 +1,11 @@
 # Configuration for SecBench
 
 # API Keys (Leave empty if not used)
-openai_api_key: "YOUR_API_KEY"
-openrouter_api_key: "YOUR_API_KEY"
+openai_api_key: "sk-YOUROPENROUTERAPIKEY"
+openrouter_api_key: "sk-YOUROPENROUTERAPIKEY"
 
 # API Configuration
-api_base_url: "https://openrouter.ai/api/v1/" # "http://localhost:8080/v1"
+api_base_url: "https://openrouter.ai/api/v1/" # "https://openrouter.ai/api/v1/" or "http://localhost:8080/v1"
 # default_model: "openai/gpt-4o-mini"
 
 # System Prompt

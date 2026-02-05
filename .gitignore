@@ -45,10 +45,10 @@ bin/
 **/.venvs/
 
 ### CodeQL ###
-**/codeql-db/
-SecBenchSuite/results/seccodeplt/evaluation
-
 SecBenchSuite/results/
+**/results/
+**/codeql-db/
+
 
 ### VS Code ###
 .vscode/
