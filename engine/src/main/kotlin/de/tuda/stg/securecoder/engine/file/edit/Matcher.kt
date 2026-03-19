@@ -6,8 +6,8 @@ import de.tuda.stg.securecoder.engine.file.edit.Matcher.MatchResult.Success
 interface Matcher {
     sealed interface MatchResult {
         sealed interface Error : MatchResult {
-            object ReplaceOnNotExistent : Error
-            object NoMatch : Error
+            data object ReplaceOnNotExistent : Error
+            data object NoMatch : Error
             data class MultipleMatch (val matches: List<Int>) : Error
         }
         sealed interface Success : MatchResult {
