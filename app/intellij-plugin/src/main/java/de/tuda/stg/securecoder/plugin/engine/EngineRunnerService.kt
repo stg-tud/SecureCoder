@@ -67,7 +67,7 @@ class EngineRunnerService(
             if (settings.enableLlmGuardian) LlmGuardian(buildLlmClient(settings.guardianLlm, "securecoder guardian")) else null
         )
         
-        //return EngineHandle(DummyAgentStreamer(), {})
+        //return EngineHandle(DemoEngine(), {})
         return EngineHandle(
             WorkflowEngine(enricher, llm, guardians),
             {
