@@ -55,6 +55,7 @@ class EngineRunnerService(
     private fun buildEngine(): EngineHandle {
         val settings = settings.state
         val llm = buildLlmClient(settings.mainLlm, "securecoder")
+        val guardianLlmConfig = if (settings.useMainLlmForGuardian) settings.mainLlm else settings.guardianLlm
         
         val enricher = if (settings.enablePromptEnriching) {
             EnricherClient(settings.enricherUrl)
@@ -64,7 +65,7 @@ class EngineRunnerService(
         val guardians = listOfNotNull(
             if (settings.enableDummyGuardian) DummyGuardian(sleepMillis = 2000) else null,
             if (settings.enableCodeQLGuardian) CodeQLGuardian(settings.codeqlBinary) else null,
-            if (settings.enableLlmGuardian) LlmGuardian(buildLlmClient(settings.guardianLlm, "securecoder guardian")) else null
+            if (settings.enableLlmGuardian) LlmGuardian(buildLlmClient(guardianLlmConfig, "securecoder guardian")) else null
         )
         
         //return EngineHandle(DemoEngine(), {})

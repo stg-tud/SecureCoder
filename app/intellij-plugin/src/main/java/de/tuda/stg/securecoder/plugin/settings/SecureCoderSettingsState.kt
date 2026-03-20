@@ -36,6 +36,7 @@ class SecureCoderSettingsState : PersistentStateComponent<SecureCoderSettingsSta
         var enableDummyGuardian: Boolean = true,
         var enableCodeQLGuardian: Boolean = false,
         var enableLlmGuardian: Boolean = true,
+        var useMainLlmForGuardian: Boolean = true,
         var codeqlBinary: String = "codeql",
         var mainLlm: LlmConfig = LlmConfig(),
         var guardianLlm: LlmConfig = LlmConfig(),

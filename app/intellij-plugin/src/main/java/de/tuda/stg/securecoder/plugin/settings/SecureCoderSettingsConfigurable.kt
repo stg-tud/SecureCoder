@@ -17,6 +17,8 @@ import com.intellij.ui.EnumComboBoxModel
 import com.intellij.ui.awt.RelativePoint
 import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.dsl.builder.*
+import com.intellij.ui.layout.and
+import com.intellij.ui.layout.not
 import com.intellij.ui.layout.selected
 import com.intellij.ui.layout.selectedValueMatches
 import de.tuda.stg.securecoder.guardian.CodeQLRunner
@@ -178,14 +180,18 @@ class SecureCoderSettingsConfigurable : BoundConfigurable(SecureCoderBundle.mess
 
                 group(SecureCoderBundle.message("settings.group.guardian.llm")) {
                     val llmGuardian = JBCheckBox(SecureCoderBundle.message("settings.guardian.llm.enable"))
+                    val useMainLlmForGuardian = JBCheckBox(SecureCoderBundle.message("settings.guardian.llm.use.main"))
                     row {
                         cell(llmGuardian).bindSelected(settings.state::enableLlmGuardian)
                     }
+                    row {
+                        cell(useMainLlmForGuardian).bindSelected(settings.state::useMainLlmForGuardian)
+                    }.enabledIf(llmGuardian.selected)
 
                     createLlmConfigSection(
                         SecureCoderBundle.message("settings.group.llmGuardian"),
                         settings.state.guardianLlm
-                    ).enabledIf(llmGuardian.selected)
+                    ).enabledIf(llmGuardian.selected.and(useMainLlmForGuardian.selected.not()))
                 }
             }
         }
