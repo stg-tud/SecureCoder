@@ -1,6 +1,7 @@
 package de.tuda.stg.securecoder.openaibridge
 
 import de.tuda.stg.securecoder.engine.Engine
+import de.tuda.stg.securecoder.engine.guardian.LlmGuardian
 import de.tuda.stg.securecoder.engine.llm.LlmClient
 import de.tuda.stg.securecoder.engine.llm.OllamaClient
 import de.tuda.stg.securecoder.engine.llm.OpenRouterClient
@@ -10,10 +11,11 @@ import de.tuda.stg.securecoder.guardian.CodeQLGuardian
 
 object EngineFactory {
     fun fromEnvironment(): Engine {
+        val llmClient = createLlmClientFromEnvironment()
         return WorkflowEngine(
             PromptEnricher.PASSTHROUGH,
-            createLlmClientFromEnvironment(),
-            listOf(CodeQLGuardian())
+            llmClient,
+            listOf(CodeQLGuardian(), LlmGuardian(llmClient))
         )
     }
 
