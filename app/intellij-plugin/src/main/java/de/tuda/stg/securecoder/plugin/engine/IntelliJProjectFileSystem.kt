@@ -61,6 +61,9 @@ class IntelliJProjectFileSystem(
                     return@writeAction
                 }
                 val parentVf = VfsUtil.createDirectories(parentDirPath)
+                if (parentVf == null) {
+                    throw IOException("Could not create parent directory for $parentDirPath")
+                }
                 parentVf.refresh(false, true)
                 vf = parentVf.findChild(ioFile.name) ?: parentVf.createChildData(this, ioFile.name)
             } else if (vf.isDirectory) {
