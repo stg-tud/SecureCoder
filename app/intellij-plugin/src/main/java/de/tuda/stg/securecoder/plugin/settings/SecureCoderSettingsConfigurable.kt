@@ -36,117 +36,161 @@ class SecureCoderSettingsConfigurable : BoundConfigurable(SecureCoderBundle.mess
         createLlmConfigSection(
             SecureCoderBundle.message("settings.group.llmProvider"),
             settings.state.mainLlm
-        )
+        ).bottomGap(BottomGap.MEDIUM)
+
         group(SecureCoderBundle.message("settings.group.security")) {
-            val enricher = JBCheckBox(SecureCoderBundle.message("settings.enricher.enabled"))
-            row {
-                cell(enricher).bindSelected(settings.state::enablePromptEnriching)
-            }
-            row(SecureCoderBundle.message("settings.enricher.url")) {
-                textField()
-                    .bindText(settings.state::enricherUrl)
-                    .columns(COLUMNS_MEDIUM)
-            }.enabledIf(enricher.selected).bottomGap(BottomGap.SMALL)
-            row {
-                checkBox(SecureCoderBundle.message("settings.guardian.dummy")).bindSelected(settings.state::enableDummyGuardian)
-            }
-            val codeql = JBCheckBox(SecureCoderBundle.message("settings.guardian.codeql.enable"))
-            row {
-                cell(codeql).bindSelected(settings.state::enableCodeQLGuardian)
-            }
-            row(SecureCoderBundle.message("settings.codeql.binary")) {
-                val codeqlPathCell = textFieldWithBrowseButton(
-                    FileChooserDescriptorFactory.singleFile()
-                )
-                    .bindText(settings.state::codeqlBinary)
-                    .columns(COLUMNS_MEDIUM)
-                val codeqlPathField = codeqlPathCell.component
-                button(SecureCoderBundle.message("settings.codeql.test")) { event ->
-                    val loadingBalloon = JBPopupFactory.getInstance()
-                        .createHtmlTextBalloonBuilder(SecureCoderBundle.message("settings.codeql.checking"), AnimatedIcon.Default.INSTANCE, null, null, null)
-                        .createBalloon()
-
-                    loadingBalloon.show(
-                        RelativePoint.getSouthOf(event.source as JComponent),
-                        Balloon.Position.below
-                    )
-                    ApplicationManager.getApplication().executeOnPooledThread {
-                        val bin = settings.state.codeqlBinary.ifBlank { "codeql" }
-                        val (message, type) = try {
-                            SecureCoderBundle.message("settings.codeql.found", CodeQLRunner(bin).getToolVersion()) to MessageType.INFO
-                        } catch (e: Exception) {
-                            SecureCoderBundle.message("settings.codeql.error", (e.message ?: e.toString())) to MessageType.ERROR
-                        }
-                        ApplicationManager.getApplication().invokeLater(
-                            {
-                                loadingBalloon.hide()
-                                val balloon = JBPopupFactory.getInstance()
-                                    .createHtmlTextBalloonBuilder(message, type, null)
-                                    .createBalloon()
-                                balloon.show(
-                                    RelativePoint.getSouthOf(event.source as JComponent),
-                                    Balloon.Position.below
-                                )
-                            },
-                            ModalityState.any()
-                        )
+            group(SecureCoderBundle.message("settings.group.enricher")) {
+                val enricher = JBCheckBox(SecureCoderBundle.message("settings.enricher.enabled"))
+                row {
+                    cell(enricher).bindSelected(settings.state::enablePromptEnriching)
+                }
+                row(SecureCoderBundle.message("settings.enricher.url")) {
+                    textField()
+                        .bindText(settings.state::enricherUrl)
+                        .columns(COLUMNS_MEDIUM)
+                }.enabledIf(enricher.selected)
+            }.bottomGap(BottomGap.MEDIUM)
+            group(SecureCoderBundle.message("settings.group.guardians")) {
+                group(SecureCoderBundle.message("settings.group.guardian.dummy")) {
+                    row {
+                        checkBox(SecureCoderBundle.message("settings.guardian.dummy"))
+                            .bindSelected(settings.state::enableDummyGuardian)
                     }
-                }
-                button(SecureCoderBundle.message("settings.codeql.download")) { event ->
-                    val button = event.source as JButton
-                    button.setEnabled(false)
-                    ProgressManager.getInstance().run(object : Task.Backgroundable(null, SecureCoderBundle.message("settings.codeql.installing"), true) {
-                        private var resultPath: Path? = null
-                        private var exception: Exception? = null
+                }.bottomGap(BottomGap.MEDIUM)
+                group(SecureCoderBundle.message("settings.group.guardian.codeql")) {
+                    val codeql = JBCheckBox(SecureCoderBundle.message("settings.guardian.codeql.enable"))
+                    row {
+                        cell(codeql).bindSelected(settings.state::enableCodeQLGuardian)
+                    }
+                    row(SecureCoderBundle.message("settings.codeql.binary")) {
+                        val codeqlPathCell = textFieldWithBrowseButton(
+                            FileChooserDescriptorFactory.singleFile()
+                        )
+                            .bindText(settings.state::codeqlBinary)
+                            .columns(COLUMNS_MEDIUM)
 
-                        override fun run(indicator: ProgressIndicator) {
-                            val installer = CodeQLInstaller()
-                            try {
-                                resultPath = installer.getOrInstallCodeQL(indicator)
-                            } catch (e: IOException) {
-                                exception = e
+                        val codeqlPathField = codeqlPathCell.component
+
+                        button(SecureCoderBundle.message("settings.codeql.test")) { event ->
+                            val loadingBalloon = JBPopupFactory.getInstance()
+                                .createHtmlTextBalloonBuilder(
+                                    SecureCoderBundle.message("settings.codeql.checking"),
+                                    AnimatedIcon.Default.INSTANCE,
+                                    null, null, null
+                                )
+                                .createBalloon()
+
+                            loadingBalloon.show(
+                                RelativePoint.getSouthOf(event.source as JComponent),
+                                Balloon.Position.below
+                            )
+
+                            ApplicationManager.getApplication().executeOnPooledThread {
+                                val bin = settings.state.codeqlBinary.ifBlank { "codeql" }
+                                val (message, type) = try {
+                                    SecureCoderBundle.message(
+                                        "settings.codeql.found",
+                                        CodeQLRunner(bin).getToolVersion()
+                                    ) to MessageType.INFO
+                                } catch (e: Exception) {
+                                    SecureCoderBundle.message(
+                                        "settings.codeql.error",
+                                        (e.message ?: e.toString())
+                                    ) to MessageType.ERROR
+                                }
+
+                                ApplicationManager.getApplication().invokeLater(
+                                    {
+                                        loadingBalloon.hide()
+                                        JBPopupFactory.getInstance()
+                                            .createHtmlTextBalloonBuilder(message, type, null)
+                                            .createBalloon()
+                                            .show(
+                                                RelativePoint.getSouthOf(event.source as JComponent),
+                                                Balloon.Position.below
+                                            )
+                                    },
+                                    ModalityState.any()
+                                )
                             }
                         }
 
-                        override fun onSuccess() {
-                            button.setEnabled(true)
-                            if (exception != null) {
-                                JBPopupFactory.getInstance()
-                                    .createHtmlTextBalloonBuilder(
-                                        SecureCoderBundle.message("settings.codeql.install.failed", exception!!.message ?: exception!!.toString()),
-                                        MessageType.ERROR,
-                                        null
-                                    )
-                                    .createBalloon()
-                                    .show(RelativePoint.getSouthOf(button), Balloon.Position.below)
-                            } else if (resultPath != null) {
-                                val path = resultPath.toString()
-                                settings.state.codeqlBinary = path
-                                codeqlPathField.text = path
-                                JBPopupFactory.getInstance()
-                                    .createHtmlTextBalloonBuilder(SecureCoderBundle.message("settings.codeql.downloaded"), MessageType.INFO, null)
-                                    .createBalloon()
-                                    .show(RelativePoint.getSouthOf(button), Balloon.Position.below)
-                            }
-                        }
+                        button(SecureCoderBundle.message("settings.codeql.download")) { event ->
+                            val button = event.source as JButton
+                            button.isEnabled = false
 
-                        override fun onCancel() {
-                            button.setEnabled(true)
+                            ProgressManager.getInstance().run(object : Task.Backgroundable(
+                                null,
+                                SecureCoderBundle.message("settings.codeql.installing"),
+                                true
+                            ) {
+                                private var resultPath: Path? = null
+                                private var exception: Exception? = null
+
+                                override fun run(indicator: ProgressIndicator) {
+                                    val installer = CodeQLInstaller()
+                                    try {
+                                        resultPath = installer.getOrInstallCodeQL(indicator)
+                                    } catch (e: IOException) {
+                                        exception = e
+                                    }
+                                }
+
+                                override fun onSuccess() {
+                                    button.isEnabled = true
+                                    when {
+                                        exception != null -> {
+                                            JBPopupFactory.getInstance()
+                                                .createHtmlTextBalloonBuilder(
+                                                    SecureCoderBundle.message(
+                                                        "settings.codeql.install.failed",
+                                                        exception!!.message ?: exception!!.toString()
+                                                    ),
+                                                    MessageType.ERROR,
+                                                    null
+                                                )
+                                                .createBalloon()
+                                                .show(RelativePoint.getSouthOf(button), Balloon.Position.below)
+                                        }
+                                        resultPath != null -> {
+                                            val path = resultPath.toString()
+                                            settings.state.codeqlBinary = path
+                                            codeqlPathField.text = path
+                                            JBPopupFactory.getInstance()
+                                                .createHtmlTextBalloonBuilder(
+                                                    SecureCoderBundle.message("settings.codeql.downloaded"),
+                                                    MessageType.INFO,
+                                                    null
+                                                )
+                                                .createBalloon()
+                                                .show(RelativePoint.getSouthOf(button), Balloon.Position.below)
+                                        }
+                                    }
+                                }
+
+                                override fun onCancel() {
+                                    button.isEnabled = true
+                                }
+                            })
                         }
-                    })
+                    }.enabledIf(codeql.selected)
+                }.bottomGap(BottomGap.MEDIUM)
+
+                group(SecureCoderBundle.message("settings.group.guardian.llm")) {
+                    val llmGuardian = JBCheckBox(SecureCoderBundle.message("settings.guardian.llm.enable"))
+                    row {
+                        cell(llmGuardian).bindSelected(settings.state::enableLlmGuardian)
+                    }
+
+                    createLlmConfigSection(
+                        SecureCoderBundle.message("settings.group.llmGuardian"),
+                        settings.state.guardianLlm
+                    ).enabledIf(llmGuardian.selected)
                 }
-            }.enabledIf(codeql.selected)
-            val llmGuardian = JBCheckBox(SecureCoderBundle.message("settings.guardian.llm.enable"))
-            row {
-                cell(llmGuardian).bindSelected(settings.state::enableLlmGuardian)
             }
-
-            createLlmConfigSection(
-                SecureCoderBundle.message("settings.group.llmGuardian"),
-                settings.state.guardianLlm
-            ).enabledIf(llmGuardian.selected)
         }
     }
+
 
     override fun apply() {
         super.apply()
