@@ -21,6 +21,8 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import org.slf4j.LoggerFactory
@@ -54,6 +56,7 @@ class OpenRouterClient (
         val stream: Boolean = false,
         val metadata: JsonObject = buildJsonObject {},
         @SerialName("response_format") val responseFormat: JsonObject? = null,
+        val provider: JsonObject? = null,
     )
 
     @Serializable
@@ -138,7 +141,10 @@ class OpenRouterClient (
             messages = mapped,
             temperature = params.temperature,
             maxTokens = params.maxTokens,
-            responseFormat = responseFormat
+            responseFormat = responseFormat,
+            provider = buildJsonObject {
+                put("require_parameters", JsonPrimitive(true))
+            }
         )
         val obj = performRequest(req)
         val content = obj.choices.firstOrNull()?.message?.content
@@ -146,7 +152,7 @@ class OpenRouterClient (
         return try {
             json.decodeFromString(serializer, content)
         } catch (e: Exception) {
-            throw RuntimeException("Failed to decode OpenRouter structured content into ${'$'}{serializer.descriptor.serialName}. Content: ${'$'}content", e)
+            throw RuntimeException("Failed to decode OpenRouter structured content into ${serializer.descriptor.serialName}. Content: $content", e)
         }
     }
 

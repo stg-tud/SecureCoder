@@ -7,6 +7,8 @@ import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import com.intellij.platform.ide.progress.withBackgroundProgress
 import de.tuda.stg.securecoder.engine.Engine
+import de.tuda.stg.securecoder.engine.guardian.LlmGuardian
+import de.tuda.stg.securecoder.engine.llm.LlmClient
 import de.tuda.stg.securecoder.engine.llm.OllamaClient
 import de.tuda.stg.securecoder.engine.llm.OpenRouterClient
 import de.tuda.stg.securecoder.engine.workflow.WorkflowEngine
@@ -18,6 +20,7 @@ import de.tuda.stg.securecoder.plugin.engine.event.EngineResultMapper
 import de.tuda.stg.securecoder.plugin.engine.event.StreamEventMapper
 import de.tuda.stg.securecoder.plugin.engine.event.UiStreamEvent
 import de.tuda.stg.securecoder.plugin.settings.SecureCoderSettingsState
+import de.tuda.stg.securecoder.plugin.settings.SecureCoderSettingsState.LlmConfig
 import de.tuda.stg.securecoder.plugin.settings.SecureCoderSettingsState.LlmProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -35,16 +38,24 @@ class EngineRunnerService(
         val close: () -> Unit,
     )
 
+    private fun buildLlmClient(
+        config: LlmConfig,
+        clientName: String
+    ): LlmClient {
+        return when (config.provider) {
+            LlmProvider.OPENROUTER -> OpenRouterClient(
+                config.openrouterApiKey,
+                config.openrouterModel,
+                clientName
+            )
+            LlmProvider.OLLAMA -> OllamaClient(config.ollamaModel)
+        }
+    }
+
     private fun buildEngine(): EngineHandle {
         val settings = settings.state
-        val llm = when (settings.llmProvider) {
-            LlmProvider.OPENROUTER -> OpenRouterClient(
-                settings.openrouterApiKey,
-                settings.openrouterModel,
-                "securecoder"
-            )
-            LlmProvider.OLLAMA -> OllamaClient(settings.ollamaModel)
-        }
+        val llm = buildLlmClient(settings.mainLlm, "securecoder")
+        val guardianLlmConfig = if (settings.useMainLlmForGuardian) settings.mainLlm else settings.guardianLlm
         
         val enricher = if (settings.enablePromptEnriching) {
             EnricherClient(settings.enricherUrl)
@@ -53,10 +64,11 @@ class EngineRunnerService(
         }
         val guardians = listOfNotNull(
             if (settings.enableDummyGuardian) DummyGuardian(sleepMillis = 2000) else null,
-            if (settings.enableCodeQLGuardian) CodeQLGuardian(settings.codeqlBinary) else null
+            if (settings.enableCodeQLGuardian) CodeQLGuardian(settings.codeqlBinary) else null,
+            if (settings.enableLlmGuardian) LlmGuardian(buildLlmClient(guardianLlmConfig, "securecoder guardian")) else null
         )
         
-        //return EngineHandle(DummyAgentStreamer(), {})
+        //return EngineHandle(DemoEngine(), {})
         return EngineHandle(
             WorkflowEngine(enricher, llm, guardians),
             {
