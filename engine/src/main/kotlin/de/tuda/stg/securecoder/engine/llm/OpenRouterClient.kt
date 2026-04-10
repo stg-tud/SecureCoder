@@ -15,6 +15,7 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 import io.ktor.serialization.kotlinx.json.json
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -27,10 +28,12 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import org.slf4j.LoggerFactory
 
+@OptIn(ExperimentalSerializationApi::class)
 class OpenRouterClient (
     private val apiKey: String,
     private val model: String,
     private val siteName: String? = null,
+    private val providerOrder: List<String> = emptyList(),
 ) : LlmClient {
     private val logger = LoggerFactory.getLogger("OpenRouterClient")
     private val json: Json = Json {
@@ -45,7 +48,7 @@ class OpenRouterClient (
     private val endpoint = "$baseUrl/chat/completions"
 
     @Serializable
-    private data class OpenRouterMessage(val role: String, val content: String)
+    private data class OpenRouterMessage(val role: String, val content: String?)
 
     @Serializable
     private data class OpenRouterChatRequest(
@@ -111,11 +114,12 @@ class OpenRouterClient (
             model = model,
             messages = mapped,
             temperature = params.temperature,
-            maxTokens = params.maxTokens
+            maxTokens = params.maxTokens,
+            provider = providerPreferences(requireParameters = false),
         )
         val obj = performRequest(req)
         val content = obj.choices.firstOrNull()?.message?.content
-            ?: error("OpenRouter did not return any response choices ")
+            ?: error("OpenRouter returned no textual response content")
         return content
     }
 
@@ -130,9 +134,10 @@ class OpenRouterClient (
         val responseFormat = buildJsonObject {
             put("type", "json_schema")
             put("json_schema", buildJsonObject {
-                put("name", serializer.descriptor.serialName.ifBlank { "securecoder_schema" })
+                put("name", schemaName(serializer))
                 put("strict", true)
                 put("schema", schema)
+                schemaDescription(serializer)?.let { put("description", it) }
             })
         }
 
@@ -142,13 +147,11 @@ class OpenRouterClient (
             temperature = params.temperature,
             maxTokens = params.maxTokens,
             responseFormat = responseFormat,
-            provider = buildJsonObject {
-                put("require_parameters", JsonPrimitive(true))
-            }
+            provider = providerPreferences(requireParameters = true),
         )
         val obj = performRequest(req)
         val content = obj.choices.firstOrNull()?.message?.content
-            ?: error("OpenRouter did not return any response choices ")
+            ?: error("OpenRouter returned no textual response content")
         return try {
             json.decodeFromString(serializer, content)
         } catch (e: Exception) {
@@ -157,4 +160,39 @@ class OpenRouterClient (
     }
 
     override fun close() = http.close()
+
+    private fun schemaName(serializer: KSerializer<*>): String {
+        val rawName = serializer.descriptor.serialName
+            .substringAfterLast('.')
+            .ifBlank { "securecoder_schema" }
+        val sanitized = rawName
+            .map { c -> if (c.isLetterOrDigit() || c == '_' || c == '-') c else '_' }
+            .joinToString("")
+            .trim('_', '-')
+            .ifBlank { "securecoder_schema" }
+        return sanitized.take(64)
+    }
+
+    private fun schemaDescription(serializer: KSerializer<*>): String? =
+        serializer.descriptor.annotations
+            .filterIsInstance<LLMDescription>()
+            .firstOrNull()
+            ?.text
+
+    private fun providerPreferences(requireParameters: Boolean): JsonObject? {
+        if (!requireParameters && providerOrder.isEmpty()) return null
+        return buildJsonObject {
+            if (providerOrder.isNotEmpty()) {
+                val providers = buildJsonArray {
+                    providerOrder.forEach { add(JsonPrimitive(it)) }
+                }
+                put("only", providers)
+                put("order", providers)
+                put("allow_fallbacks", providerOrder.size > 1)
+            }
+            if (requireParameters) {
+                put("require_parameters", true)
+            }
+        }
+    }
 }

@@ -27,7 +27,15 @@ object EngineFactory {
             return OpenRouterClient(
                 openRouterKey,
                 propOrEnv("MODEL") ?: "openai/gpt-oss-20b",
-                "securecoder/openapi-bridge"
+                "securecoder/openapi-bridge",
+                propOrEnv("OPENROUTER_PROVIDERS")
+                    ?.split(",")
+                    ?.map { it.trim() }
+                    ?.filter { it.isNotEmpty() }
+                    ?: propOrEnv("OPENROUTER_PROVIDER")
+                        ?.let { listOf(it.trim()) }
+                        ?.filter { it.isNotEmpty() }
+                    ?: emptyList()
             )
         }
         return OllamaClient(
