@@ -47,6 +47,10 @@ class OpenRouterClient (
     private val baseUrl = "https://openrouter.ai/api/v1"
     private val endpoint = "$baseUrl/chat/completions"
 
+    init {
+        require(apiKey.isNotBlank()) { "OPENROUTER_KEY must be set and non-blank" }
+    }
+
     @Serializable
     private data class OpenRouterMessage(val role: String, val content: String?)
 

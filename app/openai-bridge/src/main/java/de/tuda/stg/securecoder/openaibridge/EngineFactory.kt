@@ -23,6 +23,9 @@ object EngineFactory {
         fun propOrEnv(name: String): String? = System.getProperty(name) ?: System.getenv(name)
 
         val openRouterKey = propOrEnv("OPENROUTER_KEY")
+        if (openRouterKey != null && openRouterKey.isBlank()) {
+            throw IllegalStateException("OPENROUTER_KEY is set but blank")
+        }
         if (openRouterKey != null) {
             return OpenRouterClient(
                 openRouterKey,
