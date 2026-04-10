@@ -10,7 +10,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 WORKDIR /opt
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends curl ca-certificates unzip \
+    && apt-get install -y --no-install-recommends curl ca-certificates unzip python3 \
     && rm -rf /var/lib/apt/lists/*
 
 ENV CODEQL_VERSION=2.16.6
