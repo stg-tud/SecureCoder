@@ -3,6 +3,8 @@ package de.tuda.stg.securecoder.engine.llm
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.serializer
 
+class LlmUpstreamException(message: String, cause: Throwable? = null) : RuntimeException(message, cause)
+
 interface LlmClient : AutoCloseable {
     suspend fun chat(
         messages: List<ChatMessage>,

@@ -30,11 +30,14 @@ import org.slf4j.LoggerFactory
 
 @OptIn(ExperimentalSerializationApi::class)
 class OpenRouterClient (
-    private val apiKey: String,
+    apiKey: String,
     private val model: String,
     private val siteName: String? = null,
     private val providerOrder: List<String> = emptyList(),
 ) : LlmClient {
+    private val apiKey: String = apiKey.also {
+        require(it.isNotBlank()) { "OPENROUTER_KEY must be set and non-blank" }
+    }
     private val logger = LoggerFactory.getLogger("OpenRouterClient")
     private val json: Json = Json {
         ignoreUnknownKeys = true
@@ -46,10 +49,6 @@ class OpenRouterClient (
     }
     private val baseUrl = "https://openrouter.ai/api/v1"
     private val endpoint = "$baseUrl/chat/completions"
-
-    init {
-        require(apiKey.isNotBlank()) { "OPENROUTER_KEY must be set and non-blank" }
-    }
 
     @Serializable
     private data class OpenRouterMessage(val role: String, val content: String?)
@@ -86,25 +85,29 @@ class OpenRouterClient (
         req: OpenRouterChatRequest,
     ): OpenRouterChatResponse {
         logger.debug("Sending LLM request: {}", req)
-        val resp: HttpResponse = http.post(endpoint) {
-            contentType(ContentType.Application.Json)
-            accept(ContentType.Application.Json)
-            header(HttpHeaders.Authorization, "Bearer $apiKey")
-            siteName?.let { header("X-Title", it) }
-            setBody(req)
+        val resp: HttpResponse = try {
+            http.post(endpoint) {
+                contentType(ContentType.Application.Json)
+                accept(ContentType.Application.Json)
+                header(HttpHeaders.Authorization, "Bearer $apiKey")
+                siteName?.let { header("X-Title", it) }
+                setBody(req)
+            }
+        } catch (e: Exception) {
+            throw LlmUpstreamException("OpenRouter request failed: ${e.message ?: e::class.simpleName}", e)
         }
 
         val body = resp.bodyAsText()
         logger.debug("Got LLM response: {}", body)
         if (!resp.status.isSuccess()) {
             val errorMessage = body.ifBlank { "<Empty response>" }
-            throw RuntimeException("OpenRouter Error ${resp.status.value}: $errorMessage")
+            throw LlmUpstreamException("OpenRouter Error ${resp.status.value}: $errorMessage")
         }
         return try {
             json.decodeFromString(body)
         } catch (e: SerializationException) {
             val formattedBody = body.ifBlank { "<Empty response>" }
-            throw RuntimeException("Failed to parse OpenRouter response body. Raw body: $formattedBody", e)
+            throw LlmUpstreamException("Failed to parse OpenRouter response body. Raw body: $formattedBody", e)
         }
     }
 
@@ -123,7 +126,7 @@ class OpenRouterClient (
         )
         val obj = performRequest(req)
         val content = obj.choices.firstOrNull()?.message?.content
-            ?: error("OpenRouter returned no textual response content")
+            ?: throw LlmUpstreamException("OpenRouter returned no textual response content")
         return content
     }
 
@@ -155,7 +158,7 @@ class OpenRouterClient (
         )
         val obj = performRequest(req)
         val content = obj.choices.firstOrNull()?.message?.content
-            ?: error("OpenRouter returned no textual response content")
+            ?: throw LlmUpstreamException("OpenRouter returned no textual response content")
         return try {
             json.decodeFromString(serializer, content)
         } catch (e: Exception) {
