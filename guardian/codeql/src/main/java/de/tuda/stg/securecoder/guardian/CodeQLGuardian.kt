@@ -53,7 +53,10 @@ class CodeQLGuardian(
         }
     }
 
-    private fun detectBuildCommand(language: String, sourceRoot: Path): String? {
+    internal fun detectBuildCommand(language: String, sourceRoot: Path): String? {
+        if (language == "python") {
+            return "/usr/bin/true"
+        }
         if (language != "java") {
             return null
         }
