@@ -5,7 +5,10 @@ import de.tuda.stg.securecoder.engine.llm.ChatMessage
 import de.tuda.stg.securecoder.engine.llm.ChatMessage.Role
 import de.tuda.stg.securecoder.engine.llm.LlmClient
 import de.tuda.stg.securecoder.engine.llm.LLMDescription
+import de.tuda.stg.securecoder.engine.llm.LlmUpstreamException
 import de.tuda.stg.securecoder.engine.llm.chatStructured
+import de.tuda.stg.securecoder.engine.workflow.FeedbackBuilder.buildFeedbackForLlm
+import de.tuda.stg.securecoder.engine.workflow.GuardianExecutor
 import de.tuda.stg.securecoder.filesystem.FileSystem
 import de.tuda.stg.securecoder.engine.llm.ChatExchange
 import kotlinx.serialization.Serializable
@@ -15,7 +18,8 @@ import kotlin.collections.plusAssign
 
 class StructuredEditFilesLlmWrapper(
     private val llmClient: LlmClient
-) {
+) : EditFormatHandler {
+    override val formatId: String = "structured_json"
     //TODO path => **uri** ; EditFilesLlmWrapper should be separate from the filesystem implementation
     private val prompt = """
         Your task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!
@@ -34,32 +38,42 @@ class StructuredEditFilesLlmWrapper(
     """.trimIndent()
 
 
-    suspend fun chat(
+    override suspend fun chat(
         messages: List<ChatMessage>,
         fileSystem: FileSystem,
-        params: LlmClient.GenerationParams = LlmClient.GenerationParams(),
-        onParseError: suspend (parseErrors: List<String>, llm: ChatExchange) -> Unit = { _, _ -> },
-        attempts: Int = 3
-    ): ChatResult {
+        params: LlmClient.GenerationParams,
+        onParseError: suspend (parseErrors: List<String>, llm: ChatExchange) -> Unit,
+        attempts: Int,
+    ): EditFormatHandler.ChatResult {
         val messages = messages.toMutableList()
         appendPromptToLastSystem(messages)
-        repeat(attempts) {
+        for (attempt in 0 until attempts) {
             val llmInput = messages.toList()
-            val structured = llmClient.chatStructured<StructuredEdits>(llmInput, params)
+            val structured = try {
+                llmClient.chatStructured<StructuredEdits>(llmInput, params)
+            } catch (e: LlmUpstreamException) {
+                throw e
+            } catch (e: Exception) {
+                val message = e.message ?: e.toString()
+                val feedback = buildString {
+                    appendLine("Your previous output could not be decoded as the required structured edit JSON.")
+                    appendLine("Error: $message")
+                    appendLine("Respond again with ONLY a JSON object that matches the provided schema. Do NOT include prose, markdown, or explanations.")
+                }
+                messages += ChatMessage(Role.User, feedback)
+                onParseError(listOf(message), ChatExchange(llmInput, feedback))
+                continue
+            }
             messages += ChatMessage(Role.Assistant, Json.encodeToString(structured))
             when (val result = validateAndConvert(structured, fileSystem)) {
-                is ParseResult.Ok -> return ChatResult(messages, result.value)
+                is ParseResult.Ok -> return EditFormatHandler.ChatResult(messages, result.value)
                 is ParseResult.Err -> {
                     messages += ChatMessage(Role.User, result.buildMessage())
                     onParseError(result.messages, ChatExchange(llmInput, messages.last().content))
                 }
             }
         }
-        return ChatResult(messages, null)
-    }
-
-    data class ChatResult(val messages: List<ChatMessage>, val changes: Changes?) {
-        fun changesMessage() = messages.last { it.role == Role.Assistant }
+        return EditFormatHandler.ChatResult(messages, null)
     }
 
     sealed interface ParseResult {
@@ -70,7 +84,7 @@ class StructuredEditFilesLlmWrapper(
                 appendLine("It violated the required format.")
                 appendLine("Errors:")
                 messages.forEach { appendLine(it) }
-                appendLine("Respond again with ONLY edit blocks that strictly follow the rules. Do NOT include prose, markdown, or explanations.")
+                appendLine("Respond again with ONLY a JSON object that matches the provided schema. Do NOT include prose, markdown, or explanations.")
                 appendLine("IMPORTANT: Resend the COMPLETE set of edits you intend to apply from your previous message")
             }
         }
@@ -85,7 +99,7 @@ class StructuredEditFilesLlmWrapper(
         }
         for (e in structured.edits) {
             val file = e.filePath.trim()
-            val searchPart = e.search
+            var searchPart = e.search
             val replacePart = e.replace
             if (file.isEmpty()) {
                 allErrors += "`filePath` should not be empty"
@@ -95,8 +109,11 @@ class StructuredEditFilesLlmWrapper(
                 allErrors += "`search` and `replace` parameters are the same"
                 continue
             }
-            val replace = Changes.SearchReplace(file, SearchedText(searchPart), replacePart)
             val content = fileSystem.getFile(file)?.content()
+            if (content == null && searchPart.isNotEmpty() && replacePart.isNotEmpty()) {
+                searchPart = ""
+            }
+            val replace = Changes.SearchReplace(file, SearchedText(searchPart), replacePart)
             val match = ApplyChanges.match(content, replace.searchedText)
             if (match is Matcher.MatchResult.Error) {
                 allErrors += ApplyChanges.buildErrorMessage(file, searchPart, match)
@@ -118,6 +135,17 @@ class StructuredEditFilesLlmWrapper(
             messages += ChatMessage(Role.System, "$prompt\n\nRespond ONLY with a JSON object that matches the provided schema. Do not include explanations.")
         }
     }
+
+    override fun buildGuardianFeedback(
+        guardianResult: GuardianExecutor.GuardianResult,
+        reviewMode: ReviewMode,
+    ): String = guardianResult.buildFeedbackForLlm(
+        responseInstruction = "Respond again with ONLY the structured JSON edit object required by the current schema. Do NOT include prose.",
+        reviewModeInstruction = when (reviewMode) {
+            ReviewMode.PATCH -> "Patch the current working version from your previous changes."
+            ReviewMode.REPLACE -> "Regenerate the complete fixed file set from scratch against the original context."
+        },
+    )
 
     @Serializable
     data class StructuredEdits(

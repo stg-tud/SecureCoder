@@ -4,13 +4,16 @@ import de.tuda.stg.securecoder.engine.file.edit.Changes.SearchedText
 import de.tuda.stg.securecoder.engine.llm.ChatMessage
 import de.tuda.stg.securecoder.engine.llm.ChatMessage.Role
 import de.tuda.stg.securecoder.engine.llm.LlmClient
+import de.tuda.stg.securecoder.engine.workflow.FeedbackBuilder.buildFeedbackForLlm
+import de.tuda.stg.securecoder.engine.workflow.GuardianExecutor
 import de.tuda.stg.securecoder.filesystem.FileSystem
 import de.tuda.stg.securecoder.engine.llm.ChatExchange
 import kotlin.collections.plusAssign
 
 class EditFilesLlmWrapper(
     private val llmClient: LlmClient
-) {
+) : EditFormatHandler {
+    override val formatId: String = "xml_search_replace"
     //TODO path => **uri** ; EditFilesLlmWrapper should be separate from the filesystem implementation
     private val prompt = """
         Your task it is to produce code. The agent will just parse the code you produce. So dont do a extensive review in your final answer!
@@ -37,13 +40,13 @@ class EditFilesLlmWrapper(
     """.trimIndent()
 
 
-    suspend fun chat(
+    override suspend fun chat(
         messages: List<ChatMessage>,
         fileSystem: FileSystem,
-        params: LlmClient.GenerationParams = LlmClient.GenerationParams(),
-        onParseError: suspend (parseErrors: List<String>, llm: ChatExchange) -> Unit = { _, _ -> },
-        attempts: Int = 3
-    ): ChatResult {
+        params: LlmClient.GenerationParams,
+        onParseError: suspend (parseErrors: List<String>, llm: ChatExchange) -> Unit,
+        attempts: Int,
+    ): EditFormatHandler.ChatResult {
         val messages = messages.toMutableList()
         appendPromptToLastSystem(messages)
         repeat(attempts) {
@@ -51,18 +54,14 @@ class EditFilesLlmWrapper(
             val response = llmClient.chat(llmInput, params)
             messages += ChatMessage(Role.Assistant, response)
             when (val result = parse(response, fileSystem)) {
-                is ParseResult.Ok -> return ChatResult(messages, result.value)
+                is ParseResult.Ok -> return EditFormatHandler.ChatResult(messages, result.value)
                 is ParseResult.Err -> {
                     messages += ChatMessage(Role.User, result.buildMessage())
                     onParseError(result.messages, ChatExchange(llmInput, response))
                 }
             }
         }
-        return ChatResult(messages, null)
-    }
-
-    data class ChatResult(val messages: List<ChatMessage>, val changes: Changes?) {
-        fun changesMessage() = messages.last { it.role == Role.Assistant }
+        return EditFormatHandler.ChatResult(messages, null)
     }
 
     sealed interface ParseResult {
@@ -178,4 +177,15 @@ class EditFilesLlmWrapper(
             messages += ChatMessage(Role.System, prompt)
         }
     }
+
+    override fun buildGuardianFeedback(
+        guardianResult: GuardianExecutor.GuardianResult,
+        reviewMode: ReviewMode,
+    ): String = guardianResult.buildFeedbackForLlm(
+        responseInstruction = "Respond again with ONLY XML <EDITN> search/replace blocks. Do NOT include prose, markdown, or explanations.",
+        reviewModeInstruction = when (reviewMode) {
+            ReviewMode.PATCH -> "Patch the current working version from your previous changes."
+            ReviewMode.REPLACE -> "Regenerate the complete fixed file set from scratch against the original context."
+        },
+    )
 }
