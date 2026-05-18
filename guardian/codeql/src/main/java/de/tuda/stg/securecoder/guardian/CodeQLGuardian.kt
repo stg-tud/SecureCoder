@@ -9,7 +9,7 @@ class CodeQLGuardian(
     private val codeQlBinary: String = "codeql",
     private val defaultQueryPacksByLanguage: Map<String, String> = mapOf(
         "javascript" to "codeql/javascript-queries",
-        "python" to "codeql/python-queries",
+        "python" to "codeql/python-queries:codeql-suites/python-security-extended.qls",
         "java" to "codeql/java-queries",
         "cpp" to "codeql/cpp-queries",
         "csharp" to "codeql/csharp-queries",
