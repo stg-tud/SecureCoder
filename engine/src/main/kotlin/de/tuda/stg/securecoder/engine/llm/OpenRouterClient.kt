@@ -4,6 +4,7 @@ import de.tuda.stg.securecoder.engine.llm.ChatMessage.Role
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.java.Java
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.request.accept
 import io.ktor.client.request.header
 import io.ktor.client.request.post
@@ -34,6 +35,7 @@ class OpenRouterClient (
     private val model: String,
     private val siteName: String? = null,
     private val providerOrder: List<String> = emptyList(),
+    private val timeoutMs: Long = DEFAULT_TIMEOUT_MS,
 ) : LlmClient {
     private val apiKey: String = apiKey.also {
         require(it.isNotBlank()) { "OPENROUTER_KEY must be set and non-blank" }
@@ -46,6 +48,11 @@ class OpenRouterClient (
     }
     private val http = HttpClient(Java) {
         install(ContentNegotiation) { json(json) }
+        install(HttpTimeout) {
+            requestTimeoutMillis = timeoutMs
+            connectTimeoutMillis = timeoutMs
+            socketTimeoutMillis = timeoutMs
+        }
     }
     private val baseUrl = "https://openrouter.ai/api/v1"
     private val endpoint = "$baseUrl/chat/completions"
@@ -124,8 +131,8 @@ class OpenRouterClient (
             maxTokens = params.maxTokens,
             provider = providerPreferences(requireParameters = false),
         )
-        val obj = performRequest(req)
-        val content = obj.choices.firstOrNull()?.message?.content
+        val obj = performRequestExpectingTextualContent(req)
+        val content = obj.choices.firstNotNullOfOrNull { it.message.content?.takeIf(String::isNotBlank) }
             ?: throw LlmUpstreamException("OpenRouter returned no textual response content")
         return content
     }
@@ -156,8 +163,8 @@ class OpenRouterClient (
             responseFormat = responseFormat,
             provider = providerPreferences(requireParameters = true),
         )
-        val obj = performRequest(req)
-        val content = obj.choices.firstOrNull()?.message?.content
+        val obj = performRequestExpectingTextualContent(req)
+        val content = obj.choices.firstNotNullOfOrNull { it.message.content?.takeIf(String::isNotBlank) }
             ?: throw LlmUpstreamException("OpenRouter returned no textual response content")
         return try {
             json.decodeFromString(serializer, content)
@@ -201,5 +208,29 @@ class OpenRouterClient (
                 put("require_parameters", true)
             }
         }
+    }
+
+    private suspend fun performRequestExpectingTextualContent(
+        req: OpenRouterChatRequest,
+    ): OpenRouterChatResponse {
+        repeat(EMPTY_CONTENT_MAX_ATTEMPTS) { attempt ->
+            val response = performRequest(req)
+            if (response.choices.any { !it.message.content.isNullOrBlank() }) {
+                return response
+            }
+            if (attempt + 1 < EMPTY_CONTENT_MAX_ATTEMPTS) {
+                logger.warn(
+                    "OpenRouter returned no textual response content on attempt {} for model {}; retrying.",
+                    attempt + 1,
+                    model,
+                )
+            }
+        }
+        throw LlmUpstreamException("OpenRouter returned no textual response content")
+    }
+
+    companion object {
+        private const val DEFAULT_TIMEOUT_MS = 120_000L
+        private const val EMPTY_CONTENT_MAX_ATTEMPTS = 3
     }
 }
