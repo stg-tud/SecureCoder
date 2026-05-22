@@ -38,3 +38,14 @@ data class Usage(
     val completion_tokens: Int = 0,
     val total_tokens: Int = 0
 )
+
+@Serializable
+data class OpenAiErrorEnvelope(
+    val error: OpenAiErrorBody,
+)
+
+@Serializable
+data class OpenAiErrorBody(
+    val message: String,
+    val code: String,
+)
