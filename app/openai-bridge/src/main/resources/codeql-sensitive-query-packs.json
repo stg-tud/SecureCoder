@@ -1,0 +1,26 @@
+{
+  "python": [
+    "codeql/python-queries:codeql-suites/python-security-extended.qls"
+  ],
+  "javascript": [
+    "codeql/javascript-queries:codeql-suites/javascript-security-extended.qls"
+  ],
+  "go": [
+    "codeql/go-queries:codeql-suites/go-security-extended.qls"
+  ],
+  "cpp": [
+    "codeql/cpp-queries:codeql-suites/cpp-security-extended.qls"
+  ],
+  "java": [
+    "codeql/java-queries:codeql-suites/java-security-extended.qls"
+  ],
+  "csharp": [
+    "codeql/csharp-queries:codeql-suites/csharp-security-extended.qls"
+  ],
+  "ruby": [
+    "codeql/ruby-queries:codeql-suites/ruby-security-extended.qls"
+  ],
+  "swift": [
+    "codeql/swift-queries:codeql-suites/swift-security-extended.qls"
+  ]
+}
