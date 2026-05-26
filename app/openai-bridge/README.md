@@ -12,9 +12,18 @@ This module contains the HTTP server. It exposes a minimal OpenAI-style `POST /v
   - `OLLAMA_BASE_URL` — base URL to Ollama (default: 11434 on the host)
   - `OLLAMA_KEEP_ALIVE` — keep-alive duration (default: `5m`)
 
+The Docker image also includes the guardian toolchain used by the bridge:
+- `codeql`
+- `python3`
+- `node`
+- `gofmt`
+- `clang`
+- `clang++`
+
 ### Build and run
 Make sure you have Docker installed and are in the project root directory.
 ```
+JAVA_HOME=$(/usr/libexec/java_home -v 21) ./gradlew --no-configuration-cache :app:openai-bridge:installDist
 docker build -f app/openai-bridge/Dockerfile -t openai-bridge:latest .
 ```
 
@@ -38,6 +47,16 @@ Run using OpenRouter instead of Ollama:
 docker run --rm -p 8080:8080 \
   -e OPENROUTER_KEY=... \
   -e MODEL=openai/gpt-oss-20b \
+  openai-bridge:latest
+```
+
+Run with persistent workflow logs on the host:
+```
+docker run --rm -p 8080:8080 \
+  -e OPENROUTER_KEY=... \
+  -e MODEL=qwen/qwen3-coder \
+  -e PERSISTENT_CHAT_LOG_PATH=/logs/bridge-chat.jsonl \
+  -v "$(pwd)/.bench-runs/docker-bridge-logs:/logs" \
   openai-bridge:latest
 ```
 
