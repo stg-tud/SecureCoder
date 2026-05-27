@@ -1,0 +1,198 @@
+{
+  "tasks": [
+    {
+      "id": "textkit_csv_separator",
+      "task_family": "single-line replacement",
+      "project": "textkit",
+      "source_files": ["formatter.py"],
+      "prompt": "Update format_csv_row so it joins values with ';' instead of ','. Keep the rest of the module unchanged.",
+      "repair_prompt": "The behavior is correct. Now introduce a module-level constant named CSV_SEPARATOR with the value ';' and use that constant from format_csv_row. Do not modify slugify, build_preview, or build_profile_url.",
+      "verify_command": ["python3", "verify.py", "textkit_csv_separator"],
+      "allowed_changed_files": ["formatter.py"],
+      "max_changed_lines": 10,
+      "review_assertions": {
+        "must_contain": {
+          "formatter.py": ["CSV_SEPARATOR = \";\"", "return CSV_SEPARATOR.join(values)"]
+        }
+      }
+    },
+    {
+      "id": "textkit_preview_helper",
+      "task_family": "add a helper function and update call site",
+      "project": "textkit",
+      "source_files": ["formatter.py"],
+      "prompt": "Make build_preview collapse repeated internal whitespace before trimming and truncating. Add a helper function if needed.",
+      "repair_prompt": "Please add a dedicated helper named collapse_spaces and call it from build_preview instead of inlining the whitespace-normalization logic.",
+      "verify_command": ["python3", "verify.py", "textkit_preview_helper"],
+      "allowed_changed_files": ["formatter.py"],
+      "max_changed_lines": 18,
+      "review_assertions": {
+        "must_contain": {
+          "formatter.py": ["def collapse_spaces(", "cleaned = collapse_spaces("]
+        }
+      }
+    },
+    {
+      "id": "textkit_profile_url_quote",
+      "task_family": "insert imports / dependencies",
+      "project": "textkit",
+      "source_files": ["formatter.py"],
+      "prompt": "Make build_profile_url URL-encode the username using the Python standard library so spaces and slashes are escaped in the path segment.",
+      "repair_prompt": "Preserve the public function signature, but move the quoting into a helper named safe_path_segment and call that helper from build_profile_url.",
+      "verify_command": ["python3", "verify.py", "textkit_profile_url_quote"],
+      "allowed_changed_files": ["formatter.py"],
+      "max_changed_lines": 18,
+      "review_assertions": {
+        "must_contain": {
+          "formatter.py": ["from urllib.parse import quote", "def safe_path_segment(", "return f\"/users/{safe_path_segment(username)}\""]
+        }
+      }
+    },
+    {
+      "id": "orders_ignore_negative_quantity",
+      "task_family": "small local patch",
+      "project": "orders",
+      "source_files": ["pricing.py", "service.py"],
+      "prompt": "Update subtotal so items with a negative quantity are ignored instead of reducing the total.",
+      "repair_prompt": "Keep the public signatures unchanged, but extract the per-item calculation into a helper named _line_total and call that helper from subtotal.",
+      "verify_command": ["python3", "verify.py", "orders_ignore_negative_quantity"],
+      "allowed_changed_files": ["pricing.py"],
+      "max_changed_lines": 18,
+      "review_assertions": {
+        "must_contain": {
+          "pricing.py": ["def _line_total(", "total += _line_total(item)"]
+        }
+      }
+    },
+    {
+      "id": "orders_lowercase_discount_code",
+      "task_family": "multi-line patch with surrounding context",
+      "project": "orders",
+      "source_files": ["pricing.py", "service.py"],
+      "prompt": "Make apply_discount accept discount codes case-insensitively and ignore surrounding whitespace.",
+      "repair_prompt": "Keep the call sites untouched, but move the normalization into a helper named normalize_discount_code and call that helper from apply_discount.",
+      "verify_command": ["python3", "verify.py", "orders_lowercase_discount_code"],
+      "allowed_changed_files": ["pricing.py"],
+      "max_changed_lines": 18,
+      "review_assertions": {
+        "must_contain": {
+          "pricing.py": ["def normalize_discount_code(", "normalized = normalize_discount_code(code)"]
+        }
+      }
+    },
+    {
+      "id": "orders_format_total_helper",
+      "task_family": "edit across two files",
+      "project": "orders",
+      "source_files": ["pricing.py", "service.py"],
+      "prompt": "Add a helper named format_total to pricing.py that formats cents as a Euro string like '€12.34', and update quote_order to use it for the display field.",
+      "repair_prompt": "Keep the formatting logic in the new helper and only wire quote_order to that helper. Do not duplicate the formatting code in service.py.",
+      "verify_command": ["python3", "verify.py", "orders_format_total_helper"],
+      "allowed_changed_files": ["pricing.py", "service.py"],
+      "max_changed_lines": 18,
+      "review_assertions": {
+        "must_contain": {
+          "pricing.py": ["def format_total("],
+          "service.py": ["format_total(total)"]
+        }
+      }
+    },
+    {
+      "id": "catalog_inventory_badge",
+      "task_family": "edit across two files",
+      "project": "catalog",
+      "source_files": ["models.py", "view.py"],
+      "prompt": "Add a helper named inventory_badge in models.py that returns '[IN]' for in-stock items and '[OUT]' for sold-out items. Update render_card to include that badge before the product name.",
+      "repair_prompt": "Keep stock_label available for other callers and introduce the new helper only for the card rendering path.",
+      "verify_command": ["python3", "verify.py", "catalog_inventory_badge"],
+      "allowed_changed_files": ["models.py", "view.py"],
+      "max_changed_lines": 18,
+      "review_assertions": {
+        "must_contain": {
+          "models.py": ["def inventory_badge("],
+          "view.py": ["inventory_badge(count)"]
+        }
+      }
+    },
+    {
+      "id": "catalog_price_label_compact",
+      "task_family": "whole-function rewrite",
+      "project": "catalog",
+      "source_files": ["models.py", "view.py"],
+      "prompt": "Rewrite price_label so whole-euro values render without a decimal fraction, e.g. 1200 -> '€12', while other values still keep two decimals.",
+      "repair_prompt": "Preserve the function signature, keep the change inside price_label, and make the whole-euro branch use a local euros variable.",
+      "verify_command": ["python3", "verify.py", "catalog_price_label_compact"],
+      "allowed_changed_files": ["models.py"],
+      "max_changed_lines": 12,
+      "review_assertions": {
+        "must_contain": {
+          "models.py": ["euros = cents // 100"]
+        }
+      }
+    },
+    {
+      "id": "catalog_render_card_multiline",
+      "task_family": "fix a failing behavior described in text",
+      "project": "catalog",
+      "source_files": ["models.py", "view.py"],
+      "prompt": "Change render_card so the stock status appears on a second line instead of inside parentheses, while keeping the price on the first line.",
+      "repair_prompt": "Do not touch models.py. This is a rendering-only change in view.py, and the second line should come from a helper named render_status_line.",
+      "verify_command": ["python3", "verify.py", "catalog_render_card_multiline"],
+      "allowed_changed_files": ["view.py"],
+      "max_changed_lines": 16,
+      "review_assertions": {
+        "must_contain": {
+          "view.py": ["def render_status_line(", "render_status_line(count)"]
+        }
+      }
+    },
+    {
+      "id": "notifications_title_case_subject",
+      "task_family": "single-line replacement",
+      "project": "notifications",
+      "source_files": ["emailer.py"],
+      "prompt": "Update build_subject so it starts with 'Report: ' instead of 'report: '.",
+      "repair_prompt": "Keep the change local to build_subject, but introduce a SUBJECT_PREFIX constant and use it from the function.",
+      "verify_command": ["python3", "verify.py", "notifications_title_case_subject"],
+      "allowed_changed_files": ["emailer.py"],
+      "max_changed_lines": 10,
+      "review_assertions": {
+        "must_contain": {
+          "emailer.py": ["SUBJECT_PREFIX = \"Report: \"", "return f\"{SUBJECT_PREFIX}{report_name}\""]
+        }
+      }
+    },
+    {
+      "id": "notifications_trim_body_name",
+      "task_family": "small local patch",
+      "project": "notifications",
+      "source_files": ["emailer.py"],
+      "prompt": "Make build_body trim surrounding whitespace from user_name and title-case it before building the greeting.",
+      "repair_prompt": "Preserve the function signature, keep the change local to build_body, and store the cleaned display name in a local variable named display_name.",
+      "verify_command": ["python3", "verify.py", "notifications_trim_body_name"],
+      "allowed_changed_files": ["emailer.py"],
+      "max_changed_lines": 10,
+      "review_assertions": {
+        "must_contain": {
+          "emailer.py": ["display_name = user_name.strip().title()", "greeting = f\"hello {display_name}\""]
+        }
+      }
+    },
+    {
+      "id": "notifications_digest_bullets",
+      "task_family": "whole-function rewrite",
+      "project": "notifications",
+      "source_files": ["emailer.py"],
+      "prompt": "Rewrite render_digest so it returns one bullet per item using '- ' prefixes and returns 'No updates.' when the list is empty.",
+      "repair_prompt": "Please keep the render_digest function name and signature exactly as they are, and use an explicit early return for the empty-list case.",
+      "verify_command": ["python3", "verify.py", "notifications_digest_bullets"],
+      "allowed_changed_files": ["emailer.py"],
+      "max_changed_lines": 14,
+      "review_assertions": {
+        "must_contain": {
+          "emailer.py": ["if not items:", "return \"No updates.\""]
+        }
+      }
+    }
+  ]
+}

@@ -14,6 +14,7 @@ import de.tuda.stg.securecoder.engine.file.edit.ReviewMode
 import de.tuda.stg.securecoder.engine.llm.LlmClient
 import de.tuda.stg.securecoder.engine.llm.OllamaClient
 import de.tuda.stg.securecoder.engine.llm.OpenRouterClient
+import de.tuda.stg.securecoder.engine.llm.UsageCollectingLlmClient
 import de.tuda.stg.securecoder.engine.workflow.GuardianRetryPolicy
 import de.tuda.stg.securecoder.engine.workflow.SelfTestLoop
 import de.tuda.stg.securecoder.engine.workflow.WorkflowEngine
@@ -32,7 +33,12 @@ import kotlin.io.path.exists
 import kotlin.io.path.readText
 
 object EngineFactory {
-    fun fromEnvironment(): Engine {
+    data class Runtime(
+        val engine: Engine,
+        val usageClient: UsageCollectingLlmClient?,
+    )
+
+    fun fromEnvironment(): Runtime {
         val llmClient = createLlmClientFromEnvironment()
         val codeQlBinary = propOrEnv("CODEQL_BIN") ?: "codeql"
         val promptEnricher = if (boolPropOrEnv("ENABLE_HEURISTIC_PROMPT_ENRICHER", default = true)) {
@@ -81,7 +87,7 @@ object EngineFactory {
                 ?: 20L,
         )
         val traceLogger = createTraceLogger()
-        return WorkflowEngine(
+        val engine = WorkflowEngine(
             promptEnricher,
             llmClient,
             guardians,
@@ -90,6 +96,10 @@ object EngineFactory {
             guardianRetryPolicy = guardianRetryPolicy,
             selfTestLoop = selfTestLoop,
             traceLogger = traceLogger,
+        )
+        return Runtime(
+            engine = engine,
+            usageClient = llmClient as? UsageCollectingLlmClient,
         )
     }
 
@@ -164,7 +174,7 @@ object EngineFactory {
                     .withCustomQueryPacks(sensitiveQueryPackOverrides),
             )
         }
-        if (boolPropOrEnv("ENABLE_LLM_GUARDIAN", default = true)) {
+        if (boolPropOrEnv("ENABLE_LLM_GUARDIAN", default = false)) {
             guardians += LlmGuardian(llmClient)
         }
         return guardians

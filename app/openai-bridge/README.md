@@ -20,6 +20,8 @@ The Docker image also includes the guardian toolchain used by the bridge:
 - `clang`
 - `clang++`
 
+By default, the generic LLM guardian is disabled and the bridge relies on syntax guardians plus the base and sensitive CodeQL guardians. Re-enable the generic LLM guardian explicitly with `ENABLE_LLM_GUARDIAN=true` if you want that extra review layer.
+
 ### Build and run
 Make sure you have Docker installed and are in the project root directory.
 ```

@@ -10,8 +10,8 @@ import kotlinx.serialization.json.Json
 
 fun main() {
     val port = System.getenv("PORT")?.toIntOrNull() ?: 8080
-    val engine = EngineFactory.fromEnvironment()
-    val agentService = AgentService(engine)
+    val runtime = EngineFactory.fromEnvironment()
+    val agentService = AgentService(runtime.engine, runtime.usageClient)
     embeddedServer(Netty, port) {
         install(ContentNegotiation) {
             json(Json {

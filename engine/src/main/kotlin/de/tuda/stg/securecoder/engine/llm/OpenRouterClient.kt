@@ -16,6 +16,10 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 import io.ktor.serialization.kotlinx.json.json
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.withContext
+import kotlin.coroutines.AbstractCoroutineContextElement
+import kotlin.coroutines.CoroutineContext
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
@@ -36,7 +40,7 @@ class OpenRouterClient (
     private val siteName: String? = null,
     private val providerOrder: List<String> = emptyList(),
     private val timeoutMs: Long = DEFAULT_TIMEOUT_MS,
-) : LlmClient {
+) : UsageCollectingLlmClient {
     private val apiKey: String = apiKey.also {
         require(it.isNotBlank()) { "OPENROUTER_KEY must be set and non-blank" }
     }
@@ -56,6 +60,7 @@ class OpenRouterClient (
     }
     private val baseUrl = "https://openrouter.ai/api/v1"
     private val endpoint = "$baseUrl/chat/completions"
+    private val usageCollector = UsageCollector()
 
     @Serializable
     private data class OpenRouterMessage(val role: String, val content: String?)
@@ -76,7 +81,25 @@ class OpenRouterClient (
     private data class OpenRouterChoice(val index: Int, val message: OpenRouterMessage)
 
     @Serializable
-    private data class OpenRouterChatResponse(val choices: List<OpenRouterChoice>)
+    private data class OpenRouterUsage(
+        @SerialName("prompt_tokens") val promptTokens: Int = 0,
+        @SerialName("completion_tokens") val completionTokens: Int = 0,
+        @SerialName("total_tokens") val totalTokens: Int = 0,
+        val cost: Double? = null,
+    ) {
+        fun toUsageStats(): UsageStats = UsageStats(
+            promptTokens = promptTokens,
+            completionTokens = completionTokens,
+            totalTokens = totalTokens,
+            estimatedCost = cost,
+        )
+    }
+
+    @Serializable
+    private data class OpenRouterChatResponse(
+        val choices: List<OpenRouterChoice>,
+        val usage: OpenRouterUsage? = null,
+    )
 
     private fun mapMessages(messages: List<ChatMessage>): List<OpenRouterMessage> =
         messages.map {
@@ -132,6 +155,7 @@ class OpenRouterClient (
             provider = providerPreferences(requireParameters = false),
         )
         val obj = performRequestExpectingTextualContent(req)
+        currentUsageAccumulator()?.add(obj.usage?.toUsageStats())
         val content = obj.choices.firstNotNullOfOrNull { it.message.content?.takeIf(String::isNotBlank) }
             ?: throw LlmUpstreamException("OpenRouter returned no textual response content")
         return content
@@ -164,6 +188,7 @@ class OpenRouterClient (
             provider = providerPreferences(requireParameters = true),
         )
         val obj = performRequestExpectingTextualContent(req)
+        currentUsageAccumulator()?.add(obj.usage?.toUsageStats())
         val content = obj.choices.firstNotNullOfOrNull { it.message.content?.takeIf(String::isNotBlank) }
             ?: throw LlmUpstreamException("OpenRouter returned no textual response content")
         return try {
@@ -174,6 +199,9 @@ class OpenRouterClient (
     }
 
     override fun close() = http.close()
+
+    override suspend fun <T> collectUsage(block: suspend () -> T): Pair<T, UsageStats?> =
+        usageCollector.collect(block)
 
     private fun schemaName(serializer: KSerializer<*>): String {
         val rawName = serializer.descriptor.serialName
@@ -233,4 +261,31 @@ class OpenRouterClient (
         private const val DEFAULT_TIMEOUT_MS = 120_000L
         private const val EMPTY_CONTENT_MAX_ATTEMPTS = 3
     }
+
+    private class UsageAccumulator : AbstractCoroutineContextElement(Key) {
+        companion object Key : CoroutineContext.Key<UsageAccumulator>
+
+        var usage: UsageStats = UsageStats()
+            private set
+
+        fun add(delta: UsageStats?) {
+            if (delta != null) {
+                usage += delta
+            }
+        }
+    }
+
+    private class UsageCollector {
+        suspend fun <T> collect(block: suspend () -> T): Pair<T, UsageStats?> {
+            val accumulator = UsageAccumulator()
+            val result = withContext(accumulator) {
+                block()
+            }
+            val usage = accumulator.usage.takeUnless { it.isEmpty() }
+            return result to usage
+        }
+    }
+
+    private suspend fun currentUsageAccumulator(): UsageAccumulator? =
+        currentCoroutineContext()[UsageAccumulator]
 }

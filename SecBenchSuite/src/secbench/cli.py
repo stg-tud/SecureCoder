@@ -6,6 +6,7 @@ from pathlib import Path
 from rich.console import Console, Group
 from rich.panel import Panel
 from rich.live import Live
+from rich.text import Text
 
 # Text is available in rich.text but sometimes pylance complains if not installed in env
 # We can use simple strings or import inside function if needed, but let's try explicit import again
@@ -15,15 +16,25 @@ from rich.live import Live
 from secbench.config import Config
 from secbench.runners.generation import GenerationRunner
 from secbench.benchmarks.cweval import CWEvalBenchmark
+from secbench.benchmarks.editrepair import EditRepairBenchmark
 from secbench.benchmarks.seccodeplt import SecCodePLTBenchmark
+from secbench.benchmarks.securityeval import SecurityEvalBenchmark
 
 console = Console()
+
+
+def plain_lines(lines):
+    return [Text(str(line)) for line in lines[-20:]]
 
 
 async def run_generation(args, config: Config):
     api_key = config.openrouter_api_key or config.openai_api_key or "dummy"
 
-    runner = GenerationRunner(api_key=api_key, base_url=config.api_base_url)
+    runner = GenerationRunner(
+        api_key=api_key,
+        base_url=config.api_base_url,
+        provider_order=config.openrouter_providers,
+    )
 
     # Prepare output directory
     output_dir = Path(config.output_dir) / "generated_samples"
@@ -35,7 +46,7 @@ async def run_generation(args, config: Config):
 
     def generate_view():
         return Panel(
-            Group(*[line for line in output_lines[-20:]]),
+            Group(*plain_lines(output_lines)),
             title=f"Generating with {args.model}",
             border_style="green",
         )
@@ -67,7 +78,7 @@ async def run_cweval(args, config: Config):
 
     def generate_view():
         return Panel(
-            Group(*[line for line in output_lines[-20:]]),
+            Group(*plain_lines(output_lines)),
             title=f"Running CWEval with {args.model}",
             border_style="magenta",
         )
@@ -118,7 +129,7 @@ async def run_seccodeplt(args, config: Config):
 
     def generate_view():
         return Panel(
-            Group(*[line for line in output_lines[-20:]]),
+            Group(*plain_lines(output_lines)),
             title=f"Running SecCodePLT with {args.model}",
             border_style="cyan",
         )
@@ -133,6 +144,65 @@ async def run_seccodeplt(args, config: Config):
             n=args.n,
             temperature=args.temperature,
             output_callback=update_output,
+        )
+        live.update(generate_view())
+
+
+async def run_securityeval(args, config: Config):
+    bench_path = Path("Benchmarks/SecurityEval")
+    benchmark = SecurityEvalBenchmark(config, bench_path)
+    output_dir = Path(config.output_dir) / "securityeval"
+
+    output_lines = []
+
+    def generate_view():
+        return Panel(
+            Group(*plain_lines(output_lines)),
+            title=f"Running SecurityEval with {args.model}",
+            border_style="yellow",
+        )
+
+    def update_output(msg: str):
+        output_lines.append(msg)
+
+    with Live(generate_view(), refresh_per_second=10) as live:
+        await benchmark.run_pipeline(
+            model=args.model,
+            output_dir=output_dir,
+            n=args.n,
+            temperature=args.temperature,
+            output_callback=update_output,
+            limit=args.limit,
+            skip_eval=args.skip_eval,
+        )
+        live.update(generate_view())
+
+
+async def run_editrepair(args, config: Config):
+    bench_path = Path("Benchmarks/EditRepair")
+    benchmark = EditRepairBenchmark(config, bench_path)
+    output_dir = Path(config.output_dir) / "editrepair"
+
+    output_lines = []
+
+    def generate_view():
+        return Panel(
+            Group(*plain_lines(output_lines)),
+            title=f"Running EditRepair with {args.model}",
+            border_style="blue",
+        )
+
+    def update_output(msg: str):
+        output_lines.append(msg)
+
+    with Live(generate_view(), refresh_per_second=10) as live:
+        await benchmark.run_pipeline(
+            model=args.model,
+            output_dir=output_dir,
+            n=args.n,
+            temperature=args.temperature,
+            output_callback=update_output,
+            limit=args.limit,
         )
         live.update(generate_view())
 
@@ -180,7 +250,7 @@ def main():
     eval_parser = subparsers.add_parser("evaluate", help="Evaluate samples")
     eval_parser.add_argument(
         "--benchmark",
-        choices=["cweval", "seccodeplt"],
+        choices=["cweval", "seccodeplt", "securityeval", "editrepair"],
         default="cweval",
         help="Benchmark to run",
     )
@@ -197,6 +267,16 @@ def main():
         "--samples-dir",
         help="Directory containing generated samples for evaluation (skips generation)",
     )
+    eval_parser.add_argument(
+        "--limit",
+        type=int,
+        help="Limit number of benchmark prompts, useful for smoke tests",
+    )
+    eval_parser.add_argument(
+        "--skip-eval",
+        action="store_true",
+        help="Only generate outputs; skip analyzer evaluation",
+    )
 
     args = parser.parse_args()
 
@@ -209,6 +289,10 @@ def main():
             asyncio.run(run_cweval(args, config))
         elif args.benchmark == "seccodeplt":
             asyncio.run(run_seccodeplt(args, config))
+        elif args.benchmark == "securityeval":
+            asyncio.run(run_securityeval(args, config))
+        elif args.benchmark == "editrepair":
+            asyncio.run(run_editrepair(args, config))
         else:
             print("Evaluation not implemented yet.")
     else:

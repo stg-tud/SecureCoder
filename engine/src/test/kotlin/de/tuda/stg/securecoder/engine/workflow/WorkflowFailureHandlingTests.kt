@@ -551,6 +551,68 @@ class WorkflowFailureHandlingTests {
     }
 
     @Test
+    fun guardian_feedback_adds_cross_language_codeql_hints() {
+        val result = GuardianExecutor.GuardianResult(
+            violations = listOf(
+                Violation(
+                    rule = RuleRef(id = "js/server-side-request-forgery", name = "SSRF"),
+                    message = "User-controlled data reaches a request target.",
+                    location = Location(file = "server.js", startLine = 8),
+                ),
+                Violation(
+                    rule = RuleRef(id = "go/log-injection", name = "Log injection"),
+                    message = "Attacker-controlled data reaches logging.",
+                    location = Location(file = "app.go", startLine = 14),
+                ),
+                Violation(
+                    rule = RuleRef(id = "cpp/weak-crypto-key", name = "Weak crypto"),
+                    message = "The selected key size is too weak.",
+                    location = Location(file = "crypto.cpp", startLine = 21),
+                ),
+            ),
+            files = listOf(
+                File(
+                    "server.js",
+                    """
+                    function redirect(target) {
+                        return fetch(target);
+                    }
+                    """.trimIndent(),
+                ),
+                File(
+                    "app.go",
+                    """
+                    package main
+
+                    func writeLog(msg string) string {
+                        return msg
+                    }
+                    """.trimIndent(),
+                ),
+                File(
+                    "crypto.cpp",
+                    """
+                    #include <string>
+
+                    std::string encrypt(const std::string& input) {
+                        return input;
+                    }
+                    """.trimIndent(),
+                ),
+            ),
+        )
+
+        val feedback = result.buildFeedbackForLlm(
+            responseInstruction = "Respond with only edits.",
+            reviewModeInstruction = "Patch the current working version.",
+        )
+
+        assertTrue(feedback.contains("Map user input to fixed server-side destinations"))
+        assertTrue(feedback.contains("Do not log raw attacker-controlled strings"))
+        assertTrue(feedback.contains("upgrade the weak cryptography"))
+    }
+
+    @Test
     fun hard_reject_stops_immediately() {
         runBlocking {
             val engine = WorkflowEngine(

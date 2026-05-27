@@ -24,4 +24,23 @@ fun Route.openAIRoutes(agentService: AgentService) {
             }
         }
     }
+    route("/v1/agent/edit") {
+        post {
+            try {
+                val request = call.receive<AgentEditRequest>()
+                val response = agentService.generateEditResponse(request)
+                call.respond(response)
+            } catch (ex: OpenAiBridgeException) {
+                call.respond(
+                    ex.status,
+                    OpenAiErrorEnvelope(
+                        error = OpenAiErrorBody(
+                            message = ex.message,
+                            code = ex.code,
+                        )
+                    )
+                )
+            }
+        }
+    }
 }
