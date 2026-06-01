@@ -9,7 +9,7 @@ object EngineResultMapper {
                 mapper.createGenerationError()
             }
             is EngineResult.Failure.ValidationFailure -> {
-                mapper.createValidationError(result.maxGuardianRetries)
+                mapper.createValidationError(result.retryPolicy.hardLimit)
             }
             is EngineResult.Success -> null
         }

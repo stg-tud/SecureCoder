@@ -22,7 +22,7 @@ data class Violation(
     val rule: RuleRef,
     val message: String,
     val location: Location,
-    val hardReject: Boolean,
+    val hardReject: Boolean? = null,
     val confidence: String? = null,
     val raw: String? = null,
 )

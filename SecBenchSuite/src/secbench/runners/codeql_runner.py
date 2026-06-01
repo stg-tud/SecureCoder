@@ -1,6 +1,7 @@
 import asyncio
 import json
 import logging
+import os
 import shutil
 import subprocess
 from pathlib import Path
@@ -12,11 +13,33 @@ class CodeQLRunner:
     def __init__(self, codeql_path: str = "codeql"):
         self.codeql_path = codeql_path
 
+    def _subprocess_env(self) -> dict:
+        env = os.environ.copy()
+        path_entries = [
+            entry
+            for entry in env.get("PATH", "").split(os.pathsep)
+            if entry
+            and ".venv/bin" not in entry
+            and "Library/Application Support/uv/python" not in entry
+        ]
+        system_prefix = ["/usr/bin", "/bin", "/usr/sbin", "/sbin"]
+        env["PATH"] = os.pathsep.join(system_prefix + [entry for entry in path_entries if entry not in system_prefix])
+        env.pop("VIRTUAL_ENV", None)
+        env.pop("PYTHONPATH", None)
+        env.pop("PYTHONHOME", None)
+        return env
+
     async def check_available(self) -> bool:
         """Check if codeql is available."""
         return shutil.which(self.codeql_path) is not None
 
-    async def create_database(self, source_root: Path, db_path: Path, language: str) -> bool:
+    async def create_database(
+        self,
+        source_root: Path,
+        db_path: Path,
+        language: str,
+        build_command: Optional[str] = None,
+    ) -> bool:
         """Create CodeQL database."""
         if db_path.exists():
             shutil.rmtree(db_path)
@@ -30,9 +53,14 @@ class CodeQLRunner:
             f"--source-root={str(source_root)}",
             "--overwrite"
         ]
+        if build_command:
+            cmd.append(f"--command={build_command}")
         
         process = await asyncio.create_subprocess_exec(
-            *cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
+            *cmd,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+            env=self._subprocess_env(),
         )
         stdout, stderr = await process.communicate()
         
@@ -63,7 +91,10 @@ class CodeQLRunner:
         logger.info(f"Running CodeQL analysis: {' '.join(cmd)}")
         
         process = await asyncio.create_subprocess_exec(
-            *cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
+            *cmd,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+            env=self._subprocess_env(),
         )
         stdout, stderr = await process.communicate()
         

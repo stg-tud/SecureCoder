@@ -32,8 +32,8 @@ data class LlmAnalyzeResponse(
         @LLMDescription("Line number where the issue starts, null if not applicable")
         val line: Int? = null,
 
-        @LLMDescription("Indicates whether this finding make it impossible to apply the changes even with manuel approval")
-        val hardReject: Boolean,
+        @LLMDescription("Set to true only when the candidate should be rejected immediately. Use false or null for findings that should remain repairable through retries.")
+        val hardReject: Boolean? = null,
 
         @LLMDescription("The estimated likelihood that this finding is a true positive (e.g., High, Medium, Low)")
         val confidence: String?

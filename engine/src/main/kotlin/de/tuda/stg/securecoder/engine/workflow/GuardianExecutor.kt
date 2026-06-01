@@ -1,8 +1,10 @@
 package de.tuda.stg.securecoder.engine.workflow
 
 import de.tuda.stg.securecoder.engine.file.edit.ApplyChanges
+import de.tuda.stg.securecoder.engine.file.edit.ApplyChanges.applyEdits
 import de.tuda.stg.securecoder.engine.file.edit.Changes
 import de.tuda.stg.securecoder.filesystem.FileSystem
+import de.tuda.stg.securecoder.filesystem.InMemoryFileSystem
 import de.tuda.stg.securecoder.guardian.AnalyzeRequest
 import de.tuda.stg.securecoder.guardian.File
 import de.tuda.stg.securecoder.guardian.Guardian
@@ -12,6 +14,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.toList
 import kotlin.collections.map
 
 class GuardianExecutor (
@@ -24,6 +27,7 @@ class GuardianExecutor (
         val failures: List<GuardianFailure> = emptyList(),
     ) {
         fun hasNoViolations() = violations.isEmpty()
+        fun hasBlockingHardReject() = violations.any { it.hardReject == true }
     }
 
     data class GuardianFailure(
@@ -38,7 +42,17 @@ class GuardianExecutor (
             { fileSystem.getFile(it)?.content() },
             { file, content -> files.add(File(file, content)) }
         )
-        return execute(AnalyzeRequest(fileSystem, files))
+        val updatedFileSystem = snapshot(fileSystem)
+        updatedFileSystem.applyEdits(changes.searchReplaces)
+        return execute(AnalyzeRequest(updatedFileSystem, files))
+    }
+
+    private suspend fun snapshot(fileSystem: FileSystem): InMemoryFileSystem {
+        val copy = InMemoryFileSystem()
+        fileSystem.allFiles().toList().forEach { file ->
+            copy.upsert(file.name(), file.content())
+        }
+        return copy
     }
 
     private suspend fun execute(request: AnalyzeRequest): GuardianResult = coroutineScope {

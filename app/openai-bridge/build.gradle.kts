@@ -12,6 +12,8 @@ dependencies {
     implementation(libs.ktor.serialization.json)
     implementation(libs.ktor.server.content.negotiation)
     runtimeOnly(libs.logback)
+    testImplementation(kotlin("test"))
+    testImplementation(libs.kotlinx.coroutines.core)
 }
 
 application {

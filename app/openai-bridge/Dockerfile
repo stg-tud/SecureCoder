@@ -1,16 +1,17 @@
-FROM eclipse-temurin:21-jdk AS builder
-WORKDIR /work
-
-COPY . .
-
-RUN chmod +x ./gradlew && ./gradlew --no-daemon :app:openai-bridge:installDist -x test
-
-FROM eclipse-temurin:21-jdk
+FROM eclipse-temurin:21-jdk-jammy
 ENV DEBIAN_FRONTEND=noninteractive
 WORKDIR /opt
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends curl ca-certificates unzip \
+    && apt-get install -y --no-install-recommends \
+        ca-certificates \
+        clang \
+        curl \
+        g++ \
+        golang-go \
+        nodejs \
+        python3 \
+        unzip \
     && rm -rf /var/lib/apt/lists/*
 
 ENV CODEQL_VERSION=2.16.6
@@ -20,8 +21,14 @@ RUN mkdir -p /opt/codeql \
  && tar -xzf /tmp/codeql.tgz -C /opt/codeql --strip-components=1 \
  && rm /tmp/codeql.tgz
 ENV PATH="/opt/codeql:${PATH}"
+ENV CODEQL_BIN="/opt/codeql/codeql"
+ENV PYTHON_BIN="python3"
+ENV NODE_BIN="node"
+ENV GOFMT_BIN="gofmt"
+ENV CLANG_BIN="clang"
+ENV CLANGXX_BIN="clang++"
 
-COPY --from=builder /work/app/openai-bridge/build/install/openai-bridge /opt/openai-bridge
+COPY app/openai-bridge/build/install/openai-bridge /opt/openai-bridge
 
 ENV PORT="8080"
 ENV OLLAMA_BASE_URL="http://host.docker.internal:11434"

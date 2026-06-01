@@ -14,6 +14,7 @@ class BaseBenchmark:
         self.generation_runner = GenerationRunner(
             api_key=config.openrouter_api_key or config.openai_api_key or "dummy",
             base_url=config.api_base_url,
+            provider_order=config.openrouter_providers,
         )
 
     async def generate_samples(
@@ -51,12 +52,13 @@ class BaseBenchmark:
             for j in range(n):
                 log(f"Generating sample {j+1}/{n} for prompt {prompt_id}...")
                 try:
-                    content = await self.generation_runner.generate_one(
+                    result = await self.generation_runner.generate_one_with_metadata(
                         model=model,
                         prompt=prompt_text,
                         system_prompt=self.config.system_prompt,
                         temperature=temperature,
                     )
+                    content = result["content"]
                     results.append(
                         {
                             "id": prompt_id,
@@ -65,6 +67,7 @@ class BaseBenchmark:
                             "sample_index": j,
                             "model": model,
                             "metadata": item.get("metadata", {}),
+                            "usage": result.get("usage"),
                         }
                     )
                 except Exception as e:

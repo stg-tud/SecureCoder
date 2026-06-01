@@ -19,7 +19,7 @@ object FileSystemToDiskWriter {
         for (file in files) {
             val p = Path.of(file.name()).normalize()
             val comps = p.iterator().asSequence().map { it.toString() }.toList()
-            val relComps = comps.drop(commonPrefix.size)
+            val relComps = comps.drop(commonPrefix.size).ifEmpty { listOf(p.fileName.toString()) }
             val target = relComps.fold(tmpDir) { acc, segment -> acc.resolve(segment) }
 
             val parent = target.parent

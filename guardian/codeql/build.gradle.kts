@@ -5,4 +5,5 @@ plugins {
 dependencies {
     implementation(project(":guardian:api"))
     implementation(libs.kotlinx.serialization.json)
+    testImplementation(kotlin("test"))
 }
